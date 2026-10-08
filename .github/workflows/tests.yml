@@ -42,3 +42,11 @@ jobs:
 
       - name: Run CI Checks
         run: composer ci:check
+
+      # Click-through of every lesson in /dev/playground. Uses the Google Chrome
+      # preinstalled on the runner (playwright.config.ts: channel 'chrome'); assets
+      # come from the `npm run build` done by composer setup.
+      - name: E2E (Playwright)
+        run: |
+          php artisan config:clear
+          npm run test:e2e
