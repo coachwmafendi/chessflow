@@ -6,6 +6,7 @@ Senarai semak untuk MIGRATION_PLAN §8. Langkah bertanda **[awak]** dibuat dalam
 
 - Project `chessflow` → resource baharu daripada repo GitHub `coachwmafendi/chessflow`, branch `main`.
 - Build pack **Nixpacks** (Laravel dikesan automatik; `npm ci && npm run build` dijalankan kerana ada `package.json`).
+- **PHP 8.4** diperlukan (Symfony 8 dalam `composer.lock`). Nixpacks membaca `"php": "^8.4"` daripada `composer.json`; jika imej memilih versi lain, tetapkan `NIXPACKS_PHP_VERSION=8.4`.
 - Database: resource **PostgreSQL** berasingan dalam project yang sama (suite ujian sudah lulus pada Postgres 17). MySQL juga boleh.
 - Had sumber permulaan: app 1 vCPU / 768 MB, DB 512 MB.
 - Health check: `/up`.
