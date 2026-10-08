@@ -1,4 +1,4 @@
-import type { BoardApi, Lesson, LessonResult, StepContext } from '../types';
+import type { BoardApi, Lesson, LessonResult, ServerLessonResult, StepContext } from '../types';
 import { createBoard } from '../core/board';
 import { SFX } from '../core/sound';
 import { runStep } from '../steps';
@@ -24,6 +24,15 @@ interface Els {
 export interface LessonRunnerHandlers {
     complete?: (result: LessonResult) => void;
 }
+
+const FLAME_SVG =
+    '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2s5 4.5 5 10a5 5 0 0 1-10 0c0-2.4 1.3-4.2 2.4-5.2.2 1.8 1.1 3 2.3 3.4C11 7.6 12 2 12 2zm0 12.5c-1.1.9-1.6 1.8-1.6 2.7a1.6 1.6 0 0 0 3.2 0c0-.9-.5-1.8-1.6-2.7z"/></svg>';
+
+const escapeHtml = (s: string): string =>
+    s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c] as string);
+
+const link = (href: string, label: string, cls: string): string =>
+    '<a class="' + cls + '" href="' + escapeHtml(href) + '">' + escapeHtml(label) + '</a>';
 
 const starsHtml = (n: number): string =>
     [0, 1, 2].map((i) => '<i class="star-ico' + (i < n ? '' : ' off') + '"></i>').join('');
@@ -197,6 +206,12 @@ export class LessonRunner {
         SFX.win();
         const durationMs = Date.now() - this.startedAt;
 
+        if (this.lesson.daily) {
+            this.showDailyModal();
+            this.handlers.complete?.({ slug: this.lesson.id, mistakes: this.mistakes, failedSteps: [], durationMs });
+            return;
+        }
+
         if (this.lesson.exam) {
             const q = this.lesson.steps.length;
             const score = q - this.failed.size;
@@ -214,6 +229,51 @@ export class LessonRunner {
         const stars = this.mistakes <= 1 ? 3 : this.mistakes <= 4 ? 2 : 1;
         this.showLessonModal(stars);
         this.handlers.complete?.({ slug: this.lesson.id, mistakes: this.mistakes, failedSteps: [], durationMs });
+    }
+
+    /**
+     * Adds the server's verdict (XP, streak, next lesson, certificate) to the finish modal.
+     * Stars/score shown before this are the client's own count; XP only ever comes from here.
+     */
+    showResult(r: ServerLessonResult): void {
+        const card = this.els.modal.querySelector('.card');
+        if (!card) return;
+
+        if (this.lesson.daily && r.streak) {
+            const h = card.querySelector('h2');
+            if (h) h.textContent = r.streak + ' hari berturut-turut!';
+        }
+
+        card.querySelector('.xp')?.remove();
+        card.querySelector('.actions')?.remove();
+
+        if (r.xp > 0) card.insertAdjacentHTML('beforeend', '<div class="xp">+' + r.xp + ' XP</div>');
+        else if (this.lesson.daily) card.insertAdjacentHTML('beforeend', '<p>XP teka-teki hari ini sudah dikutip.</p>');
+
+        const links: string[] = [];
+        if (r.certificateUrl) links.push(link(r.certificateUrl, 'Lihat sijil', 'cta'));
+        if (r.retryUrl) links.push(link(r.retryUrl, 'Cuba lagi', 'cta'));
+        if (r.next) links.push(link(r.next.url, 'Seterusnya: ' + r.next.title, r.certificateUrl ? 'ghost' : 'cta'));
+        if (r.mapUrl) links.push(link(r.mapUrl, 'Ke peta', 'ghost'));
+        if (links.length) {
+            card.insertAdjacentHTML('beforeend', '<div class="actions" style="justify-content:center">' + links.join('') + '</div>');
+            card.querySelector<HTMLElement>('.actions a')?.focus();
+        }
+
+        if (typeof r.totalXp === 'number') {
+            document.querySelectorAll('[data-stat="xp"]').forEach((el) => (el.textContent = String(r.totalXp)));
+        }
+        if (typeof r.totalStars === 'number') {
+            document.querySelectorAll('[data-stat="stars"]').forEach((el) => (el.textContent = String(r.totalStars)));
+        }
+    }
+
+    private showDailyModal(): void {
+        this.els.modal.hidden = false;
+        this.els.modal.innerHTML =
+            '<div class="card" role="dialog" aria-modal="true"><span class="qico flame big">' +
+            FLAME_SVG +
+            '</span><h2>Teka-teki selesai!</h2><p>Teka-teki hari ini selesai. Datang lagi esok untuk teka-teki baharu.</p></div>';
     }
 
     private showLessonModal(stars: number): void {
@@ -249,6 +309,6 @@ export class LessonRunner {
               q +
               '</b>. Perlu sekurang-kurangnya ' +
               need +
-              ' untuk lulus.</p></div>';
+              ' untuk lulus. Ulang kaji pelajaran tahap ini dan cuba lagi.</p></div>';
     }
 }

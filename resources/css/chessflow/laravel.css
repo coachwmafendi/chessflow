@@ -1,0 +1,21 @@
+/* Additions for the Laravel app: prototype buttons rendered as links, forms, certificate page. */
+:where(a.cta, a.ghost, a.node, a.qcard, a.pill, a.logo) { text-decoration: none; color: inherit; }
+a.cta, a.ghost { display: inline-flex; align-items: center; justify-content: center; }
+.top form { display: contents; }
+
+.auth-card { max-width: 420px; margin: 32px auto; background: var(--surface); border: 1px solid var(--line); border-radius: 24px; padding: 24px; }
+.auth-card h1 { margin-bottom: 8px; }
+.auth-card label { display: block; font-weight: 600; margin-top: 14px; }
+.auth-card input { width: 100%; margin-top: 6px; padding: 10px 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--bg); color: var(--ink); font: inherit; }
+.auth-card .cta { width: 100%; margin-top: 20px; }
+.auth-card .err { color: var(--coral); font-size: 14px; margin-top: 6px; }
+.auth-card .alt { margin-top: 16px; font-size: 14px; text-align: center; }
+
+.cert-page { max-width: 640px; margin: 24px auto; }
+.cert-page .verify { margin-top: 16px; font-size: 14px; text-align: center; color: var(--muted); }
+.cert-page form { display: flex; gap: 8px; justify-content: center; margin-top: 12px; }
+
+@media print {
+    .top, .foot, .no-print { display: none !important; }
+    body { background: #fff; }
+}

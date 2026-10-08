@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\Role;
+use App\Support\Chessflow;
 use Database\Factories\UserFactory;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -61,6 +62,19 @@ class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
             'streak_last_date' => 'date',
             'preferences' => 'array',
         ];
+    }
+
+    /** Streak shown to the user: it lapses once a whole day is missed. */
+    public function currentStreak(): int
+    {
+        $last = $this->streak_last_date?->toDateString();
+
+        return in_array($last, [Chessflow::today(), Chessflow::yesterday()], true) ? $this->streak_current : 0;
+    }
+
+    public function totalStars(): int
+    {
+        return (int) $this->lessonProgress()->sum('best_stars');
     }
 
     public function isStaff(): bool
@@ -151,6 +165,12 @@ class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
     /**
      * Get the user's initials
      */
+    public function hasVerifiedEmail(): bool
+    {
+        // Students sign in with username + PIN and have no email to verify.
+        return $this->email === null || parent::hasVerifiedEmail();
+    }
+
     public function initials(): string
     {
         $initials = Str::initials($this->name, true);

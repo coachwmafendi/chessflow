@@ -126,7 +126,8 @@ export interface Lesson {
     title: string;
     icon: string;
     exam?: boolean;
-    tip?: string;
+    daily?: boolean;
+    tip?: string | null;
     steps: Step[];
     position?: number;
     xp?: number;
@@ -149,6 +150,20 @@ export interface LessonResult {
     mistakes: number;
     failedSteps: number[];
     durationMs: number;
+}
+
+// What the server sends back (Livewire `lesson-result`) after it has recorded a finished lesson.
+export interface ServerLessonResult {
+    xp: number;
+    passed: boolean;
+    stars?: number;
+    streak?: number;
+    totalXp?: number;
+    totalStars?: number;
+    mapUrl?: string;
+    next?: { url: string; title: string } | null;
+    certificateUrl?: string | null;
+    retryUrl?: string | null;
 }
 
 // Context handed to each step-type runner by LessonRunner.

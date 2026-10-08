@@ -17,6 +17,12 @@ export default defineConfig({
                 bunny('Instrument Sans', {
                     weights: [400, 500, 600],
                 }),
+                bunny('Baloo 2', {
+                    weights: [600, 700, 800],
+                }),
+                bunny('Lexend', {
+                    weights: [400, 500, 600],
+                }),
             ],
         }),
         tailwindcss(),

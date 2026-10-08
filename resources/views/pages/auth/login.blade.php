@@ -55,5 +55,10 @@
             <span>{{ __('Don\'t have an account?') }}</span>
             <flux:link :href="route('register')" wire:navigate>{{ __('Sign up') }}</flux:link>
         </div>
+
+        <div class="text-sm text-center text-zinc-600 dark:text-zinc-400">
+            <span>Murid?</span>
+            <flux:link :href="route('murid.login')">Masuk dengan nama pengguna dan PIN</flux:link>
+        </div>
     </div>
 </x-layouts::auth>
