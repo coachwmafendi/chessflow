@@ -2,7 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 
-Route::view('/', 'welcome')->name('home');
+Route::livewire('/', 'pages::utama')->name('home');
+Route::livewire('tentang', 'pages::tentang')->name('tentang');
 
 Route::livewire('masuk-murid', 'pages::masuk-murid')->middleware('guest')->name('murid.login');
 Route::livewire('sijil/{code}', 'pages::sijil')->name('sijil');

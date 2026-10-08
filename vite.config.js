@@ -8,6 +8,7 @@ export default defineConfig({
         laravel({
             input: [
                 'resources/css/app.css',
+                'resources/css/chessflow.css',
                 'resources/js/app.js',
                 'resources/js/passkeys.js',
                 'resources/ts/app.ts',

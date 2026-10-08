@@ -23,6 +23,15 @@ return [
         'rewarded_wins_per_day' => 10,
     ],
 
+    // Results are reported by the browser, so the server limits how often they count.
+    'limits' => [
+        'lessons_per_minute' => 6,
+        'daily_per_minute' => 5,
+        'games_per_minute' => 6,
+        // A lesson finished faster than this (per step) is not recorded.
+        'min_seconds_per_step' => 2,
+    ],
+
     'student_login' => [
         'max_attempts_per_minute' => 5,
     ],

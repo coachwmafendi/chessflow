@@ -4,6 +4,7 @@ use App\Actions\CompleteLesson;
 use App\Actions\SubmitExam;
 use App\Models\Lesson;
 use App\Support\Curriculum;
+use App\Support\ProgressGuard;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\On;
 use Livewire\Component;
@@ -11,10 +12,14 @@ use Livewire\Component;
 new #[Layout('layouts::chessflow')] class extends Component {
     public Lesson $lesson;
 
+    /** Server time the lesson was opened (Livewire checksums public state, so the browser can't change it). */
+    public int $startedAt = 0;
+
     public function mount(Lesson $lesson): void
     {
         $this->authorize('view', $lesson);
         $this->lesson = $lesson;
+        $this->startedAt = now()->getTimestamp();
     }
 
     /**
@@ -28,6 +33,14 @@ new #[Layout('layouts::chessflow')] class extends Component {
     {
         $this->authorize('view', $this->lesson);
         $user = auth()->user();
+
+        $minSeconds = count($this->lesson->steps) * (int) config('chessflow.limits.min_seconds_per_step');
+        if (now()->getTimestamp() - $this->startedAt < $minSeconds || ! ProgressGuard::allow($user, 'lessons')) {
+            $this->dispatch('lesson-result', xp: 0, passed: false, message: ProgressGuard::TOO_FAST, mapUrl: route('peta'));
+
+            return;
+        }
+
         $next = app(Curriculum::class)->next($this->lesson);
 
         if ($this->lesson->isExam()) {

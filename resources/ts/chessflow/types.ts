@@ -164,6 +164,8 @@ export interface ServerLessonResult {
     next?: { url: string; title: string } | null;
     certificateUrl?: string | null;
     retryUrl?: string | null;
+    // Set when the server refused to record the result (rate limit / too fast).
+    message?: string;
 }
 
 // Context handed to each step-type runner by LessonRunner.

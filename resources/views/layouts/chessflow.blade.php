@@ -10,12 +10,12 @@
         <title>{{ isset($title) ? $title.' · ChessFlow' : 'ChessFlow' }}</title>
         <link rel="icon" href="/favicon.svg" type="image/svg+xml">
         @fonts
-        @vite(['resources/css/app.css', 'resources/ts/app.ts'])
+        @vite(['resources/css/chessflow.css', 'resources/ts/app.ts'])
     </head>
     <body>
         <div class="app">
             <header class="top">
-                <a class="logo" href="{{ $user ? route('peta') : url('/') }}" aria-label="ChessFlow, ke peta">
+                <a class="logo" href="{{ $user ? route('peta') : route('home') }}" aria-label="ChessFlow, ke peta">
                     <span class="mark"><i class="pc wN"></i></span><b>Chess<span>Flow</span></b>
                 </a>
                 <div class="stats">
@@ -49,6 +49,7 @@
 
             <footer class="foot">
                 <span>ChessFlow · Belajar catur dalam Bahasa Melayu untuk kanak-kanak dan pemula</span>
+                <span class="foot-r"><a href="{{ route('tentang') }}">Tentang, privasi dan lesen</a></span>
             </footer>
         </div>
     </body>

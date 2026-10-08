@@ -2,6 +2,7 @@
 
 use App\Actions\RecordGame;
 use App\Enums\GameResult;
+use App\Support\ProgressGuard;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Title;
@@ -17,6 +18,10 @@ new #[Layout('layouts::chessflow')] #[Title('Main lawan Pak Kuda')] class extend
         }
 
         $user = auth()->user();
+        if (! ProgressGuard::allow($user, 'games')) {
+            return;
+        }
+
         $r = app(RecordGame::class)->handle($user, $userColor, $level, $gameResult, $pgn, $moveCount);
 
         $this->dispatch('game-result', xp: $r['xp'], wins: $r['wins'], totalXp: $user->fresh()->xp);

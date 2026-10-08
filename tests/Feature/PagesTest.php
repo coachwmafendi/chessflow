@@ -32,9 +32,9 @@ it('blocks locked lessons', function () {
 it('completes a lesson through the Livewire bridge and unlocks the next one', function () {
     $papan = Lesson::where('slug', 'papan')->first();
 
-    Livewire::actingAs($this->student)
-        ->test('pages::pelajaran', ['lesson' => $papan])
-        ->dispatch('lesson-completed', slug: 'papan', mistakes: 0, failedSteps: [], durationMs: 1000, xp: 99999)
+    $page = Livewire::actingAs($this->student)->test('pages::pelajaran', ['lesson' => $papan]);
+    $this->travel(2)->minutes();
+    $page->dispatch('lesson-completed', slug: 'papan', mistakes: 0, failedSteps: [], durationMs: 1000, xp: 99999)
         ->assertDispatched('lesson-result', fn (string $name, array $p) => $p['xp'] === $papan->xp
             && $p['stars'] === 3
             && $p['next']['url'] === route('pelajaran', 'kuda'));
@@ -47,9 +47,9 @@ it('issues a certificate for a passed level exam', function () {
     $teacherOpened = User::factory()->teacher()->create();
     $exam = Lesson::where('slug', 'ujian1')->first();
 
-    Livewire::actingAs($teacherOpened)
-        ->test('pages::pelajaran', ['lesson' => $exam])
-        ->dispatch('lesson-completed', slug: 'ujian1', mistakes: 0, failedSteps: [0])
+    $page = Livewire::actingAs($teacherOpened)->test('pages::pelajaran', ['lesson' => $exam]);
+    $this->travel(2)->minutes();
+    $page->dispatch('lesson-completed', slug: 'ujian1', mistakes: 0, failedSteps: [0])
         ->assertDispatched('lesson-result', fn (string $name, array $p) => $p['passed'] === true && str_contains((string) $p['certificateUrl'], '/sijil/'));
 
     $certificate = Certificate::firstOrFail();
@@ -58,9 +58,9 @@ it('issues a certificate for a passed level exam', function () {
 
 it('lets only the owner rename a certificate', function () {
     $owner = User::factory()->teacher()->create();
-    Livewire::actingAs($owner)
-        ->test('pages::pelajaran', ['lesson' => Lesson::where('slug', 'ujian1')->first()])
-        ->dispatch('lesson-completed', failedSteps: []);
+    $page = Livewire::actingAs($owner)->test('pages::pelajaran', ['lesson' => Lesson::where('slug', 'ujian1')->first()]);
+    $this->travel(2)->minutes();
+    $page->dispatch('lesson-completed', failedSteps: []);
     $code = Certificate::firstOrFail()->code;
 
     Livewire::actingAs($owner)->test('pages::sijil', ['code' => $code])
@@ -73,6 +73,30 @@ it('lets only the owner rename a certificate', function () {
         ->set('displayName', 'Bukan Aina')
         ->call('saveName')
         ->assertForbidden();
+});
+
+it('does not record a lesson finished impossibly fast', function () {
+    $papan = Lesson::where('slug', 'papan')->first();
+
+    Livewire::actingAs($this->student)->test('pages::pelajaran', ['lesson' => $papan])
+        ->dispatch('lesson-completed', slug: 'papan', mistakes: 0)
+        ->assertDispatched('lesson-result', fn (string $name, array $p) => $p['xp'] === 0 && isset($p['message']));
+
+    expect($this->student->fresh()->xp)->toBe(0)
+        ->and($this->student->lessonProgress()->count())->toBe(0);
+});
+
+it('rate limits lesson completions per user', function () {
+    config(['chessflow.limits.lessons_per_minute' => 2]);
+    $papan = Lesson::where('slug', 'papan')->first();
+
+    $page = Livewire::actingAs($this->student)->test('pages::pelajaran', ['lesson' => $papan]);
+    $this->travel(2)->minutes();
+    foreach (range(1, 3) as $i) {
+        $page->dispatch('lesson-completed', slug: 'papan', mistakes: 0);
+    }
+
+    expect($this->student->lessonProgress()->first()->attempts)->toBe(2);
 });
 
 it('records the daily puzzle and the game through their pages', function () {

@@ -4,6 +4,7 @@ use App\Actions\CompleteDaily;
 use App\Actions\PickDailyPuzzle;
 use App\Models\DailyPuzzle;
 use App\Support\Chessflow;
+use App\Support\ProgressGuard;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Title;
@@ -22,6 +23,12 @@ new #[Layout('layouts::chessflow')] #[Title('Teka-teki Harian')] class extends C
     public function complete(): void
     {
         $user = auth()->user();
+        if (! ProgressGuard::allow($user, 'daily')) {
+            $this->dispatch('lesson-result', xp: 0, passed: false, message: ProgressGuard::TOO_FAST, mapUrl: route('peta'));
+
+            return;
+        }
+
         $r = app(CompleteDaily::class)->handle($user);
 
         $this->dispatch('lesson-result', ...[

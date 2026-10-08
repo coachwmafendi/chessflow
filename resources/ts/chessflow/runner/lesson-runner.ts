@@ -246,9 +246,14 @@ export class LessonRunner {
 
         card.querySelector('.xp')?.remove();
         card.querySelector('.actions')?.remove();
+        card.querySelector('.server-msg')?.remove();
+
+        if (r.message) {
+            card.insertAdjacentHTML('beforeend', '<p class="status bad server-msg">' + escapeHtml(r.message) + '</p>');
+        }
 
         if (r.xp > 0) card.insertAdjacentHTML('beforeend', '<div class="xp">+' + r.xp + ' XP</div>');
-        else if (this.lesson.daily) card.insertAdjacentHTML('beforeend', '<p>XP teka-teki hari ini sudah dikutip.</p>');
+        else if (this.lesson.daily && !r.message) card.insertAdjacentHTML('beforeend', '<p>XP teka-teki hari ini sudah dikutip.</p>');
 
         const links: string[] = [];
         if (r.certificateUrl) links.push(link(r.certificateUrl, 'Lihat sijil', 'cta'));

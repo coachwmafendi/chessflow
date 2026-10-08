@@ -1,9 +1,5 @@
 @import 'tailwindcss';
 @import '../../vendor/livewire/flux/dist/flux.css';
-@import './chessflow/base.css';
-@import './chessflow/extra.css';
-@import './chessflow/pieces.css';
-@import './chessflow/laravel.css';
 
 @source '../views';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';

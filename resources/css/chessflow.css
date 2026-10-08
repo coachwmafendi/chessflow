@@ -1,0 +1,6 @@
+/* ChessFlow pages (layouts/chessflow, layouts/playground): prototype styles only, no Tailwind/Flux.
+   Kept separate from app.css so the prototype's global body/button rules don't leak into Flux pages. */
+@import './chessflow/base.css';
+@import './chessflow/extra.css';
+@import './chessflow/pieces.css';
+@import './chessflow/laravel.css';
