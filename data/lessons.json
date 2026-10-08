@@ -1,0 +1,3018 @@
+{
+ "levels": [
+  {
+   "n": 1,
+   "name": "Kenal Catur",
+   "note": "Papan, buah dan peraturan asas"
+  },
+  {
+   "n": 2,
+   "name": "Main Dengan Betul",
+   "note": "Notasi, pembukaan dan mate asas"
+  },
+  {
+   "n": 3,
+   "name": "Taktik",
+   "note": "Helah untuk menang buah"
+  },
+  {
+   "n": 4,
+   "name": "Strategi",
+   "note": "Rancang permainan tengah"
+  },
+  {
+   "n": 5,
+   "name": "Endgame",
+   "note": "Tamatkan permainan dengan yakin"
+  }
+ ],
+ "lessons": [
+  {
+   "id": "papan",
+   "tahap": 1,
+   "title": "Papan Catur",
+   "icon": "wR",
+   "steps": [
+    {
+     "type": "explain",
+     "title": "64 petak",
+     "pcs": "",
+     "hl": [
+      "file:e",
+      "rank:4"
+     ],
+     "ring": [
+      "e4"
+     ],
+     "say": "Papan catur ada <b>64 petak</b>: 8 lajur (huruf <b>a</b> hingga <b>h</b>) dan 8 baris (nombor <b>1</b> hingga <b>8</b>). Setiap petak ada nama: huruf lajur + nombor baris.",
+     "task": "Lajur e dan baris 4 bertemu di petak <kbd>e4</kbd>. Huruf di bawah, nombor di tepi."
+    },
+    {
+     "type": "tap",
+     "title": "Cari petak",
+     "pcs": "",
+     "say": "Jom uji! Cari huruf dulu di bawah papan, kemudian naik ke nombor barisnya.",
+     "wrong": "Itu petak {sq}. Cari huruf dulu, kemudian nombor.",
+     "seq": [
+      {
+       "ask": "Tekan petak <kbd>d5</kbd>.",
+       "sq": [
+        "d5"
+       ]
+      },
+      {
+       "ask": "Tekan petak <kbd>a1</kbd>.",
+       "sq": [
+        "a1"
+       ]
+      },
+      {
+       "ask": "Tekan petak <kbd>h8</kbd>.",
+       "sq": [
+        "h8"
+       ]
+      },
+      {
+       "ask": "Tekan petak <kbd>c6</kbd>.",
+       "sq": [
+        "c6"
+       ]
+      },
+      {
+       "ask": "Tekan petak <kbd>g2</kbd>.",
+       "sq": [
+        "g2"
+       ],
+       "ok": "Hebat! Awak sudah pandai membaca papan catur."
+      }
+     ]
+    },
+    {
+     "type": "quiz",
+     "title": "Cerah di kanan",
+     "pcs": "",
+     "ring": [
+      "h1"
+     ],
+     "say": "Sebelum main, pastikan papan diletak dengan betul.",
+     "task": "Bila Putih duduk di depan papan, petak di <b>sudut kanan bawah</b> mesti warna apa?",
+     "options": [
+      {
+       "t": "Cerah",
+       "ok": true,
+       "why": "Betul! Ingat: <b>cerah di kanan</b>. Kalau papan terbalik, susunan buah pun jadi salah."
+      },
+      {
+       "t": "Gelap",
+       "why": "Bukan. Petak h1 mesti cerah. Ingat: cerah di kanan."
+      }
+     ]
+    },
+    {
+     "type": "explain",
+     "title": "Susunan permulaan",
+     "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+     "ring": [
+      "d1",
+      "d8"
+     ],
+     "say": "Tir di sudut, kemudian Kuda, Gajah, dan di tengah Menteri dan Raja. Menteri ikut warna petaknya: Menteri putih di petak cerah <kbd>d1</kbd>, Menteri hitam di petak gelap <kbd>d8</kbd>.",
+     "task": "Barisan depan diisi 8 bidak. Putih sentiasa bergerak dahulu."
+    },
+    {
+     "type": "tap",
+     "title": "Kenal buah",
+     "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+     "say": "Sekarang cari buah-buah ini.",
+     "wrong": "Bukan yang itu. Cuba lagi.",
+     "seq": [
+      {
+       "ask": "Tekan <b>Raja putih</b>.",
+       "sq": [
+        "e1"
+       ]
+      },
+      {
+       "ask": "Tekan <b>Menteri hitam</b>.",
+       "sq": [
+        "d8"
+       ]
+      },
+      {
+       "ask": "Tekan <b>kedua-dua</b> Kuda putih.",
+       "sq": [
+        "b1",
+        "g1"
+       ],
+       "all": true
+      },
+      {
+       "ask": "Tekan <b>Tir hitam</b> di sudut kanan atas.",
+       "sq": [
+        "h8"
+       ],
+       "ok": "Bagus! Awak kenal semua buah."
+      }
+     ]
+    }
+   ],
+   "position": 1
+  },
+  {
+   "id": "kuda",
+   "tahap": 1,
+   "title": "Kenal Kuda",
+   "icon": "wN",
+   "steps": [
+    {
+     "type": "explain",
+     "title": "Ini Kuda",
+     "pcs": "wNd4",
+     "showMoves": "d4",
+     "initPath": "e6",
+     "say": "Saya Pak Kuda! Kuda bergerak macam huruf <b>L</b>: dua petak lurus, kemudian satu petak ke tepi. Dari tengah papan, kuda boleh pergi ke <b>8 petak</b>. Kuda bernilai 3 mata.",
+     "task": "Tekan mana-mana titik untuk tengok laluan L kuda."
+    },
+    {
+     "type": "find",
+     "title": "Cari 8 petak",
+     "pcs": "wNe4",
+     "piece": "e4",
+     "say": "Sekarang giliran awak. Kuda ada di <kbd>e4</kbd>. Cari <b>semua</b> petak yang kuda boleh pergi.",
+     "task": "Tekan semua petak yang kuda boleh pergi.",
+     "done": "Hebat! Kesemua 8 petak membentuk bulatan di sekeliling kuda."
+    },
+    {
+     "type": "puzzle",
+     "title": "Kuda boleh melompat",
+     "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+     "accept": {
+      "piece": "n"
+     },
+     "say": "Kuda ialah satu-satunya buah yang boleh <b>melompat</b> melepasi buah lain. Sebab itu kuda boleh keluar sebelum bidak bergerak.",
+     "task": "Tekan salah satu kuda putih, kemudian lompat ke petak bertitik.",
+     "wrongMsg": "Cuba gerakkan kuda.",
+     "win": "Lompat! Kuda melepasi barisan bidak. Tiada buah lain boleh buat begitu."
+    },
+    {
+     "type": "tap",
+     "title": "Kuda di tepi, nasibnya sepi",
+     "pcs": "wNa1 wNd5",
+     "say": "Ada pepatah catur: <b>kuda di tepi, nasibnya sepi</b>. Kuda di tepi papan boleh pergi ke sedikit petak sahaja.",
+     "wrongMap": {
+      "a1": "Kuda a1 cuma boleh pergi ke 2 petak. Cuba kuda yang satu lagi."
+     },
+     "wrong": "Tekan salah satu kuda.",
+     "seq": [
+      {
+       "ask": "Kuda mana boleh pergi ke <b>lebih banyak</b> petak? Tekan kuda itu.",
+       "sq": [
+        "d5"
+       ],
+       "dotsOf": [
+        "a1",
+        "d5"
+       ],
+       "ok": "Betul! Kuda d5 kawal 8 petak, kuda a1 hanya 2. Letak kuda di tengah supaya ia kuat."
+      }
+     ]
+    },
+    {
+     "type": "collect",
+     "title": "Misi: Kuda Kutip Bintang",
+     "pcs": "wNa1",
+     "piece": "a1",
+     "stars": [
+      "c2",
+      "e5",
+      "b6",
+      "g6",
+      "h2"
+     ],
+     "say": "Masa untuk misi! Bawa kuda kutip <b>semua bintang</b>. Cuba guna langkah sesedikit mungkin.",
+     "task": "Tekan petak bertitik untuk gerakkan kuda."
+    }
+   ],
+   "position": 2
+  },
+  {
+   "id": "gajah",
+   "tahap": 1,
+   "title": "Kenal Gajah",
+   "icon": "wB",
+   "steps": [
+    {
+     "type": "explain",
+     "title": "Ini Gajah",
+     "pcs": "wBd4",
+     "showMoves": "d4",
+     "say": "Gajah bergerak <b>serong</b> (diagonal), sejauh mana pun selagi tiada halangan. Gajah bernilai 3 mata, sama seperti Kuda.",
+     "task": "Tekan mana-mana titik untuk tengok laluan gajah."
+    },
+    {
+     "type": "find",
+     "title": "Halangan dan makan",
+     "pcs": "wBc3 wPe5 bPa5",
+     "piece": "c3",
+     "say": "Gajah tak boleh melompat. Bidak putih di e5 menghalang laluannya. Tapi gajah boleh <b>makan</b> bidak hitam di a5.",
+     "task": "Tekan semua petak yang gajah boleh pergi, termasuk petak makan.",
+     "done": "Betul! Gajah berhenti sebelum bidak sendiri, dan boleh makan buah lawan."
+    },
+    {
+     "type": "quiz",
+     "title": "Warna gajah",
+     "pcs": "wBc1 wBf1",
+     "ring": [
+      "c1"
+     ],
+     "say": "Setiap pemain ada dua Gajah: satu di petak gelap, satu di petak cerah.",
+     "task": "Gajah di c1 berdiri di petak gelap. Bolehkah ia sampai ke petak cerah?",
+     "options": [
+      {
+       "t": "Boleh, kalau bergerak banyak kali",
+       "why": "Tidak boleh. Gajah bergerak serong, jadi ia sentiasa kekal pada warna yang sama."
+      },
+      {
+       "t": "Tidak boleh, sampai bila-bila",
+       "ok": true,
+       "why": "Betul! Gajah petak gelap kekal di petak gelap sepanjang permainan."
+      }
+     ]
+    },
+    {
+     "type": "collect",
+     "title": "Misi: Gajah Kutip Bintang",
+     "pcs": "wBc1",
+     "piece": "c1",
+     "stars": [
+      "a3",
+      "e5",
+      "h6",
+      "f2",
+      "b8"
+     ],
+     "say": "Semua bintang ada di petak gelap, sama warna dengan gajah ini. Kutip semuanya!",
+     "task": "Tekan petak bertitik untuk gerakkan gajah."
+    }
+   ],
+   "position": 3
+  },
+  {
+   "id": "tir",
+   "tahap": 1,
+   "title": "Kenal Tir",
+   "icon": "wR",
+   "steps": [
+    {
+     "type": "explain",
+     "title": "Ini Tir",
+     "pcs": "wRd4",
+     "showMoves": "d4",
+     "say": "Tir bergerak <b>lurus</b>: ke depan, belakang, kiri dan kanan, sejauh mana pun. Tir bernilai <b>5 mata</b>.",
+     "task": "Tekan mana-mana titik untuk tengok laluan tir."
+    },
+    {
+     "type": "find",
+     "title": "Halangan dan makan",
+     "pcs": "wRe4 wPe6 bNb4",
+     "piece": "e4",
+     "say": "Bidak putih di e6 menghalang tir. Kuda hitam di b4 pula boleh dimakan.",
+     "task": "Tekan semua petak yang tir boleh pergi, termasuk petak makan.",
+     "done": "Betul! Tir kawal banyak petak bila laluannya terbuka."
+    },
+    {
+     "type": "tap",
+     "title": "Tir menyerang",
+     "pcs": "wRd2 bNd7 bBb4 bPf3 wKg1 bKh8",
+     "say": "Tir boleh menyerang dari jauh.",
+     "wrongMap": {
+      "b4": "Gajah b4 tiada pada laluan lurus tir.",
+      "f3": "Bidak f3 di baris 3, bukan baris 2. Tir tak boleh makan serong."
+     },
+     "wrong": "Itu bukan buah hitam yang boleh dimakan.",
+     "seq": [
+      {
+       "ask": "Tir putih boleh makan <b>satu</b> buah hitam. Tekan buah itu.",
+       "sq": [
+        "d7"
+       ],
+       "arrows": [
+        [
+         "d2",
+         "d7"
+        ]
+       ],
+       "ok": "Betul! Tir naik lurus di lajur d dan makan Kuda."
+      }
+     ]
+    },
+    {
+     "type": "collect",
+     "title": "Misi: Tir Kutip Bintang",
+     "pcs": "wRa1 wPd1 wPa5 wPc4",
+     "piece": "a1",
+     "stars": [
+      "h1",
+      "c6",
+      "e8",
+      "b3"
+     ],
+     "say": "Bidak putih menghalang beberapa laluan. Rancang jalan tir dengan bijak!",
+     "task": "Tekan petak bertitik untuk gerakkan tir."
+    }
+   ],
+   "position": 4
+  },
+  {
+   "id": "menteri",
+   "tahap": 1,
+   "title": "Menteri & Raja",
+   "icon": "wQ",
+   "steps": [
+    {
+     "type": "explain",
+     "title": "Ini Menteri",
+     "pcs": "wQd4",
+     "showMoves": "d4",
+     "say": "Menteri ialah buah paling kuat, bernilai <b>9 mata</b>. Ia bergerak macam <b>Tir + Gajah</b>: lurus dan serong.",
+     "task": "Tekan mana-mana titik untuk tengok laluan menteri."
+    },
+    {
+     "type": "collect",
+     "title": "Misi: Menteri Kutip Bintang",
+     "pcs": "wQd1",
+     "piece": "d1",
+     "stars": [
+      "a4",
+      "h5",
+      "e8",
+      "b6",
+      "g2"
+     ],
+     "say": "Menteri boleh pergi jauh dalam satu langkah. Kutip semua bintang dengan langkah paling sedikit!",
+     "task": "Tekan petak bertitik untuk gerakkan menteri."
+    },
+    {
+     "type": "explain",
+     "title": "Ini Raja",
+     "pcs": "wKe4",
+     "showMoves": "e4",
+     "say": "Raja paling penting tapi bergerak perlahan: <b>1 petak</b> ke mana-mana arah. Kalau Raja tak dapat diselamatkan (sah mati), permainan tamat!",
+     "task": "Tekan mana-mana titik untuk tengok langkah raja."
+    },
+    {
+     "type": "tap",
+     "title": "Raja mesti selamat",
+     "pcs": "wKe1 bRa2 bKh8",
+     "arrows": [
+      [
+       "a2",
+       "h2"
+      ]
+     ],
+     "say": "Raja tak boleh masuk ke petak yang <b>diserang</b> buah lawan. Tir hitam kawal seluruh baris 2.",
+     "wrongMap": {
+      "d2": "d2 diserang Tir hitam!",
+      "e2": "e2 diserang Tir hitam!",
+      "f2": "f2 diserang Tir hitam!"
+     },
+     "wrong": "Raja tak boleh pergi sejauh itu. Raja bergerak 1 petak sahaja.",
+     "seq": [
+      {
+       "ask": "Tekan <b>semua</b> petak yang selamat untuk Raja putih.",
+       "sq": [
+        "d1",
+        "f1"
+       ],
+       "all": true,
+       "ok": "Betul! Raja hanya selamat di d1 dan f1."
+      }
+     ]
+    },
+    {
+     "type": "quiz",
+     "title": "Dua Raja",
+     "pcs": "wKe4 bKe6",
+     "hl": [
+      "e5"
+     ],
+     "say": "Satu peraturan penting tentang dua Raja.",
+     "task": "Bolehkah Raja putih bergerak ke e5, betul-betul di sebelah Raja hitam?",
+     "options": [
+      {
+       "t": "Boleh",
+       "why": "Tidak boleh. Raja tak boleh berdiri bersebelahan dengan Raja lawan."
+      },
+      {
+       "t": "Tidak boleh",
+       "ok": true,
+       "why": "Betul! Mesti ada sekurang-kurangnya satu petak di antara dua Raja."
+      }
+     ]
+    }
+   ],
+   "position": 5
+  },
+  {
+   "id": "bidak",
+   "tahap": 1,
+   "title": "Bidak & Promosi",
+   "icon": "wP",
+   "steps": [
+    {
+     "type": "explain",
+     "title": "Ini Bidak",
+     "pcs": "wPe2 wPd4 bPc5 bPe5 bPd5",
+     "dots": [
+      "e3",
+      "e4"
+     ],
+     "ring": [
+      "c5",
+      "e5"
+     ],
+     "arrows": [
+      [
+       "d4",
+       "c5"
+      ],
+      [
+       "d4",
+       "e5"
+      ]
+     ],
+     "say": "Bidak bergerak <b>ke depan 1 petak</b>. Pada langkah pertamanya, bidak boleh maju <b>2 petak</b>. Bidak <b>makan secara serong</b> ke depan.",
+     "task": "Bidak e2 boleh ke e3 atau e4. Bidak d4 tersekat, tapi boleh makan c5 atau e5."
+    },
+    {
+     "type": "puzzle",
+     "title": "Bidak makan serong",
+     "fen": "4k3/8/8/3np3/4P3/8/8/4K3 w - - 0 1",
+     "line": [
+      "e4d5"
+     ],
+     "say": "Bidak e4 tak boleh maju sebab tersekat bidak e5. Tapi ia boleh makan serong!",
+     "task": "Makan Kuda hitam dengan bidak.",
+     "wrongMsg": "Cuba gunakan bidak.",
+     "win": "Bagus! Bidak makan Kuda secara serong."
+    },
+    {
+     "type": "puzzle",
+     "title": "Promosi!",
+     "fen": "8/1P2k3/8/8/8/8/8/4K3 w - - 0 1",
+     "line": [
+      "b7b8q"
+     ],
+     "say": "Bila bidak sampai ke baris terakhir, ia <b>naik pangkat</b> (promosi) jadi Menteri, Tir, Gajah atau Kuda. Biasanya kita pilih Menteri!",
+     "task": "Tolak bidak ke b8.",
+     "wrongMsg": "Tolak bidak ke depan.",
+     "win": "Promosi! Bidak bertukar jadi Menteri."
+    },
+    {
+     "type": "play",
+     "title": "Perlumbaan bidak",
+     "fen": "8/8/1k6/6P1/8/8/8/4K3 w - - 0 1",
+     "goal": "promote",
+     "bot": "chase",
+     "maxMoves": 6,
+     "say": "Raja hitam cuba tangkap bidak awak. Bawa bidak ke baris 8 dahulu!",
+     "task": "Tolak bidak sampai promosi.",
+     "win": "Menang perlumbaan! Raja hitam terlalu jauh untuk menangkap bidak."
+    }
+   ],
+   "position": 6
+  },
+  {
+   "id": "nilai",
+   "tahap": 1,
+   "title": "Nilai Buah",
+   "icon": "bQ",
+   "steps": [
+    {
+     "type": "explain",
+     "title": "Berapa nilai setiap buah?",
+     "pcs": "wPb4 wNc4 wBd4 wRe4 wQf4 wKg4",
+     "counter": "1 · 3 · 3 · 5 · 9",
+     "say": "Setiap buah ada nilai mata: <b>Bidak 1</b>, <b>Kuda 3</b>, <b>Gajah 3</b>, <b>Tir 5</b>, <b>Menteri 9</b>. Raja tiada nilai sebab Raja tak boleh ditukar.",
+     "task": "Hafal nilai ini. Ia membantu kita tahu tukaran mana yang untung."
+    },
+    {
+     "type": "quiz",
+     "title": "Untung atau rugi?",
+     "fen": "4k3/4p3/3r4/1N6/8/8/8/4K3 w - - 0 1",
+     "arrows": [
+      [
+       "b5",
+       "d6"
+      ]
+     ],
+     "say": "Kuda putih makan Tir hitam, kemudian bidak hitam makan Kuda.",
+     "task": "Untung atau rugi untuk Putih?",
+     "options": [
+      {
+       "t": "Untung 2 mata",
+       "ok": true,
+       "why": "Betul! Dapat Tir (5), hilang Kuda (3). 5 − 3 = untung 2."
+      },
+      {
+       "t": "Rugi 2 mata",
+       "why": "Kira lagi: Putih dapat 5 dan hilang 3."
+      },
+      {
+       "t": "Sama sahaja",
+       "why": "Tir lebih bernilai daripada Kuda."
+      }
+     ]
+    },
+    {
+     "type": "quiz",
+     "title": "Bidak beracun",
+     "fen": "4k3/8/2n5/4p3/8/8/4Q3/4K3 w - - 0 1",
+     "arrows": [
+      [
+       "e2",
+       "e5"
+      ]
+     ],
+     "say": "Menteri putih boleh makan bidak e5, tapi bidak itu dijaga Kuda hitam.",
+     "task": "Patutkah Menteri makan bidak itu?",
+     "options": [
+      {
+       "t": "Ya, dapat bidak percuma",
+       "why": "Bukan percuma! Dapat 1, hilang 9."
+      },
+      {
+       "t": "Tidak, rugi 8 mata",
+       "ok": true,
+       "why": "Betul! 1 − 9 = rugi 8. Selalu semak siapa yang menjaga buah lawan."
+      }
+     ]
+    },
+    {
+     "type": "puzzle",
+     "title": "Pilih tangkapan terbaik",
+     "fen": "4k3/n4p2/4p3/3q4/8/2N5/8/R3K3 w - - 0 1",
+     "line": [
+      "c3d5",
+      "e6d5"
+     ],
+     "say": "Ada dua buah hitam yang boleh dimakan. Pilih yang paling untung.",
+     "task": "Buat tangkapan paling untung.",
+     "wrongMsg": "Tangkapan itu kurang untung. Cari buah hitam yang paling bernilai.",
+     "win": "Hebat! Kuda (3) ditukar dengan Menteri (9). Untung 6 mata!"
+    }
+   ],
+   "position": 7
+  },
+  {
+   "id": "khas",
+   "tahap": 1,
+   "title": "Castling & En Passant",
+   "icon": "wK",
+   "steps": [
+    {
+     "type": "explain",
+     "title": "Castling",
+     "fen": "r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w KQkq - 0 1",
+     "demo": [
+      "e1g1"
+     ],
+     "demoEnd": "Raja ke g1, Tir melompat ke f1.",
+     "say": "<b>Castling</b>: Raja bergerak 2 petak ke arah Tir, kemudian Tir melompat ke sebelah Raja. Ia selamatkan Raja dan aktifkan Tir sekali gus.",
+     "task": "Tengok castling ke kanan (castling pendek)."
+    },
+    {
+     "type": "puzzle",
+     "title": "Buat castling",
+     "fen": "r1bqk2r/pppp1ppp/2n2n2/2b1p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 6 5",
+     "line": [
+      "e1g1"
+     ],
+     "say": "Syarat castling: Raja dan Tir belum pernah bergerak, tiada buah di antaranya, dan Raja tidak sedang kena sah.",
+     "task": "Tekan Raja, kemudian petak g1.",
+     "wrongMsg": "Tekan Raja, kemudian petak g1 untuk castling.",
+     "win": "Castling berjaya! Raja kini selamat di sudut."
+    },
+    {
+     "type": "quiz",
+     "title": "Boleh castling?",
+     "fen": "4k3/8/8/8/8/8/6b1/4K2R w K - 0 1",
+     "arrows": [
+      [
+       "g2",
+       "f1"
+      ]
+     ],
+     "say": "Satu lagi syarat: Raja tak boleh <b>melalui</b> petak yang diserang.",
+     "task": "Bolehkah Putih castling ke kanan sekarang?",
+     "options": [
+      {
+       "t": "Boleh",
+       "why": "Tidak boleh. Gajah hitam kawal f1, dan Raja perlu melalui f1."
+      },
+      {
+       "t": "Tidak boleh",
+       "ok": true,
+       "why": "Betul! Gajah hitam kawal f1, jadi Raja tak boleh lalu di situ."
+      }
+     ]
+    },
+    {
+     "type": "explain",
+     "title": "En passant",
+     "fen": "4k3/3p4/8/4P3/8/8/8/4K3 b - - 0 1",
+     "demo": [
+      "d7d5",
+      "e5d6"
+     ],
+     "demoEnd": "Bidak putih makan secara en passant dan berhenti di d6.",
+     "say": "<b>En passant</b>: bila bidak lawan maju 2 petak dan berhenti betul-betul di sebelah bidak awak, awak boleh makan ia seolah-olah ia maju 1 petak sahaja.",
+     "task": "Peluang ini hanya ada pada langkah yang <b>terus</b> berikutnya."
+    },
+    {
+     "type": "puzzle",
+     "title": "Cuba en passant",
+     "fen": "4k3/8/8/3pP3/8/8/8/4K3 w - d6 0 1",
+     "line": [
+      "e5d6"
+     ],
+     "say": "Bidak hitam baru sahaja maju dari d7 ke d5.",
+     "task": "Makan bidak d5 secara en passant.",
+     "wrongMsg": "Bukan itu. Bidak e5 boleh makan serong ke d6.",
+     "win": "En passant! Bidak hitam d5 hilang dari papan."
+    }
+   ],
+   "position": 8
+  },
+  {
+   "id": "sah",
+   "tahap": 1,
+   "title": "Sah & Sah Mati",
+   "icon": "bK",
+   "steps": [
+    {
+     "type": "explain",
+     "title": "Apa itu sah?",
+     "fen": "4k3/8/8/8/8/8/8/4R1K1 b - - 0 1",
+     "arrows": [
+      [
+       "e1",
+       "e8"
+      ]
+     ],
+     "say": "<b>Sah</b> (check) bermaksud Raja sedang diserang. Raja mesti diselamatkan dengan salah satu cara: <b>Lari</b>, <b>Halang</b> atau <b>Makan</b>.",
+     "task": "Tir putih sedang memberi sah kepada Raja hitam."
+    },
+    {
+     "type": "puzzle",
+     "title": "Cara 1: Lari",
+     "fen": "4r1k1/8/8/8/8/8/8/4K3 w - - 0 1",
+     "accept": {
+      "piece": "k"
+     },
+     "say": "Raja putih kena sah oleh Tir hitam!",
+     "task": "Gerakkan Raja ke petak yang selamat.",
+     "win": "Raja lari ke tempat selamat!"
+    },
+    {
+     "type": "puzzle",
+     "title": "Cara 2: Halang",
+     "fen": "4r1k1/8/8/8/8/R7/3P1P2/3QKB2 w - - 0 1",
+     "accept": {
+      "notPiece": "k"
+     },
+     "say": "Raja putih kena sah lagi, tapi kali ini Raja tak boleh lari ke mana-mana.",
+     "task": "Letak satu buah di antara Tir hitam dan Raja.",
+     "win": "Serangan dihalang!"
+    },
+    {
+     "type": "puzzle",
+     "title": "Cara 3: Makan",
+     "fen": "4k3/8/8/8/8/3n4/2P5/4K3 w - - 0 1",
+     "accept": {
+      "capture": true
+     },
+     "say": "Kuda hitam memberi sah.",
+     "task": "Makan buah yang memberi sah.",
+     "wrongMsg": "Itu cara lari. Kali ini cuba cara makan.",
+     "win": "Kuda yang memberi sah sudah dimakan!"
+    },
+    {
+     "type": "explain",
+     "title": "Sah mati",
+     "fen": "3R2k1/5ppp/8/8/8/8/8/6K1 b - - 0 1",
+     "arrows": [
+      [
+       "d8",
+       "g8"
+      ]
+     ],
+     "ring": [
+      "g8"
+     ],
+     "say": "<b>Sah mati</b> (checkmate) = Raja kena sah dan <b>tiada cara</b> untuk lari, halang atau makan. Siapa buat sah mati, dia <b>menang</b>!",
+     "task": "Raja hitam terkurung di belakang bidaknya sendiri. Tiada jalan keluar."
+    },
+    {
+     "type": "quiz",
+     "title": "Sah, sah mati atau stalemate?",
+     "fen": "7k/5Q2/6K1/8/8/8/8/8 b - - 0 1",
+     "say": "Hitam yang perlu bergerak.",
+     "task": "Apa keadaan Raja hitam?",
+     "options": [
+      {
+       "t": "Sah",
+       "why": "Raja hitam tidak diserang sekarang."
+      },
+      {
+       "t": "Sah mati",
+       "why": "Untuk sah mati, Raja mesti sedang diserang. Di sini tidak."
+      },
+      {
+       "t": "Stalemate (seri)",
+       "ok": true,
+       "why": "Betul! Raja tak diserang, tapi Hitam tiada langkah sah. Itu <b>stalemate</b> dan permainan seri."
+      }
+     ]
+    },
+    {
+     "type": "puzzle",
+     "title": "Sah mati pertama",
+     "fen": "6k1/5ppp/8/8/8/8/8/R5K1 w - - 0 1",
+     "acceptMate": true,
+     "say": "Masa untuk sah mati pertama awak!",
+     "task": "Cari <b>sah mati dalam 1 langkah</b>.",
+     "win": "Sah mati! Raja hitam terkurung di belakang bidaknya sendiri."
+    }
+   ],
+   "position": 9
+  },
+  {
+   "id": "seri",
+   "tahap": 1,
+   "title": "Cara Seri",
+   "icon": "wK",
+   "steps": [
+    {
+     "type": "explain",
+     "title": "Stalemate",
+     "fen": "7k/5Q2/6K1/8/8/8/8/8 b - - 0 1",
+     "hl": [
+      "g8",
+      "g7",
+      "h7"
+     ],
+     "say": "<b>Stalemate</b>: pemain yang perlu bergerak tiada langkah sah, tetapi Rajanya <b>tidak</b> kena sah. Keputusannya <b>seri</b>, walaupun Putih ada Menteri!",
+     "task": "Semua petak di sekeliling Raja hitam diserang, tapi Raja sendiri tidak kena sah."
+    },
+    {
+     "type": "quiz",
+     "title": "Jenis-jenis seri",
+     "pcs": "wKe1 bKe8",
+     "say": "Selain stalemate, ada beberapa lagi cara permainan berakhir seri.",
+     "task": "Mana satu <b>bukan</b> seri?",
+     "options": [
+      {
+       "t": "Kedudukan sama berulang 3 kali",
+       "why": "Itu seri (ulangan tiga kali)."
+      },
+      {
+       "t": "50 langkah tanpa makan atau gerak bidak",
+       "why": "Itu seri (peraturan 50 langkah)."
+      },
+      {
+       "t": "Tinggal Raja lawan Raja sahaja",
+       "why": "Itu seri (buah tak cukup untuk sah mati)."
+      },
+      {
+       "t": "Sah mati",
+       "ok": true,
+       "why": "Betul! Sah mati bermaksud ada pemenang."
+      }
+     ]
+    },
+    {
+     "type": "quiz",
+     "title": "Buah tak cukup",
+     "fen": "4k3/8/8/8/8/8/8/1N2K3 w - - 0 1",
+     "say": "Tak semua buah boleh buat sah mati sendirian.",
+     "task": "Putih ada Raja + Kuda. Hitam ada Raja sahaja. Bolehkah Putih menang?",
+     "options": [
+      {
+       "t": "Boleh",
+       "why": "Tidak. Raja + Kuda tak cukup untuk sah mati."
+      },
+      {
+       "t": "Tidak, ini seri",
+       "ok": true,
+       "why": "Betul! Raja + Kuda, atau Raja + Gajah, tak cukup untuk sah mati. Permainan seri."
+      }
+     ]
+    },
+    {
+     "type": "puzzle",
+     "title": "Elak stalemate",
+     "fen": "7k/8/6K1/8/8/8/8/5Q2 w - - 0 1",
+     "acceptMate": true,
+     "say": "Hati-hati! Ada langkah yang nampak bagus, tapi sebenarnya stalemate.",
+     "task": "Cari <b>sah mati</b>, jangan stalemate.",
+     "win": "Sah mati! Awak elak perangkap stalemate."
+    }
+   ],
+   "position": 10
+  },
+  {
+   "id": "ujian1",
+   "tahap": 1,
+   "exam": true,
+   "title": "Ujian Tahap 1",
+   "icon": "wK",
+   "steps": [
+    {
+     "type": "tap",
+     "title": "Soalan 1",
+     "pcs": "",
+     "say": "Ujian! Setiap soalan hanya ada satu peluang.",
+     "wrong": "Itu petak {sq}.",
+     "seq": [
+      {
+       "ask": "Tekan petak <kbd>f6</kbd>.",
+       "sq": [
+        "f6"
+       ]
+      }
+     ]
+    },
+    {
+     "type": "quiz",
+     "title": "Soalan 2",
+     "pcs": "wRd4",
+     "say": "Nilai buah.",
+     "task": "Berapa mata nilai Tir?",
+     "options": [
+      {
+       "t": "3"
+      },
+      {
+       "t": "5",
+       "ok": true,
+       "why": "Betul! Tir bernilai 5 mata."
+      },
+      {
+       "t": "9"
+      }
+     ]
+    },
+    {
+     "type": "find",
+     "title": "Soalan 3",
+     "pcs": "wNg3 bPe4",
+     "piece": "g3",
+     "say": "Kuda boleh makan buah lawan.",
+     "task": "Tekan semua petak yang kuda boleh pergi."
+    },
+    {
+     "type": "quiz",
+     "title": "Soalan 4",
+     "fen": "k7/1Q6/1K6/8/8/8/8/8 b - - 0 1",
+     "say": "Hitam yang perlu bergerak.",
+     "task": "Apa keadaan Raja hitam?",
+     "options": [
+      {
+       "t": "Sah mati",
+       "ok": true,
+       "why": "Betul! Raja kena sah, dan Menteri dijaga Raja putih."
+      },
+      {
+       "t": "Stalemate"
+      },
+      {
+       "t": "Sah sahaja, Raja boleh lari"
+      }
+     ]
+    },
+    {
+     "type": "puzzle",
+     "title": "Soalan 5",
+     "fen": "r3k2r/8/8/8/8/8/8/R3K2R w KQkq - 0 1",
+     "acceptSan": [
+      "O-O-O"
+     ],
+     "say": "Castling ada dua arah.",
+     "task": "Buat castling panjang (ke arah Tir a1).",
+     "wrongMsg": "Itu bukan castling panjang.",
+     "win": "Betul! Raja ke c1, Tir ke d1."
+    },
+    {
+     "type": "puzzle",
+     "title": "Soalan 6",
+     "fen": "6k1/5ppp/8/8/8/8/1Q3PPP/6K1 w - - 0 1",
+     "acceptMate": true,
+     "say": "Cari sah mati.",
+     "task": "Sah mati dalam 1.",
+     "win": "Sah mati!"
+    },
+    {
+     "type": "puzzle",
+     "title": "Soalan 7",
+     "fen": "8/4P1k1/8/8/8/8/8/4K3 w - - 0 1",
+     "line": [
+      "e7e8q"
+     ],
+     "say": "Bidak hampir sampai.",
+     "task": "Promosikan bidak.",
+     "wrongMsg": "Tolak bidak ke baris 8.",
+     "win": "Promosi!"
+    }
+   ],
+   "position": 11
+  },
+  {
+   "id": "notasi",
+   "tahap": 2,
+   "title": "Notasi Catur",
+   "icon": "bN",
+   "steps": [
+    {
+     "type": "explain",
+     "title": "Menulis langkah",
+     "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+     "arrows": [
+      [
+       "g1",
+       "f3"
+      ]
+     ],
+     "say": "Setiap langkah boleh ditulis: huruf buah + petak tujuan. <b>K</b> Raja, <b>Q</b> Menteri, <b>R</b> Tir, <b>B</b> Gajah, <b>N</b> Kuda. Bidak tiada huruf. Langkah anak panah ini ditulis <kbd>Nf3</kbd>.",
+     "task": "Simbol lain: <kbd>x</kbd> makan, <kbd>+</kbd> sah, <kbd>#</kbd> sah mati, <kbd>O-O</kbd> castling."
+    },
+    {
+     "type": "quiz",
+     "title": "Langkah bidak",
+     "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+     "arrows": [
+      [
+       "e2",
+       "e4"
+      ]
+     ],
+     "say": "Bidak bergerak dari e2 ke e4.",
+     "task": "Apa notasi langkah ini?",
+     "options": [
+      {
+       "t": "e4",
+       "ok": true,
+       "why": "Betul! Bidak tiada huruf, jadi cukup tulis petak tujuan."
+      },
+      {
+       "t": "Pe4",
+       "why": "Bidak tidak diberi huruf."
+      },
+      {
+       "t": "e2",
+       "why": "Tulis petak tujuan, bukan petak asal."
+      }
+     ]
+    },
+    {
+     "type": "quiz",
+     "title": "Langkah gajah",
+     "fen": "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2",
+     "arrows": [
+      [
+       "f1",
+       "c4"
+      ]
+     ],
+     "say": "Gajah putih bergerak dari f1 ke c4.",
+     "task": "Apa notasi langkah ini?",
+     "options": [
+      {
+       "t": "Bc4",
+       "ok": true,
+       "why": "Betul! B untuk Bishop (Gajah), c4 petak tujuan."
+      },
+      {
+       "t": "Gc4",
+       "why": "Notasi guna huruf antarabangsa: B untuk Bishop (Gajah)."
+      },
+      {
+       "t": "Bf1",
+       "why": "Tulis petak tujuan, bukan petak asal."
+      }
+     ]
+    },
+    {
+     "type": "puzzle",
+     "title": "Mainkan Nf3",
+     "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+     "acceptSan": [
+      "Nf3"
+     ],
+     "say": "Sekarang baca notasi dan mainkan langkahnya.",
+     "task": "Mainkan <kbd>Nf3</kbd>.",
+     "wrongMsg": "Itu bukan Nf3. N = Kuda, f3 = petak tujuan.",
+     "win": "Betul, itulah Nf3!"
+    },
+    {
+     "type": "puzzle",
+     "title": "Mainkan Qxf7#",
+     "fen": "r1bqkbnr/ppp2ppp/2np4/4p3/2B1P3/5Q2/PPPP1PPP/RNB1K1NR w KQkq - 0 4",
+     "acceptSan": [
+      "Qxf7#"
+     ],
+     "say": "<kbd>Q</kbd> Menteri, <kbd>x</kbd> makan, <kbd>f7</kbd> petak tujuan, <kbd>#</kbd> sah mati.",
+     "task": "Mainkan <kbd>Qxf7#</kbd>.",
+     "wrongMsg": "Itu bukan Qxf7#. Gerakkan Menteri dan makan di f7.",
+     "win": "Qxf7#: Menteri makan di f7 dan sah mati!"
+    }
+   ],
+   "position": 12
+  },
+  {
+   "id": "buka",
+   "tahap": 2,
+   "title": "Prinsip Pembukaan",
+   "icon": "wP",
+   "steps": [
+    {
+     "type": "explain",
+     "title": "Tiga prinsip",
+     "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+     "hl": [
+      "d4",
+      "e4",
+      "d5",
+      "e5"
+     ],
+     "say": "Tiga prinsip pembukaan: <b>1. Kawal tengah</b> dengan bidak. <b>2. Keluarkan</b> Kuda dan Gajah. <b>3. Castling</b> untuk selamatkan Raja.",
+     "task": "Empat petak bercahaya ini ialah tengah papan. Siapa kawal tengah, dia lebih mudah bergerak."
+    },
+    {
+     "type": "quiz",
+     "title": "Langkah pertama",
+     "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+     "say": "Ingat prinsip pertama: kawal tengah.",
+     "task": "Langkah pertama mana paling bagus?",
+     "options": [
+      {
+       "t": "e4",
+       "ok": true,
+       "why": "Betul! e4 kawal tengah dan buka laluan untuk Gajah dan Menteri."
+      },
+      {
+       "t": "h4",
+       "why": "h4 tidak membantu kawal tengah."
+      },
+      {
+       "t": "a3",
+       "why": "a3 terlalu jauh dari tengah."
+      },
+      {
+       "t": "Na3",
+       "why": "Kuda di tepi, nasibnya sepi!"
+      }
+     ]
+    },
+    {
+     "type": "puzzle",
+     "title": "Keluarkan Kuda",
+     "fen": "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2",
+     "accept": {
+      "piece": "n",
+      "to": [
+       "f3",
+       "c3"
+      ]
+     },
+     "say": "Prinsip kedua: keluarkan buah ke arah tengah.",
+     "task": "Keluarkan Kuda ke petak yang menghala ke tengah.",
+     "wrongMsg": "Cuba Kuda ke f3 atau c3, menghala ke tengah.",
+     "win": "Bagus! Kuda kini kawal petak tengah."
+    },
+    {
+     "type": "puzzle",
+     "title": "Keluarkan Gajah",
+     "fen": "r1bqkbnr/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3",
+     "accept": {
+      "piece": "b",
+      "to": [
+       "c4",
+       "b5"
+      ]
+     },
+     "say": "Gajah pula perlu keluar.",
+     "task": "Keluarkan Gajah ke petak aktif.",
+     "wrongMsg": "Cuba Gajah f1 ke c4 atau b5.",
+     "win": "Gajah aktif! Laluan untuk castling juga sudah terbuka."
+    },
+    {
+     "type": "puzzle",
+     "title": "Castling",
+     "fen": "r1bqk1nr/pppp1ppp/2n5/2b1p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4",
+     "acceptSan": [
+      "O-O"
+     ],
+     "say": "Prinsip ketiga: selamatkan Raja.",
+     "task": "Buat castling.",
+     "wrongMsg": "Tekan Raja, kemudian petak g1.",
+     "win": "Lengkap! Tengah, keluarkan buah, castling."
+    },
+    {
+     "type": "quiz",
+     "title": "Menteri terlalu awal",
+     "fen": "rnbqkbnr/pppp1ppp/8/4p2Q/4P3/8/PPPP1PPP/RNB1KBNR b KQkq - 1 2",
+     "arrows": [
+      [
+       "d1",
+       "h5"
+      ]
+     ],
+     "say": "Ramai pemula suka keluarkan Menteri pada awal permainan.",
+     "task": "Kenapa ia kurang bagus?",
+     "options": [
+      {
+       "t": "Menteri mudah dikejar buah lawan",
+       "ok": true,
+       "why": "Betul! Lawan keluarkan buah sambil menyerang Menteri, kita pula terpaksa lari dan buang masa."
+      },
+      {
+       "t": "Tak dibenarkan oleh peraturan",
+       "why": "Dibenarkan, cuma kurang bijak."
+      },
+      {
+       "t": "Menteri jadi lemah selamanya",
+       "why": "Menteri tetap kuat, tapi kita rugi masa bila ia dikejar."
+      }
+     ]
+    }
+   ],
+   "position": 13
+  },
+  {
+   "id": "putih",
+   "tahap": 2,
+   "title": "Pembukaan Putih",
+   "icon": "wB",
+   "steps": [
+    {
+     "type": "explain",
+     "title": "Italian Game",
+     "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+     "demo": [
+      "e2e4",
+      "e7e5",
+      "g1f3",
+      "b8c6",
+      "f1c4"
+     ],
+     "demoEnd": "Gajah di c4 menghala terus ke f7.",
+     "say": "<b>Italian Game</b>: e4, Nf3, kemudian Gajah ke c4. Semua buah keluar dengan cepat dan Raja boleh castling awal.",
+     "task": "Tengok susunan Italian Game."
+    },
+    {
+     "type": "puzzle",
+     "title": "Main Italian",
+     "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+     "line": [
+      "e2e4",
+      "e7e5",
+      "g1f3",
+      "b8c6",
+      "f1c4",
+      "f8c5",
+      "e1g1"
+     ],
+     "mids": [
+      "Hitam balas e5. Keluarkan Kuda yang menyerang bidak e5.",
+      "Hitam jaga e5 dengan Kuda. Sekarang Gajah ke c4!",
+      "Hitam pun keluarkan Gajah. Masa untuk castling!"
+     ],
+     "say": "Sekarang awak main Putih. Ikut pelan Italian langkah demi langkah.",
+     "task": "Mulakan dengan bidak Raja dua petak.",
+     "wrongMsg": "Ikut pelan Italian: e4, Nf3, Bc4, kemudian castling.",
+     "win": "Italian Game lengkap! Tengah, buah keluar, Raja selamat."
+    },
+    {
+     "type": "explain",
+     "title": "London System",
+     "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+     "demo": [
+      "d2d4",
+      "d7d5",
+      "c1f4"
+     ],
+     "demoEnd": "Gajah keluar ke f4 sebelum bidak e3.",
+     "say": "<b>London System</b>: d4, kemudian Gajah ke f4, diikuti e3 dan Nf3. Susunannya hampir sama setiap permainan, jadi mudah diingat.",
+     "task": "Tengok permulaan London System."
+    },
+    {
+     "type": "puzzle",
+     "title": "Main London",
+     "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+     "line": [
+      "d2d4",
+      "d7d5",
+      "c1f4",
+      "g8f6",
+      "e2e3",
+      "e7e6",
+      "g1f3"
+     ],
+     "mids": [
+      "Hitam main d5. Keluarkan Gajah c1 ke f4 dahulu.",
+      "Sekarang e3 untuk sokong d4 dan buka laluan Gajah f1.",
+      "Kuda ke f3."
+     ],
+     "say": "Giliran awak bina London System.",
+     "task": "Mulakan dengan bidak Menteri dua petak.",
+     "wrongMsg": "Ikut pelan London: d4, Bf4, e3, Nf3.",
+     "win": "Struktur London siap! Seterusnya Bd3, Nbd2 dan castling."
+    },
+    {
+     "type": "quiz",
+     "title": "Rahsia London",
+     "fen": "rnbqkbnr/ppp1pppp/8/3p4/3P1B2/8/PPP1PPPP/RN1QKBNR b KQkq - 1 2",
+     "ring": [
+      "f4"
+     ],
+     "say": "Dalam London, Gajah c1 sentiasa keluar awal.",
+     "task": "Kenapa Gajah keluar ke f4 <b>sebelum</b> main e3?",
+     "options": [
+      {
+       "t": "Kalau e3 dulu, Gajah c1 tersekat di dalam",
+       "ok": true,
+       "why": "Betul! Bidak e3 akan menutup laluan Gajah c1. Jadi keluarkan Gajah dulu."
+      },
+      {
+       "t": "Sebab Gajah suka petak f4",
+       "why": "Bukan sebab itu. Fikir apa jadi pada laluan Gajah selepas e3."
+      },
+      {
+       "t": "Peraturan catur mewajibkannya",
+       "why": "Tiada peraturan begitu. Ia soal strategi."
+      }
+     ]
+    }
+   ],
+   "position": 14
+  },
+  {
+   "id": "hitam",
+   "tahap": 2,
+   "title": "Pembukaan Hitam",
+   "icon": "bP",
+   "steps": [
+    {
+     "type": "explain",
+     "title": "Main sebagai Hitam",
+     "orient": "b",
+     "fen": "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1",
+     "arrows": [
+      [
+       "e2",
+       "e4"
+      ]
+     ],
+     "say": "Hitam bergerak kedua, tapi prinsipnya sama: kawal tengah, keluarkan buah, castling. Papan diterbalikkan supaya buah awak di bawah.",
+     "task": "Putih sudah main 1.e4. Apa balasan kita?"
+    },
+    {
+     "type": "puzzle",
+     "title": "Balas 1.e4 dengan e5",
+     "orient": "b",
+     "fen": "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1",
+     "line": [
+      "e7e5",
+      "g1f3",
+      "b8c6",
+      "f1c4",
+      "f8c5"
+     ],
+     "mids": [
+      "Putih serang bidak e5. Jaga dengan Kuda!",
+      "Putih keluarkan Gajah. Kita pun sama: Gajah ke c5."
+     ],
+     "say": "Cara paling mudah lawan 1.e4: tuntut tengah dengan <b>1...e5</b>.",
+     "task": "Balas dengan bidak e dua petak.",
+     "wrongMsg": "Ikut prinsip: tuntut tengah, kemudian keluarkan Kuda dan Gajah.",
+     "win": "Kedua-dua pihak keluarkan buah dengan baik. Ini dipanggil Giuoco Piano."
+    },
+    {
+     "type": "puzzle",
+     "title": "Scandinavian",
+     "orient": "b",
+     "fen": "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1",
+     "line": [
+      "d7d5",
+      "e4d5",
+      "d8d5",
+      "b1c3",
+      "d5a5"
+     ],
+     "alts": {
+      "4": [
+       "Qd6",
+       "Qd8"
+      ]
+     },
+     "mids": [
+      "Putih makan. Makan balik dengan Menteri!",
+      "Kuda serang Menteri. Undur Menteri ke tempat selamat."
+     ],
+     "say": "Satu lagi pilihan lawan 1.e4: <b>Scandinavian</b>. Terus cabar bidak e4 dengan d5!",
+     "task": "Cabar bidak e4 dengan bidak d.",
+     "wrongMsg": "Ikut pelan Scandinavian: d5, makan balik dengan Menteri, kemudian undur Menteri.",
+     "win": "Menteri selamat dan Hitam dapat bahagiannya di tengah."
+    },
+    {
+     "type": "puzzle",
+     "title": "Balas 1.d4 dengan d5",
+     "orient": "b",
+     "fen": "rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq d3 0 1",
+     "line": [
+      "d7d5",
+      "c2c4",
+      "e7e6",
+      "b1c3",
+      "g8f6"
+     ],
+     "alts": {
+      "2": [
+       "c6"
+      ]
+     },
+     "mids": [
+      "Putih tawar bidak c4 (Queen’s Gambit). Kukuhkan d5 dengan bidak e atau c.",
+      "Keluarkan Kuda ke f6."
+     ],
+     "say": "Lawan 1.d4, balas dengan <b>1...d5</b> untuk kawal tengah.",
+     "task": "Balas dengan bidak d dua petak.",
+     "wrongMsg": "Lawan d4: main d5, kukuhkan dengan e6, kemudian Nf6.",
+     "win": "Bidak d5 kukuh dan buah keluar dengan selamat."
+    },
+    {
+     "type": "explain",
+     "title": "Caro-Kann",
+     "orient": "b",
+     "fen": "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1",
+     "demo": [
+      "c7c6",
+      "d2d4",
+      "d7d5"
+     ],
+     "demoEnd": "Bidak c6 menyokong d5. Hitam kukuh di tengah.",
+     "say": "<b>Caro-Kann</b>: main c6 dulu sebagai persediaan, kemudian d5 untuk cabar e4. Pembukaan kukuh dan selamat, sesuai untuk pemain yang suka bertahan.",
+     "task": "Tengok susunan Caro-Kann."
+    },
+    {
+     "type": "quiz",
+     "title": "Tujuan c6",
+     "orient": "b",
+     "fen": "rnbqkbnr/pp2pppp/2p5/3p4/3PP3/8/PPP2PPP/RNBQKBNR w KQkq d6 0 3",
+     "arrows": [
+      [
+       "c6",
+       "d5"
+      ]
+     ],
+     "say": "Dalam Caro-Kann, Hitam main c6 sebelum d5.",
+     "task": "Apa tujuan bidak c6?",
+     "options": [
+      {
+       "t": "Sokong bidak d5",
+       "ok": true,
+       "why": "Betul! Kalau Putih makan d5, Hitam boleh makan balik dengan bidak c6."
+      },
+      {
+       "t": "Serang Raja putih",
+       "why": "c6 tidak menyerang Raja. Ia menyokong d5."
+      },
+      {
+       "t": "Buka laluan untuk Tir",
+       "why": "Bukan. c6 dimainkan untuk menyokong d5."
+      }
+     ]
+    }
+   ],
+   "position": 15
+  },
+  {
+   "id": "gambit",
+   "tahap": 2,
+   "title": "Gambit",
+   "icon": "wP",
+   "steps": [
+    {
+     "type": "explain",
+     "title": "Apa itu gambit?",
+     "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+     "demo": [
+      "d2d4",
+      "d7d5",
+      "c2c4"
+     ],
+     "demoEnd": "Putih tawar bidak c4. Ini Queen’s Gambit.",
+     "say": "<b>Gambit</b>: korbankan bidak untuk dapat tengah papan atau keluarkan buah dengan lebih cepat. Gambit yang paling terkenal ialah <b>Queen’s Gambit</b>.",
+     "task": "Tengok Putih menawarkan bidak."
+    },
+    {
+     "type": "quiz",
+     "title": "Bidak kembali",
+     "fen": "rnbqkbnr/ppp1pppp/8/8/2pP4/8/PP2PPPP/RNBQKBNR w KQkq - 0 3",
+     "ring": [
+      "c4"
+     ],
+     "say": "Hitam makan bidak c4.",
+     "task": "Bolehkah Putih dapat semula bidak itu?",
+     "options": [
+      {
+       "t": "Ya, biasanya dengan e3 dan Gajah makan c4",
+       "ok": true,
+       "why": "Betul! Bidak c4 susah dipertahankan. Putih buka laluan Gajah dengan e3, kemudian Bxc4."
+      },
+      {
+       "t": "Tidak, rugi selamanya",
+       "why": "Biasanya Putih dapat semula bidak itu dengan mudah."
+      }
+     ]
+    },
+    {
+     "type": "puzzle",
+     "title": "King’s Gambit",
+     "fen": "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 2",
+     "line": [
+      "f2f4",
+      "e5f4",
+      "g1f3"
+     ],
+     "mids": [
+      "Hitam terima gambit. Keluarkan Kuda ke f3: ia kawal tengah dan halang Qh4+."
+     ],
+     "say": "<b>King’s Gambit</b>: gambit paling berani! Putih korbankan bidak f untuk buka lajur f dan rebut tengah.",
+     "task": "Tawarkan bidak f dua petak.",
+     "wrongMsg": "Untuk King’s Gambit, tolak bidak f dua petak. Selepas itu, Kuda ke f3.",
+     "win": "King’s Gambit dimainkan! Putih akan rebut tengah dengan d4."
+    },
+    {
+     "type": "puzzle",
+     "title": "Hukum ketamakan",
+     "fen": "rnbqkbnr/p3pppp/8/1p6/2pP4/4P3/1P3PPP/RNBQKBNR w KQkq - 0 6",
+     "acceptSan": [
+      "Qf3"
+     ],
+     "hintRing": [
+      "a8"
+     ],
+     "arrows": [],
+     "say": "Hitam cuba simpan bidak gambit dengan b5 dan c6. Tapi garisan serong ke a8 sudah terbuka!",
+     "task": "Cari langkah Menteri yang menyerang Tir a8.",
+     "wrongMsg": "Cari langkah Menteri yang menyerang sudut a8.",
+     "win": "Qf3! Menteri serang Tir a8. Hitam akan rugi bahan kerana tamak simpan bidak."
+    },
+    {
+     "type": "quiz",
+     "title": "Terima atau tolak?",
+     "pcs": "",
+     "say": "Gambit nampak macam hadiah percuma.",
+     "task": "Apa sikap terbaik pemula terhadap gambit lawan?",
+     "options": [
+      {
+       "t": "Boleh terima, tapi utamakan keluarkan buah",
+       "ok": true,
+       "why": "Betul! Ambil bidak itu kalau selamat, tapi jangan buang masa cuba menyimpannya."
+      },
+      {
+       "t": "Sentiasa ambil dan simpan bidak itu",
+       "why": "Terlalu tamak boleh merugikan, macam teka-teki tadi."
+      },
+      {
+       "t": "Jangan sekali-kali terima",
+       "why": "Tidak perlu takut. Banyak gambit selamat diterima."
+      }
+     ]
+    }
+   ],
+   "position": 16
+  },
+  {
+   "id": "scholar",
+   "tahap": 2,
+   "title": "Elak Scholar’s Mate",
+   "icon": "bQ",
+   "steps": [
+    {
+     "type": "explain",
+     "title": "Perangkap 4 langkah",
+     "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+     "demo": [
+      "e2e4",
+      "e7e5",
+      "f1c4",
+      "b8c6",
+      "d1h5",
+      "g8f6",
+      "h5f7"
+     ],
+     "demoEnd": "Qxf7#. Hitam kalah dalam 4 langkah!",
+     "say": "<b>Scholar’s Mate</b>: Menteri dan Gajah putih sama-sama serang petak <b>f7</b>. Kalau Hitam tak perasan, sah mati dalam 4 langkah!",
+     "task": "Tengok bagaimana perangkap ini berlaku."
+    },
+    {
+     "type": "explain",
+     "title": "Titik lemah f7",
+     "fen": "r1bqkb1r/pppp1ppp/2n2n2/4p2Q/2B1P3/8/PPPP1PPP/RNB1K1NR w KQkq - 4 4",
+     "ring": [
+      "f7"
+     ],
+     "arrows": [
+      [
+       "h5",
+       "f7"
+      ],
+      [
+       "c4",
+       "f7"
+      ]
+     ],
+     "say": "Kenapa f7? Pada awal permainan, petak f7 hanya dijaga oleh Raja. Ia titik paling lemah Hitam (untuk Putih, f2).",
+     "task": "Dua buah putih menyerang f7, hanya satu buah hitam menjaganya."
+    },
+    {
+     "type": "puzzle",
+     "title": "Pertahankan f7",
+     "orient": "b",
+     "fen": "r1bqkbnr/pppp1ppp/2n5/4p2Q/2B1P3/8/PPPP1PPP/RNB1K1NR b KQkq - 3 3",
+     "acceptSan": [
+      "g6",
+      "Qe7",
+      "Qf6",
+      "Nh6"
+     ],
+     "say": "Sekarang awak main <b>Hitam</b>. Putih mengancam Qxf7#!",
+     "task": "Pertahankan petak f7.",
+     "wrongMsg": "Langkah itu tak melindungi f7 dengan baik. Jaga f7, atau halang laluan Menteri.",
+     "win": "Selamat! (g6 sangat bagus: halang Menteri sambil menyerangnya.)"
+    },
+    {
+     "type": "puzzle",
+     "title": "Cubaan kedua",
+     "orient": "b",
+     "fen": "r1bqkbnr/pppp1ppp/2n5/4p3/2B1P3/5Q2/PPPP1PPP/RNB1K1NR b KQkq - 3 3",
+     "acceptSan": [
+      "Nf6",
+      "Qe7",
+      "Qf6",
+      "Nh6"
+     ],
+     "say": "Putih cuba lagi dengan Menteri di f3.",
+     "task": "Pertahankan f7 sekali lagi.",
+     "wrongMsg": "Langkah itu tak melindungi f7 dengan baik. Jaga f7, atau halang laluan Menteri.",
+     "win": "Selamat! (Nf6 paling bagus: halang Menteri sambil keluarkan Kuda.)"
+    },
+    {
+     "type": "quiz",
+     "title": "Ingat perangkap ini",
+     "pcs": "wQh5 wBc4 bKe8 bPf7",
+     "ring": [
+      "f7"
+     ],
+     "say": "Kalau awak kenal perangkap ini, awak takkan terkena.",
+     "task": "Dua buah putih mana yang digunakan dalam Scholar’s Mate?",
+     "options": [
+      {
+       "t": "Menteri dan Gajah",
+       "ok": true,
+       "why": "Betul! Kedua-duanya menyerang f7."
+      },
+      {
+       "t": "Tir dan Kuda",
+       "why": "Bukan. Scholar’s Mate guna Menteri dan Gajah."
+      },
+      {
+       "t": "Raja dan Bidak",
+       "why": "Bukan. Scholar’s Mate guna Menteri dan Gajah."
+      }
+     ]
+    }
+   ],
+   "position": 17
+  },
+  {
+   "id": "mateq",
+   "tahap": 2,
+   "title": "Mate Raja + Menteri",
+   "icon": "wQ",
+   "steps": [
+    {
+     "type": "explain",
+     "title": "Pagar Menteri",
+     "fen": "8/8/4k3/8/3Q4/8/8/4K3 w - - 0 1",
+     "say": "Teknik: gunakan Menteri sebagai <b>pagar</b>. Letak Menteri satu langkah Kuda dari Raja lawan, dan ruang Raja lawan akan mengecil. Bila Raja lawan di tepi, bawa Raja sendiri untuk bantu.",
+     "task": "Ingat: selalu semak supaya Raja lawan masih ada langkah. Jangan stalemate!"
+    },
+    {
+     "type": "puzzle",
+     "title": "Sah mati di sudut",
+     "fen": "k7/8/1K6/8/8/8/7Q/8 w - - 0 1",
+     "acceptMate": true,
+     "say": "Raja putih sudah datang membantu.",
+     "task": "Cari sah mati dalam 1.",
+     "win": "Sah mati! Raja putih kawal a7 dan b7, Menteri buat yang lain."
+    },
+    {
+     "type": "puzzle",
+     "title": "Perangkap stalemate",
+     "fen": "k7/2Q5/1K6/8/8/8/8/8 w - - 0 1",
+     "acceptMate": true,
+     "say": "Raja hitam sudah hampir tiada ruang.",
+     "task": "Sah mati dalam 1. Jangan stalemate!",
+     "win": "Sah mati! Awak tidak terperangkap."
+    },
+    {
+     "type": "play",
+     "title": "Lawan Pak Kuda",
+     "fen": "8/8/8/3k4/8/8/8/Q3K3 w - - 0 1",
+     "goal": "mate",
+     "bot": "flee",
+     "maxMoves": 25,
+     "say": "Sekarang saya kawal Raja hitam. Kecilkan ruang saya dengan Menteri, kemudian bawa Raja awak!",
+     "task": "Sah mati dalam 25 langkah.",
+     "win": "Sah mati! Awak sudah kuasai mate Raja + Menteri."
+    }
+   ],
+   "position": 18
+  },
+  {
+   "id": "mater",
+   "tahap": 2,
+   "title": "Mate Raja + Tir",
+   "icon": "wR",
+   "steps": [
+    {
+     "type": "explain",
+     "title": "Ladder mate",
+     "fen": "6k1/R7/1R6/8/8/8/8/6K1 w - - 0 1",
+     "demo": [
+      "b6b8"
+     ],
+     "demoEnd": "Sah mati! Tir a7 pagar baris 7, Tir b8 beri sah.",
+     "say": "<b>Ladder mate</b> (mate tangga): dua Tir bergilir-gilir menolak Raja ke tepi, macam menaiki tangga. Satu Tir pagar satu baris, satu lagi beri sah.",
+     "task": "Tengok Tir kedua menamatkan permainan."
+    },
+    {
+     "type": "puzzle",
+     "title": "Raja + Tir",
+     "fen": "3k4/8/3K4/8/8/8/8/7R w - - 0 1",
+     "acceptMate": true,
+     "say": "Dengan satu Tir sahaja, Raja sendiri mesti membantu. Raja berdepan Raja, Tir beri sah dari tepi.",
+     "task": "Sah mati dalam 1.",
+     "win": "Sah mati! Raja putih kawal c7, d7 dan e7."
+    },
+    {
+     "type": "play",
+     "title": "Latihan dua Tir",
+     "fen": "8/8/8/3k4/8/8/8/R3K2R w - - 0 1",
+     "goal": "mate",
+     "bot": "flee",
+     "maxMoves": 15,
+     "say": "Cuba ladder mate. Hati-hati: jangan letak Tir dekat Raja hitam, nanti dimakan!",
+     "task": "Sah mati dalam 15 langkah.",
+     "win": "Ladder mate berjaya!"
+    },
+    {
+     "type": "play",
+     "title": "Cabaran Raja + Tir",
+     "fen": "8/8/8/4k3/8/8/8/4K2R w - - 0 1",
+     "goal": "mate",
+     "bot": "flee",
+     "maxMoves": 35,
+     "say": "Cabaran besar! Tir pagar Raja hitam, Raja putih maju ke depan, dan beri sah bila dua Raja berdepan.",
+     "task": "Sah mati dalam 35 langkah.",
+     "win": "Luar biasa! Mate Raja + Tir memang susah, dan awak berjaya."
+    }
+   ],
+   "position": 19
+  },
+  {
+   "id": "ujian2",
+   "tahap": 2,
+   "exam": true,
+   "title": "Ujian Tahap 2",
+   "icon": "wK",
+   "steps": [
+    {
+     "type": "quiz",
+     "title": "Soalan 1",
+     "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+     "arrows": [
+      [
+       "b1",
+       "c3"
+      ]
+     ],
+     "say": "Notasi.",
+     "task": "Apa notasi langkah ini?",
+     "options": [
+      {
+       "t": "Nc3",
+       "ok": true,
+       "why": "Betul!"
+      },
+      {
+       "t": "Kc3"
+      },
+      {
+       "t": "Bc3"
+      }
+     ]
+    },
+    {
+     "type": "quiz",
+     "title": "Soalan 2",
+     "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+     "say": "Prinsip pembukaan.",
+     "task": "Mana satu <b>bukan</b> prinsip pembukaan yang baik?",
+     "options": [
+      {
+       "t": "Kawal tengah"
+      },
+      {
+       "t": "Keluarkan Kuda dan Gajah"
+      },
+      {
+       "t": "Gerakkan Menteri awal-awal",
+       "ok": true,
+       "why": "Betul! Menteri yang keluar awal mudah dikejar."
+      },
+      {
+       "t": "Castling awal"
+      }
+     ]
+    },
+    {
+     "type": "puzzle",
+     "title": "Soalan 3",
+     "orient": "b",
+     "fen": "rnbqk1nr/pppp1ppp/8/2b1p3/2B1P3/5Q2/PPPP1PPP/RNB1K1NR b KQkq - 3 3",
+     "acceptSan": [
+      "Nf6",
+      "Qe7",
+      "Qf6",
+      "Nh6"
+     ],
+     "say": "Awak main Hitam. Putih mengancam Qxf7#.",
+     "task": "Pertahankan f7.",
+     "wrongMsg": "Putih masih boleh sah mati di f7.",
+     "win": "Selamat!"
+    },
+    {
+     "type": "puzzle",
+     "title": "Soalan 4",
+     "fen": "6k1/8/6K1/8/8/8/8/Q7 w - - 0 1",
+     "acceptMate": true,
+     "say": "Raja + Menteri.",
+     "task": "Sah mati dalam 1.",
+     "win": "Sah mati!"
+    },
+    {
+     "type": "puzzle",
+     "title": "Soalan 5",
+     "fen": "7k/8/6K1/8/8/8/8/R7 w - - 0 1",
+     "acceptMate": true,
+     "say": "Raja + Tir.",
+     "task": "Sah mati dalam 1.",
+     "win": "Sah mati!"
+    },
+    {
+     "type": "quiz",
+     "title": "Soalan 6",
+     "fen": "rnbqkbnr/ppp1pppp/8/3p4/3P4/8/PPP1PPPP/RNBQKBNR w KQkq d6 0 2",
+     "say": "London System.",
+     "task": "Dalam London System, Gajah c1 keluar ke mana?",
+     "options": [
+      {
+       "t": "f4",
+       "ok": true,
+       "why": "Betul! Bf4 sebelum e3."
+      },
+      {
+       "t": "g5"
+      },
+      {
+       "t": "Kekal di c1"
+      }
+     ]
+    },
+    {
+     "type": "quiz",
+     "title": "Soalan 7",
+     "pcs": "",
+     "say": "Gambit.",
+     "task": "Apa itu gambit?",
+     "options": [
+      {
+       "t": "Korban bidak untuk dapat masa atau tengah",
+       "ok": true,
+       "why": "Betul!"
+      },
+      {
+       "t": "Sejenis sah mati"
+      },
+      {
+       "t": "Tukar Menteri awal"
+      }
+     ]
+    }
+   ],
+   "position": 20
+  },
+  {
+   "id": "fork",
+   "tahap": 3,
+   "title": "Fork Kuda",
+   "icon": "bN",
+   "tip": "Ingat <b>CCT</b> sebelum setiap langkah: <b>C</b>heck (sah), <b>C</b>apture (makan), <b>T</b>hreat (ancaman). Banyak fork bermula dengan sah!",
+   "steps": [
+    {
+     "type": "explain",
+     "title": "Apa itu fork?",
+     "fen": "8/3q3p/6k1/8/8/5N2/6PP/6K1 w - - 0 1",
+     "demo": [
+      "f3e5",
+      "g6h5",
+      "e5d7"
+     ],
+     "demoNotes": {
+      "0": {
+       "status": "Kuda serang Raja (sah!) dan Menteri serentak.",
+       "arrows": [
+        [
+         "e5",
+         "g6"
+        ],
+        [
+         "e5",
+         "d7"
+        ]
+       ],
+       "ring": [
+        "g6",
+        "d7"
+       ]
+      }
+     },
+     "demoEnd": "Raja terpaksa lari, jadi Kuda makan Menteri. Menteri bernilai 9, Kuda cuma 3!",
+     "say": "<b>Fork</b> bermaksud satu buah menyerang <b>dua buah lawan serentak</b>. Lawan hanya boleh selamatkan satu. Kuda pakar buat fork sebab langkah L-nya susah dijangka.",
+     "task": "Tengok Kuda putih melompat ke e5."
+    },
+    {
+     "type": "puzzle",
+     "title": "Teka-teki 1: Fork diraja",
+     "fen": "2q3k1/5ppp/8/3N4/8/8/5PPP/6K1 w - - 0 1",
+     "line": [
+      "d5e7",
+      "g8h8",
+      "e7c8"
+     ],
+     "hintRing": [
+      "g8",
+      "c8"
+     ],
+     "say": "Putih untuk melangkah. Cari langkah Kuda yang serang <b>dua buah</b> hitam serentak.",
+     "task": "Tekan Kuda putih, kemudian pilih petak fork.",
+     "after1": {
+      "arrows": [
+       [
+        "e7",
+        "g8"
+       ],
+       [
+        "e7",
+        "c8"
+       ]
+      ],
+      "status": "Fork! Kuda sah Raja dan serang Menteri."
+     },
+     "mid": "Raja sudah lari. Sekarang makan Menteri!",
+     "wrongMsg": "Langkah itu belum serang dua buah serentak. Cari petak yang serang Raja dan Menteri.",
+     "win": "Kuda makan Menteri! Fork diraja berjaya."
+    },
+    {
+     "type": "puzzle",
+     "title": "Teka-teki 2: Tangkap Tir",
+     "fen": "r3k3/1p3ppp/8/1N6/8/8/5PPP/4K3 w - - 0 1",
+     "line": [
+      "b5c7",
+      "e8e7",
+      "c7a8"
+     ],
+     "hintRing": [
+      "e8",
+      "a8"
+     ],
+     "say": "Cari fork yang serang Raja dan Tir.",
+     "task": "Tekan Kuda putih, kemudian pilih petak fork.",
+     "after1": {
+      "arrows": [
+       [
+        "c7",
+        "e8"
+       ],
+       [
+        "c7",
+        "a8"
+       ]
+      ],
+      "status": "Fork! Raja dan Tir diserang."
+     },
+     "mid": "Raja lari. Sekarang makan Tir!",
+     "wrongMsg": "Belum fork lagi. Cari petak yang serang Raja dan Tir.",
+     "win": "Tir ditangkap! Untung 2 mata selepas tukaran pun, Kuda masih hidup."
+    },
+    {
+     "type": "puzzle",
+     "title": "Teka-teki 3: Sudut sempit",
+     "fen": "3q3k/6pp/8/4N3/8/8/5PPP/6K1 w - - 0 1",
+     "line": [
+      "e5f7",
+      "h8g8",
+      "f7d8"
+     ],
+     "hintRing": [
+      "h8",
+      "d8"
+     ],
+     "say": "Raja hitam di sudut. Menteri hitam di d8.",
+     "task": "Cari fork.",
+     "after1": {
+      "arrows": [
+       [
+        "f7",
+        "h8"
+       ],
+       [
+        "f7",
+        "d8"
+       ]
+      ],
+      "status": "Fork! Raja di sudut tak boleh selamatkan Menteri."
+     },
+     "mid": "Sekarang makan Menteri!",
+     "wrongMsg": "Belum fork lagi. Cari petak yang serang Raja dan Menteri.",
+     "win": "Menteri hitam jatuh!"
+    },
+    {
+     "type": "puzzle",
+     "title": "Teka-teki 4: Tanpa sah",
+     "fen": "6k1/5ppp/1q6/8/5r2/2N5/5PPP/6K1 w - - 0 1",
+     "line": [
+      "c3d5",
+      "b6d8",
+      "d5f4"
+     ],
+     "hintRing": [
+      "b6",
+      "f4"
+     ],
+     "say": "Fork tak semestinya sah Raja. Kali ini serang <b>Menteri</b> dan <b>Tir</b> serentak.",
+     "task": "Cari fork.",
+     "after1": {
+      "arrows": [
+       [
+        "d5",
+        "b6"
+       ],
+       [
+        "d5",
+        "f4"
+       ]
+      ],
+      "status": "Fork! Menteri dan Tir diserang serentak."
+     },
+     "mid": "Hitam selamatkan Menteri. Sekarang makan Tir!",
+     "wrongMsg": "Belum fork lagi. Cari petak yang serang Menteri dan Tir.",
+     "win": "Tir dimakan. Fork berjaya!"
+    }
+   ],
+   "position": 21
+  },
+  {
+   "id": "pin",
+   "tahap": 3,
+   "title": "Pin & Skewer",
+   "icon": "wB",
+   "steps": [
+    {
+     "type": "explain",
+     "title": "Apa itu pin?",
+     "fen": "4k3/8/2n5/1B6/8/8/8/4K3 b - - 0 1",
+     "arrows": [
+      [
+       "b5",
+       "e8"
+      ]
+     ],
+     "ring": [
+      "c6"
+     ],
+     "say": "<b>Pin</b>: buah lawan tak boleh bergerak kerana buah yang lebih berharga di belakangnya akan diserang. Kuda hitam ini dipin ke Raja, jadi ia langsung tak boleh bergerak!",
+     "task": "Gajah, Tir dan Menteri boleh buat pin sebab mereka menyerang dari jauh."
+    },
+    {
+     "type": "puzzle",
+     "title": "Buat pin",
+     "fen": "4k3/8/2n5/8/8/8/8/4KB2 w - - 0 1",
+     "acceptSan": [
+      "Bb5"
+     ],
+     "hintRing": [
+      "c6",
+      "e8"
+     ],
+     "say": "Kuda hitam dan Raja hitam berada pada satu garis serong.",
+     "task": "Pin Kuda hitam ke Rajanya.",
+     "wrongMsg": "Belum pin lagi. Letak Gajah supaya Kuda dan Raja berada pada garisannya.",
+     "win": "Pin! Kuda hitam kini tak boleh bergerak."
+    },
+    {
+     "type": "puzzle",
+     "title": "Serang buah yang dipin",
+     "fen": "4k3/8/2n5/1B6/3P4/8/8/4K3 w - - 0 1",
+     "acceptSan": [
+      "d5"
+     ],
+     "say": "Kuda hitam dipin. Buah yang dipin ialah sasaran yang mudah!",
+     "task": "Serang Kuda dengan bidak.",
+     "wrongMsg": "Cari langkah bidak yang menyerang Kuda.",
+     "win": "Kuda diserang bidak dan tak boleh lari kerana dipin!"
+    },
+    {
+     "type": "explain",
+     "title": "Apa itu skewer?",
+     "fen": "3k3q/8/8/8/8/8/8/R5K1 w - - 0 1",
+     "demo": [
+      "a1a8",
+      "d8e7",
+      "a8h8"
+     ],
+     "demoNotes": {
+      "0": {
+       "status": "Sah! Raja mesti lari dari baris 8.",
+       "arrows": [
+        [
+         "a8",
+         "d8"
+        ]
+       ]
+      }
+     },
+     "demoEnd": "Raja lari, Menteri di belakangnya dimakan.",
+     "say": "<b>Skewer</b> ialah pin terbalik: buah yang <b>lebih berharga di depan</b>. Bila ia lari, buah di belakangnya dimakan.",
+     "task": "Tengok Tir buat skewer."
+    },
+    {
+     "type": "puzzle",
+     "title": "Buat skewer",
+     "fen": "q7/8/8/k7/8/8/8/1R4K1 w - - 0 1",
+     "line": [
+      "b1a1",
+      "a5b5",
+      "a1a8"
+     ],
+     "hintRing": [
+      "a5",
+      "a8"
+     ],
+     "say": "Raja dan Menteri hitam berada di lajur a.",
+     "task": "Buat skewer dengan Tir.",
+     "after1": {
+      "arrows": [
+       [
+        "a1",
+        "a5"
+       ]
+      ],
+      "status": "Skewer! Raja kena sah, Menteri di belakangnya."
+     },
+     "mid": "Raja sudah lari. Makan Menteri!",
+     "wrongMsg": "Belum skewer. Letak Tir pada lajur yang sama dengan Raja dan Menteri.",
+     "win": "Menteri dimakan. Skewer berjaya!"
+    },
+    {
+     "type": "quiz",
+     "title": "Pin atau skewer?",
+     "pcs": "",
+     "say": "Mari pastikan awak faham bezanya.",
+     "task": "Dalam <b>pin</b>, buah yang lebih berharga berada di mana?",
+     "options": [
+      {
+       "t": "Di belakang",
+       "ok": true,
+       "why": "Betul! Dalam pin, buah berharga di belakang. Dalam skewer, ia di depan."
+      },
+      {
+       "t": "Di depan",
+       "why": "Itu skewer. Dalam pin, buah berharga di belakang."
+      }
+     ]
+    }
+   ],
+   "position": 22
+  },
+  {
+   "id": "terbuka",
+   "tahap": 3,
+   "title": "Serangan Terbuka",
+   "icon": "wR",
+   "steps": [
+    {
+     "type": "explain",
+     "title": "Buka laluan",
+     "fen": "4k3/1q6/8/8/4N3/8/8/4R1K1 w - - 0 1",
+     "arrows": [
+      [
+       "e1",
+       "e8"
+      ]
+     ],
+     "ring": [
+      "e4"
+     ],
+     "say": "<b>Serangan terbuka</b> (discovered attack): bila satu buah bergerak, ia membuka laluan buah di belakangnya. Dua serangan serentak!",
+     "task": "Kuda e4 menghalang Tir. Kalau Kuda bergerak, Tir terus sah Raja hitam."
+    },
+    {
+     "type": "play",
+     "title": "Sah terbuka",
+     "fen": "4k3/1q6/8/8/4N3/8/8/4R1K1 w - - 0 1",
+     "goal": "captureQ",
+     "bot": "defend",
+     "maxMoves": 2,
+     "say": "Gerakkan Kuda supaya Tir sah Raja, <b>dan</b> Kuda serang Menteri hitam pada masa yang sama.",
+     "task": "Menangi Menteri hitam dalam 2 langkah.",
+     "win": "Hebat! Sah terbuka memenangi Menteri."
+    },
+    {
+     "type": "puzzle",
+     "title": "Gajah buka laluan",
+     "fen": "3q2k1/5ppp/8/8/8/3B4/5PPP/3R2K1 w - - 0 1",
+     "line": [
+      "d3h7",
+      "g8h7",
+      "d1d8"
+     ],
+     "hintRing": [
+      "d8",
+      "h7"
+     ],
+     "say": "Tir d1 dan Menteri hitam d8 berada di lajur yang sama. Gajah d3 menghalang.",
+     "task": "Gerakkan Gajah dengan sah, buka laluan Tir.",
+     "after1": {
+      "arrows": [
+       [
+        "h7",
+        "g8"
+       ],
+       [
+        "d1",
+        "d8"
+       ]
+      ],
+      "status": "Gajah makan dengan sah, dan Tir kini serang Menteri!"
+     },
+     "mid": "Raja makan Gajah. Sekarang Tir makan Menteri!",
+     "wrongMsg": "Cari langkah Gajah yang memberi sah.",
+     "win": "Menteri dimakan. Rugi Gajah (3), dapat Menteri (9)!"
+    },
+    {
+     "type": "quiz",
+     "title": "Sah berganda",
+     "pcs": "",
+     "say": "Kadang-kadang buah yang bergerak itu juga memberi sah.",
+     "task": "Apa itu <b>sah berganda</b> (double check)?",
+     "options": [
+      {
+       "t": "Dua buah beri sah serentak",
+       "ok": true,
+       "why": "Betul! Raja tak boleh halang atau makan dua penyerang sekali gus, jadi Raja <b>wajib lari</b>."
+      },
+      {
+       "t": "Sah dua kali berturut-turut",
+       "why": "Bukan. Sah berganda ialah dua buah beri sah pada masa yang sama."
+      }
+     ]
+    }
+   ],
+   "position": 23
+  },
+  {
+   "id": "cct",
+   "tahap": 3,
+   "title": "CCT: Semak Setiap Langkah",
+   "icon": "wK",
+   "steps": [
+    {
+     "type": "explain",
+     "title": "Tiga soalan",
+     "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+     "say": "Sebelum setiap langkah, tanya 3 soalan <b>CCT</b>:<br><b>C</b>heck: ada sah?<br><b>C</b>apture: ada buah boleh dimakan?<br><b>T</b>hreat: apa ancaman saya, dan apa ancaman lawan?",
+     "task": "Pemain kuat buat semakan ini setiap kali sebelum bergerak."
+    },
+    {
+     "type": "tap",
+     "title": "Capture: buah tergantung",
+     "fen": "r3k3/ppp2ppp/2n5/6b1/8/2N2N2/PPP2PPP/R3K2R w - - 0 1",
+     "say": "Buah <b>tergantung</b> (hanging) ialah buah yang diserang tetapi tiada pengawal.",
+     "wrong": "Buah itu tidak tergantung. Cari lagi.",
+     "seq": [
+      {
+       "ask": "Tekan buah hitam yang tergantung.",
+       "sq": [
+        "g5"
+       ],
+       "arrows": [
+        [
+         "f3",
+         "g5"
+        ]
+       ],
+       "ok": "Betul! Gajah g5 diserang Kuda f3, dan tiada siapa menjaganya."
+      }
+     ]
+    },
+    {
+     "type": "puzzle",
+     "title": "Check dahulu",
+     "fen": "6k1/5ppp/8/8/8/8/5PPP/3R2K1 w - - 0 1",
+     "acceptMate": true,
+     "say": "Soalan pertama CCT: ada sah?",
+     "task": "Cari sah yang terus menang.",
+     "win": "Check adalah soalan pertama CCT, dan kali ini ia terus sah mati!"
+    },
+    {
+     "type": "puzzle",
+     "title": "Buang pengawal",
+     "fen": "6k1/5ppp/5n2/3b2B1/8/8/5PPP/3R2K1 w - - 0 1",
+     "line": [
+      "g5f6",
+      "g7f6",
+      "d1d5"
+     ],
+     "hintRing": [
+      "f6",
+      "d5"
+     ],
+     "say": "Gajah hitam d5 dijaga Kuda f6. Kalau kita buang pengawalnya dulu...",
+     "task": "Buang pengawal, kemudian menangi Gajah.",
+     "after1": {
+      "status": "Pengawal dibuang!"
+     },
+     "mid": "Sekarang Gajah d5 tergantung. Makan dengan Tir!",
+     "wrongMsg": "Kalau terus makan, Kuda f6 akan makan balik. Buang pengawal dulu.",
+     "win": "Untung! Tukar Gajah dengan Kuda, kemudian dapat Gajah percuma."
+    },
+    {
+     "type": "puzzle",
+     "title": "Threat: ancaman lawan",
+     "fen": "3r2k1/5ppp/8/8/2R5/8/5PPP/6K1 w - - 0 1",
+     "accept": {
+      "noMateInOne": true
+     },
+     "arrows": [
+      [
+       "d8",
+       "d1"
+      ]
+     ],
+     "say": "Soalan ketiga: apa ancaman <b>lawan</b>? Hitam mengancam Rd1, sah mati di baris belakang!",
+     "task": "Halang ancaman Hitam.",
+     "wrongMsg": "Hitam masih boleh main Rd1#. Beri ruang untuk Raja atau jaga baris 1.",
+     "win": "Selamat! Awak nampak ancaman lawan sebelum terlambat."
+    }
+   ],
+   "position": 24
+  },
+  {
+   "id": "mate2",
+   "tahap": 3,
+   "title": "Mate dalam 2",
+   "icon": "wQ",
+   "steps": [
+    {
+     "type": "explain",
+     "title": "Corak sah mati",
+     "fen": "3R2k1/5ppp/8/8/8/8/8/6K1 b - - 0 1",
+     "arrows": [
+      [
+       "d8",
+       "g8"
+      ]
+     ],
+     "say": "Pemain kuat hafal <b>corak</b> sah mati. Ini <b>back-rank mate</b>: Raja terkurung di belakang bidaknya, Tir atau Menteri beri sah di baris belakang.",
+     "task": "Bila nampak Raja lawan tiada ruang di baris belakang, cari peluang ini!"
+    },
+    {
+     "type": "puzzle",
+     "title": "Back-rank dalam 2",
+     "fen": "r5k1/5ppp/8/8/8/8/3R1PPP/3R2K1 w - - 0 1",
+     "line": [
+      "d2d8",
+      "a8d8",
+      "d1d8"
+     ],
+     "say": "Tir hitam a8 menjaga baris belakang. Kita ada dua Tir!",
+     "task": "Sah mati dalam 2 langkah.",
+     "after1": {
+      "status": "Sah! Hitam terpaksa makan Tir."
+     },
+     "mid": "Sekarang Tir kedua beri sah mati!",
+     "wrongMsg": "Cari langkah sah di baris 8.",
+     "win": "Tir pertama dikorbankan, Tir kedua beri sah mati!"
+    },
+    {
+     "type": "puzzle",
+     "title": "Smothered mate",
+     "fen": "6rk/6pp/8/6N1/8/8/8/6K1 w - - 0 1",
+     "acceptMate": true,
+     "say": "<b>Smothered mate</b> (mate lemas): Raja dikepung buahnya sendiri, Kuda beri sah mati.",
+     "task": "Sah mati dalam 1.",
+     "win": "Mate lemas! Raja hitam tak boleh bergerak langsung."
+    },
+    {
+     "type": "puzzle",
+     "title": "Korban Menteri",
+     "fen": "4r2k/6pp/7N/3Q4/8/8/5PPP/6K1 w - - 0 1",
+     "line": [
+      "d5g8",
+      "e8g8",
+      "h6f7"
+     ],
+     "hintRing": [
+      "g8",
+      "f7"
+     ],
+     "say": "Teka-teki hebat: korbankan Menteri untuk smothered mate!",
+     "task": "Sah mati dalam 2 langkah.",
+     "after1": {
+      "status": "Menteri dikorbankan! Raja tak boleh makan sebab Kuda h6 menjaga g8."
+     },
+     "mid": "Tir hitam makan Menteri dan menutup g8. Sekarang Kuda!",
+     "wrongMsg": "Cuba sesuatu yang berani: beri sah di g8.",
+     "win": "Smothered mate! Korban yang cantik."
+    }
+   ],
+   "position": 25
+  },
+  {
+   "id": "ujian3",
+   "tahap": 3,
+   "exam": true,
+   "title": "Ujian Tahap 3",
+   "icon": "wK",
+   "steps": [
+    {
+     "type": "puzzle",
+     "title": "Soalan 1",
+     "fen": "8/6k1/3q4/8/8/4N3/5PPP/6K1 w - - 0 1",
+     "line": [
+      "e3f5",
+      "g7g8",
+      "f5d6"
+     ],
+     "say": "Cari fork.",
+     "task": "Serang dua buah serentak.",
+     "mid": "Sekarang makan Menteri!",
+     "wrongMsg": "Itu bukan fork.",
+     "win": "Fork berjaya!"
+    },
+    {
+     "type": "puzzle",
+     "title": "Soalan 2",
+     "fen": "4k3/8/4n3/8/8/8/8/R5K1 w - - 0 1",
+     "acceptSan": [
+      "Re1"
+     ],
+     "say": "Buat pin.",
+     "task": "Pin Kuda hitam ke Rajanya.",
+     "wrongMsg": "Belum pin.",
+     "win": "Pin!"
+    },
+    {
+     "type": "puzzle",
+     "title": "Soalan 3",
+     "fen": "r7/8/2k5/8/8/8/8/1B4K1 w - - 0 1",
+     "line": [
+      "b1e4",
+      "c6c5",
+      "e4a8"
+     ],
+     "say": "Buat skewer.",
+     "task": "Sah Raja, kemudian makan buah di belakangnya.",
+     "mid": "Makan Tir!",
+     "wrongMsg": "Belum skewer.",
+     "win": "Skewer berjaya!"
+    },
+    {
+     "type": "play",
+     "title": "Soalan 4",
+     "fen": "3qk3/8/8/4N3/8/8/8/4R1K1 w - - 0 1",
+     "goal": "captureQ",
+     "bot": "defend",
+     "maxMoves": 2,
+     "say": "Serangan terbuka.",
+     "task": "Menangi Menteri hitam dalam 2 langkah.",
+     "win": "Menteri dimenangi!"
+    },
+    {
+     "type": "puzzle",
+     "title": "Soalan 5",
+     "fen": "7k/8/5N2/8/8/8/8/K5R1 w - - 0 1",
+     "acceptMate": true,
+     "say": "Tir dan Kuda bekerjasama.",
+     "task": "Sah mati dalam 1.",
+     "win": "Sah mati! Kuda kawal g8 dan h7, Tir buat yang lain."
+    },
+    {
+     "type": "quiz",
+     "title": "Soalan 6",
+     "pcs": "",
+     "say": "CCT.",
+     "task": "Apa maksud huruf <b>T</b> dalam CCT?",
+     "options": [
+      {
+       "t": "Threat (ancaman)",
+       "ok": true,
+       "why": "Betul!"
+      },
+      {
+       "t": "Tir"
+      },
+      {
+       "t": "Tukar"
+      }
+     ]
+    }
+   ],
+   "position": 26
+  },
+  {
+   "id": "struktur",
+   "tahap": 4,
+   "title": "Struktur Bidak",
+   "icon": "wP",
+   "steps": [
+    {
+     "type": "explain",
+     "title": "Jenis bidak",
+     "fen": "4k3/5p2/1p6/7P/P1P5/2P5/8/4K3 w - - 0 1",
+     "say": "Bidak tak boleh berundur, jadi susunannya penting.<br><b>Berganda</b>: dua bidak di lajur sama.<br><b>Terpencil</b>: tiada bidak kawan di lajur sebelah.<br><b>Lulus</b>: tiada bidak lawan boleh menghalangnya.",
+     "task": "Lihat bidak putih di papan ini. Kita akan kenal pasti setiap satu."
+    },
+    {
+     "type": "tap",
+     "title": "Kenal pasti bidak",
+     "fen": "4k3/5p2/1p6/7P/P1P5/2P5/8/4K3 w - - 0 1",
+     "say": "Tengok bidak putih dengan teliti.",
+     "wrong": "Bukan bidak itu. Cuba lagi.",
+     "seq": [
+      {
+       "ask": "Tekan bidak <b>lulus</b> (passed pawn).",
+       "sq": [
+        "h5"
+       ],
+       "ok": "Betul! Tiada bidak hitam di lajur g atau h untuk menghalangnya."
+      },
+      {
+       "ask": "Tekan bidak <b>berganda</b>.",
+       "sq": [
+        "c3",
+        "c4"
+       ],
+       "ok": "Betul! Dua bidak di lajur c susah melindungi satu sama lain."
+      },
+      {
+       "ask": "Tekan bidak <b>terpencil</b> di tepi papan.",
+       "sq": [
+        "a4"
+       ],
+       "ok": "Betul! Bidak a4 tiada kawan di lajur b, jadi ia mudah diserang."
+      }
+     ]
+    },
+    {
+     "type": "quiz",
+     "title": "Bidak bersambung",
+     "pcs": "wPd4 wPe4 wPc3 wPc2",
+     "hl": [
+      "d4",
+      "e4"
+     ],
+     "say": "Bidak yang berdiri bersebelahan dipanggil bidak <b>bersambung</b>.",
+     "task": "Mana lebih kuat?",
+     "options": [
+      {
+       "t": "Bidak bersambung (d4 dan e4)",
+       "ok": true,
+       "why": "Betul! Bidak bersambung saling melindungi dan sukar dihalang."
+      },
+      {
+       "t": "Bidak berganda (c2 dan c3)",
+       "why": "Bidak berganda lemah sebab mereka tak boleh melindungi satu sama lain."
+      }
+     ]
+    },
+    {
+     "type": "play",
+     "title": "Tolak bidak lulus",
+     "fen": "8/8/8/1k5P/8/8/8/4K3 w - - 0 1",
+     "goal": "promote",
+     "bot": "chase",
+     "maxMoves": 5,
+     "say": "Bidak lulus mesti ditolak! Gunakan <b>peraturan segi empat</b>: kalau Raja lawan tak dapat masuk segi empat bidak, bidak menang.",
+     "task": "Bawa bidak h5 ke promosi.",
+     "win": "Promosi! Bidak lulus memang berbahaya."
+    }
+   ],
+   "position": 27
+  },
+  {
+   "id": "buahbaik",
+   "tahap": 4,
+   "title": "Buah Baik, Buah Buruk",
+   "icon": "wB",
+   "steps": [
+    {
+     "type": "puzzle",
+     "title": "Tir di lajur terbuka",
+     "fen": "r5k1/pp3ppp/8/8/8/8/PP3PPP/R5K1 w - - 0 1",
+     "accept": {
+      "piece": "r",
+      "toFile": [
+       "c",
+       "d",
+       "e"
+      ]
+     },
+     "hl": [
+      "file:c",
+      "file:d",
+      "file:e"
+     ],
+     "say": "Tir paling kuat di <b>lajur terbuka</b>, iaitu lajur tanpa bidak. Lajur c, d dan e terbuka di sini.",
+     "task": "Letak Tir di lajur terbuka.",
+     "wrongMsg": "Lajur itu tidak terbuka. Pilih lajur c, d atau e.",
+     "win": "Tir di lajur terbuka boleh menyerang hingga ke barisan lawan!"
+    },
+    {
+     "type": "explain",
+     "title": "Gajah buruk",
+     "fen": "4k3/8/8/2P1P3/3P4/8/8/2B1K3 w - - 0 1",
+     "ring": [
+      "d4",
+      "c5",
+      "e5"
+     ],
+     "say": "<b>Gajah buruk</b> tersekat oleh bidak sendiri yang berada pada warna petak yang sama. Gajah c1 ini (petak gelap) tersekat oleh bidak d4, c5 dan e5, semuanya di petak gelap.",
+     "task": "Gajah baik pula bebas bergerak kerana bidaknya di warna lain."
+    },
+    {
+     "type": "quiz",
+     "title": "Jadikan Gajah baik",
+     "pcs": "wBc1 wPd4 wPc5 wPe5",
+     "say": "Kita boleh rancang supaya Gajah kita jadi baik.",
+     "task": "Di mana patut letak bidak supaya Gajah petak gelap jadi baik?",
+     "options": [
+      {
+       "t": "Di petak cerah",
+       "ok": true,
+       "why": "Betul! Bila bidak di petak cerah, laluan gelap Gajah terbuka."
+      },
+      {
+       "t": "Di petak gelap",
+       "why": "Itu yang buat Gajah tersekat. Letak bidak di warna yang berlawanan."
+      }
+     ]
+    },
+    {
+     "type": "puzzle",
+     "title": "Pos kuat Kuda",
+     "fen": "4k3/pp3ppp/3p4/4p3/4P3/2N5/PPP2PPP/4K3 w - - 0 1",
+     "acceptSan": [
+      "Nd5"
+     ],
+     "ring": [
+      "d5"
+     ],
+     "say": "<b>Pos kuat</b> (outpost): petak yang dijaga bidak kita dan tak boleh diserang bidak lawan. d5 dijaga bidak e4, dan Hitam tiada bidak c atau e yang boleh menghalau Kuda.",
+     "task": "Letak Kuda di pos kuat d5.",
+     "wrongMsg": "Bawa Kuda ke d5.",
+     "win": "Kuda di pos kuat sangat susah dihalau. Ia kawal banyak petak di kubu lawan."
+    },
+    {
+     "type": "quiz",
+     "title": "Bila patut tukar buah?",
+     "pcs": "",
+     "say": "Tukar buah bermaksud kedua-dua pemain makan buah yang sama nilai.",
+     "task": "Bila masa terbaik untuk tukar buah?",
+     "options": [
+      {
+       "t": "Bila kita sudah untung mata",
+       "ok": true,
+       "why": "Betul! Bila kita di depan, kurangkan buah supaya kelebihan kita lebih jelas."
+      },
+      {
+       "t": "Bila kita ketinggalan mata",
+       "why": "Bila ketinggalan, elakkan tukaran. Simpan buah untuk cari peluang."
+      }
+     ]
+    }
+   ],
+   "position": 28
+  },
+  {
+   "id": "ujian4",
+   "tahap": 4,
+   "exam": true,
+   "title": "Ujian Tahap 4",
+   "icon": "wK",
+   "steps": [
+    {
+     "type": "tap",
+     "title": "Soalan 1",
+     "fen": "4k3/p5p1/8/1P6/8/2P4P/2P5/4K3 w - - 0 1",
+     "say": "Struktur bidak putih.",
+     "wrong": "Bukan bidak itu.",
+     "seq": [
+      {
+       "ask": "Tekan bidak <b>berganda</b>.",
+       "sq": [
+        "c2",
+        "c3"
+       ]
+      }
+     ]
+    },
+    {
+     "type": "tap",
+     "title": "Soalan 2",
+     "fen": "4k3/p5p1/8/1P6/8/2P4P/2P5/4K3 w - - 0 1",
+     "say": "Struktur bidak putih.",
+     "wrong": "Bukan bidak itu.",
+     "seq": [
+      {
+       "ask": "Tekan bidak <b>terpencil</b>.",
+       "sq": [
+        "h3"
+       ]
+      }
+     ]
+    },
+    {
+     "type": "puzzle",
+     "title": "Soalan 3",
+     "fen": "r5k1/ppp2ppp/8/8/8/8/PPP2PPP/R5K1 w - - 0 1",
+     "accept": {
+      "piece": "r",
+      "toFile": [
+       "d",
+       "e"
+      ]
+     },
+     "say": "Tir aktif.",
+     "task": "Letak Tir di lajur terbuka.",
+     "wrongMsg": "Lajur itu tidak terbuka.",
+     "win": "Betul!"
+    },
+    {
+     "type": "puzzle",
+     "title": "Soalan 4",
+     "fen": "4k3/pp4pp/2p1p3/3p4/3P4/4PN2/PP4PP/4K3 w - - 0 1",
+     "acceptSan": [
+      "Ne5"
+     ],
+     "say": "Pos kuat.",
+     "task": "Letak Kuda di pos kuat.",
+     "wrongMsg": "Itu bukan pos kuat.",
+     "win": "Betul! e5 dijaga d4 dan tak boleh dihalau bidak hitam."
+    },
+    {
+     "type": "quiz",
+     "title": "Soalan 5",
+     "pcs": "wBc1 wPd4 wPe5 wPc5",
+     "say": "Gajah.",
+     "task": "Gajah c1 ini baik atau buruk?",
+     "options": [
+      {
+       "t": "Buruk",
+       "ok": true,
+       "why": "Betul! Bidak sendiri di petak gelap menyekatnya."
+      },
+      {
+       "t": "Baik"
+      }
+     ]
+    },
+    {
+     "type": "quiz",
+     "title": "Soalan 6",
+     "pcs": "",
+     "say": "Tukar buah.",
+     "task": "Awak sudah untung satu Tir. Patut tukar buah?",
+     "options": [
+      {
+       "t": "Ya, tukar supaya lebih mudah menang",
+       "ok": true,
+       "why": "Betul!"
+      },
+      {
+       "t": "Tidak, elakkan tukaran"
+      }
+     ]
+    }
+   ],
+   "position": 29
+  },
+  {
+   "id": "opposition",
+   "tahap": 5,
+   "title": "Opposition Raja",
+   "icon": "wK",
+   "steps": [
+    {
+     "type": "explain",
+     "title": "Raja berdepan",
+     "fen": "8/8/8/4k3/8/4K3/8/8 w - - 0 1",
+     "hl": [
+      "e4"
+     ],
+     "say": "Dalam endgame, Raja jadi buah penyerang. <b>Opposition</b>: dua Raja berdepan dengan satu petak kosong di tengah. Pemain yang <b>tidak</b> perlu bergerak memegang opposition, dan Raja lawan terpaksa beri laluan.",
+     "task": "Di sini Putih perlu bergerak, jadi Hitam yang pegang opposition."
+    },
+    {
+     "type": "quiz",
+     "title": "Peraturan segi empat",
+     "fen": "8/8/1k6/6P1/8/8/8/K7 b - - 0 1",
+     "hl": [
+      "d5",
+      "e5",
+      "f5",
+      "g5",
+      "d6",
+      "e6",
+      "f6",
+      "g6",
+      "d7",
+      "e7",
+      "f7",
+      "g7",
+      "d8",
+      "e8",
+      "f8",
+      "g8"
+     ],
+     "say": "Bina <b>segi empat</b> dari bidak hingga ke baris promosi. Kalau Raja lawan boleh masuk segi empat itu, ia boleh tangkap bidak.",
+     "task": "Hitam bergerak dahulu. Bolehkah Raja hitam tangkap bidak?",
+     "options": [
+      {
+       "t": "Boleh",
+       "why": "Raja hitam di b6. Satu langkah pun tak cukup untuk masuk segi empat."
+      },
+      {
+       "t": "Tidak boleh",
+       "ok": true,
+       "why": "Betul! Raja hitam di luar segi empat, jadi bidak menang perlumbaan."
+      }
+     ]
+    },
+    {
+     "type": "puzzle",
+     "title": "Raja di depan bidak",
+     "fen": "8/8/4k3/8/8/4K3/4P3/8 w - - 0 1",
+     "acceptSan": [
+      "Kd4",
+      "Ke4",
+      "Kf4"
+     ],
+     "say": "Rahsia endgame Raja + Bidak: <b>Raja jalan di depan bidak</b>, bukan di belakang.",
+     "task": "Gerakkan Raja ke depan bidak.",
+     "wrongMsg": "Langkah itu terlalu pasif. Maju ke baris 4 di depan bidak.",
+     "win": "Bagus! Raja di depan membuka jalan untuk bidak."
+    },
+    {
+     "type": "puzzle",
+     "title": "Kekal di baris 6",
+     "fen": "4k3/8/4K3/4P3/8/8/8/8 w - - 0 1",
+     "acceptSan": [
+      "Kd6",
+      "Kf6"
+     ],
+     "say": "Raja putih sudah di baris 6, di depan bidak. Jangan berundur!",
+     "task": "Cari langkah yang mengekalkan Raja di baris 6.",
+     "wrongMsg": "Raja berundur dan Hitam akan dapat opposition. Kekal di baris 6.",
+     "win": "Betul! Raja di baris 6 di depan bidak bermaksud menang."
+    }
+   ],
+   "position": 30
+  },
+  {
+   "id": "lucena",
+   "tahap": 5,
+   "title": "Lucena & Philidor",
+   "icon": "wR",
+   "steps": [
+    {
+     "type": "explain",
+     "title": "Endgame Tir",
+     "fen": "3K4/3P2k1/8/8/8/8/2r5/5R2 w - - 0 1",
+     "ring": [
+      "d8"
+     ],
+     "say": "Endgame Tir paling kerap berlaku dalam catur. Dua kedudukan wajib tahu: <b>Lucena</b> (cara menang) dan <b>Philidor</b> (cara seri).",
+     "task": "Di sini Raja putih di depan bidak, tapi Tir hitam terus beri sah dari tepi."
+    },
+    {
+     "type": "puzzle",
+     "title": "Lucena: bina jambatan",
+     "fen": "3K4/3P2k1/8/8/8/8/2r5/5R2 w - - 0 1",
+     "acceptSan": [
+      "Rf4"
+     ],
+     "ring": [
+      "f4"
+     ],
+     "say": "Rahsia Lucena ialah <b>bina jambatan</b>: Tir ke baris 4. Nanti bila Raja keluar dan kena sah, Tir datang menghalang.",
+     "task": "Letak Tir di f4.",
+     "wrongMsg": "Untuk bina jambatan, bawa Tir ke f4.",
+     "win": "Jambatan siap! Raja putih boleh keluar, dan Tir di f4 akan menghalang sah."
+    },
+    {
+     "type": "explain",
+     "title": "Philidor: cara seri",
+     "orient": "b",
+     "fen": "4k3/1R6/r7/3KP3/8/8/8/8 w - - 0 1",
+     "arrows": [
+      [
+       "a6",
+       "h6"
+      ]
+     ],
+     "say": "Sekarang awak di pihak bertahan (Hitam). <b>Philidor</b>: Tir hitam kawal <b>baris 6</b> supaya Raja putih tak boleh maju. Bila bidak putih maju ke e6, Tir terus ke baris 1 dan beri sah dari belakang.",
+     "task": "Selagi Tir kawal baris 6, Putih tak boleh menang."
+    },
+    {
+     "type": "puzzle",
+     "title": "Philidor: kawal baris 6",
+     "orient": "b",
+     "fen": "4k3/1R6/8/3KP3/8/8/8/r7 b - - 0 1",
+     "acceptSan": [
+      "Ra6"
+     ],
+     "ring": [
+      "a6"
+     ],
+     "say": "Hitam untuk bergerak. Tir hitam di a1 terlalu pasif.",
+     "task": "Bawa Tir ke baris 6.",
+     "wrongMsg": "Kawal baris 6! Bawa Tir ke a6.",
+     "win": "Kedudukan Philidor! Raja putih tak boleh maju, dan permainan menuju seri."
+    }
+   ],
+   "position": 31
+  },
+  {
+   "id": "ujian5",
+   "tahap": 5,
+   "exam": true,
+   "title": "Ujian Tahap 5",
+   "icon": "wK",
+   "steps": [
+    {
+     "type": "quiz",
+     "title": "Soalan 1",
+     "fen": "8/8/6k1/8/1P6/8/8/7K b - - 0 1",
+     "say": "Raja putih terlalu jauh untuk membantu.",
+     "task": "Hitam bergerak dahulu. Bolehkah Raja hitam tangkap bidak?",
+     "options": [
+      {
+       "t": "Boleh",
+       "ok": true,
+       "why": "Betul! Selepas satu langkah, Raja hitam masuk segi empat bidak."
+      },
+      {
+       "t": "Tidak boleh",
+       "why": "Kira segi empat dari b4 ke b8 (5 x 5 petak). Raja hitam boleh masuk dengan satu langkah."
+      }
+     ]
+    },
+    {
+     "type": "puzzle",
+     "title": "Soalan 2",
+     "fen": "8/8/3k4/8/8/3K4/3P4/8 w - - 0 1",
+     "acceptSan": [
+      "Kc4",
+      "Kd4",
+      "Ke4"
+     ],
+     "say": "Raja + Bidak.",
+     "task": "Langkah terbaik untuk Putih?",
+     "wrongMsg": "Raja mesti di depan bidak.",
+     "win": "Betul! Raja di depan bidak."
+    },
+    {
+     "type": "puzzle",
+     "title": "Soalan 3",
+     "fen": "3k4/8/3K4/3P4/8/8/8/8 w - - 0 1",
+     "acceptSan": [
+      "Kc6",
+      "Ke6"
+     ],
+     "say": "Raja putih di baris 6.",
+     "task": "Cari langkah yang menang.",
+     "wrongMsg": "Jangan berundur dari baris 6.",
+     "win": "Betul!"
+    },
+    {
+     "type": "quiz",
+     "title": "Soalan 4",
+     "pcs": "",
+     "say": "Philidor.",
+     "task": "Dalam kedudukan Philidor, Tir bertahan mengawal baris berapa?",
+     "options": [
+      {
+       "t": "Baris 6",
+       "ok": true,
+       "why": "Betul!"
+      },
+      {
+       "t": "Baris 8"
+      },
+      {
+       "t": "Baris 2"
+      }
+     ]
+    },
+    {
+     "type": "quiz",
+     "title": "Soalan 5",
+     "pcs": "",
+     "say": "Lucena.",
+     "task": "Apa nama teknik utama dalam kedudukan Lucena?",
+     "options": [
+      {
+       "t": "Bina jambatan",
+       "ok": true,
+       "why": "Betul!"
+      },
+      {
+       "t": "Fork diraja"
+      },
+      {
+       "t": "Mate tangga"
+      }
+     ]
+    }
+   ],
+   "position": 32
+  }
+ ]
+}

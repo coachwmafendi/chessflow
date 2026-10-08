@@ -1,0 +1,1157 @@
+<title>ChessFlow</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Lexend:wght@400;500;600&display=swap">
+<style>
+/* Layout: playful learning map (zigzag path of lesson stops) → lesson screen with a board on the left and Pak Kuda's coaching panel on the right */
+:root{
+  --bg:#EEF3F7; --surface:#FFFFFF; --ink:#18263A; --muted:#58677D; --line:#D6E0E8;
+  --accent:#0B8577; --accent-ink:#FFFFFF; --accent-soft:#D6EFEB;
+  --sun:#F6A91B; --sun-soft:#FFF1D2; --coral:#E5484D; --coral-soft:#FDE3E2; --good:#1D9A57; --good-soft:#DDF4E6;
+  --sq-light:#F2E7D0; --sq-dark:#7FA89F; --frame:#28463F;
+  --display:"Baloo 2", "Trebuchet MS", system-ui, sans-serif;
+  --body:"Lexend", "Segoe UI", system-ui, sans-serif;
+  --r:18px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0E1622; --surface:#172234; --ink:#E7EEF6; --muted:#9BABC0; --line:#26354B;
+  --accent:#34C2B0; --accent-ink:#06201C; --accent-soft:#143A38;
+  --sun:#FFBE3D; --sun-soft:#3A2F14; --coral:#FF6B6F; --coral-soft:#3D1D22; --good:#45C985; --good-soft:#163527;
+  --sq-light:#DCCFB4; --sq-dark:#5F8C83; --frame:#0A1A17; color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#0E1622; --surface:#172234; --ink:#E7EEF6; --muted:#9BABC0; --line:#26354B;
+  --accent:#34C2B0; --accent-ink:#06201C; --accent-soft:#143A38;
+  --sun:#FFBE3D; --sun-soft:#3A2F14; --coral:#FF6B6F; --coral-soft:#3D1D22; --good:#45C985; --good-soft:#163527;
+  --sq-light:#DCCFB4; --sq-dark:#5F8C83; --frame:#0A1A17; color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55;padding-inline:16px;padding-block:0 48px}
+.app{max-width:1080px;margin:0 auto}
+button{font:inherit;color:inherit}
+button:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+h1,h2,h3{font-family:var(--display);line-height:1.1;margin:0;text-wrap:balance}
+
+/* PIECES */
+.pc{background-size:100% 100%;background-repeat:no-repeat}
+.pc.wP{background-image:url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NSIgaGVpZ2h0PSI0NSI+PHBhdGggZD0iTTIyLjUgOWMtMi4yMSAwLTQgMS43OS00IDQgMCAuODkuMjkgMS43MS43OCAyLjM4QzE3LjMzIDE2LjUgMTYgMTguNTkgMTYgMjFjMCAyLjAzLjk0IDMuODQgMi40MSA1LjAzLTMgMS4wNi03LjQxIDUuNTUtNy40MSAxMy40N2gyM2MwLTcuOTItNC40MS0xMi40MS03LjQxLTEzLjQ3IDEuNDctMS4xOSAyLjQxLTMgMi40MS01LjAzIDAtMi40MS0xLjMzLTQuNS0zLjI4LTUuNjIuNDktLjY3Ljc4LTEuNDkuNzgtMi4zOCAwLTIuMjEtMS43OS00LTQtNHoiIGZpbGw9IiNmZmYiIHN0cm9rZT0iIzAwMCIgc3Ryb2tlLXdpZHRoPSIxLjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjwvc3ZnPg==')}
+.pc.wB{background-image:url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NSIgaGVpZ2h0PSI0NSI+PGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxnIGZpbGw9IiNmZmYiIHN0cm9rZS1saW5lY2FwPSJidXR0Ij48cGF0aCBkPSJNOSAzNmMzLjM5LS45NyAxMC4xMS40MyAxMy41LTIgMy4zOSAyLjQzIDEwLjExIDEuMDMgMTMuNSAyIDAgMCAxLjY1LjU0IDMgMi0uNjguOTctMS42NS45OS0zIC41LTMuMzktLjk3LTEwLjExLjQ2LTEzLjUtMS0zLjM5IDEuNDYtMTAuMTEuMDMtMTMuNSAxLTEuMzU0LjQ5LTIuMzIzLjQ3LTMtLjUgMS4zNTQtMS45NCAzLTIgMy0yeiIvPjxwYXRoIGQ9Ik0xNSAzMmMyLjUgMi41IDEyLjUgMi41IDE1IDAgLjUtMS41IDAtMiAwLTIgMC0yLjUtMi41LTQtMi41LTQgNS41LTEuNSA2LTExLjUtNS0xNS41LTExIDQtMTAuNSAxNC01IDE1LjUgMCAwLTIuNSAxLjUtMi41IDQgMCAwLS41LjUgMCAyeiIvPjxwYXRoIGQ9Ik0yNSA4YTIuNSAyLjUgMCAxIDEtNSAwIDIuNSAyLjUgMCAxIDEgNSAweiIvPjwvZz48cGF0aCBkPSJNMTcuNSAyNmgxME0xNSAzMGgxNW0tNy41LTE0LjV2NU0yMCAxOGg1IiBzdHJva2UtbGluZWpvaW49Im1pdGVyIi8+PC9nPjwvc3ZnPg==')}
+.pc.wN{background-image:url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NSIgaGVpZ2h0PSI0NSI+PGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0yMiAxMGMxMC41IDEgMTYuNSA4IDE2IDI5SDE1YzAtOSAxMC02LjUgOC0yMSIgZmlsbD0iI2ZmZiIvPjxwYXRoIGQ9Ik0yNCAxOGMuMzggMi45MS01LjU1IDcuMzctOCA5LTMgMi0yLjgyIDQuMzQtNSA0LTEuMDQyLS45NCAxLjQxLTMuMDQgMC0zLTEgMCAuMTkgMS4yMy0xIDItMSAwLTQuMDAzIDEtNC00IDAtMiA2LTEyIDYtMTJzMS44OS0xLjkgMi0zLjVjLS43My0uOTk0LS41LTItLjUtMyAxLTEgMyAyLjUgMyAyLjVoMnMuNzgtMS45OTIgMi41LTNjMSAwIDEgMyAxIDMiIGZpbGw9IiNmZmYiLz48cGF0aCBkPSJNOS41IDI1LjVhLjUuNSAwIDEgMS0xIDAgLjUuNSAwIDEgMSAxIDB6bTUuNDMzLTkuNzVhLjUgMS41IDMwIDEgMS0uODY2LS41LjUgMS41IDMwIDEgMSAuODY2LjV6IiBmaWxsPSIjMDAwIi8+PC9nPjwvc3ZnPg==')}
+.pc.wR{background-image:url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NSIgaGVpZ2h0PSI0NSI+PGcgZmlsbD0iI2ZmZiIgZmlsbC1ydWxlPSJldmVub2RkIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik05IDM5aDI3di0zSDl2M3ptMy0zdi00aDIxdjRIMTJ6bS0xLTIyVjloNHYyaDVWOWg1djJoNVY5aDR2NSIgc3Ryb2tlLWxpbmVjYXA9ImJ1dHQiLz48cGF0aCBkPSJNMzQgMTRsLTMgM0gxNGwtMy0zIi8+PHBhdGggZD0iTTMxIDE3djEyLjVIMTRWMTciIHN0cm9rZS1saW5lY2FwPSJidXR0IiBzdHJva2UtbGluZWpvaW49Im1pdGVyIi8+PHBhdGggZD0iTTMxIDI5LjVsMS41IDIuNWgtMjBsMS41LTIuNSIvPjxwYXRoIGQ9Ik0xMSAxNGgyMyIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVqb2luPSJtaXRlciIvPjwvZz48L3N2Zz4=')}
+.pc.wQ{background-image:url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NSIgaGVpZ2h0PSI0NSI+PGcgZmlsbD0iI2ZmZiIgZmlsbC1ydWxlPSJldmVub2RkIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik04IDEyYTIgMiAwIDEgMS00IDAgMiAyIDAgMSAxIDQgMHptMTYuNS00LjVhMiAyIDAgMSAxLTQgMCAyIDIgMCAxIDEgNCAwek00MSAxMmEyIDIgMCAxIDEtNCAwIDIgMiAwIDEgMSA0IDB6TTE2IDguNWEyIDIgMCAxIDEtNCAwIDIgMiAwIDEgMSA0IDB6TTMzIDlhMiAyIDAgMSAxLTQgMCAyIDIgMCAxIDEgNCAweiIvPjxwYXRoIGQ9Ik05IDI2YzguNS0xLjUgMjEtMS41IDI3IDBsMi0xMi03IDExVjExbC01LjUgMTMuNS0zLTE1LTMgMTUtNS41LTE0VjI1TDcgMTRsMiAxMnoiIHN0cm9rZS1saW5lY2FwPSJidXR0Ii8+PHBhdGggZD0iTTkgMjZjMCAyIDEuNSAyIDIuNSA0IDEgMS41IDEgMSAuNSAzLjUtMS41IDEtMS41IDIuNS0xLjUgMi41LTEuNSAxLjUuNSAyLjUuNSAyLjUgNi41IDEgMTYuNSAxIDIzIDAgMCAwIDEuNS0xIDAtMi41IDAgMCAuNS0xLjUtMS0yLjUtLjUtMi41LS41LTIgLjUtMy41IDEtMiAyLjUtMiAyLjUtNC04LjUtMS41LTE4LjUtMS41LTI3IDB6IiBzdHJva2UtbGluZWNhcD0iYnV0dCIvPjxwYXRoIGQ9Ik0xMS41IDMwYzMuNS0xIDE4LjUtMSAyMiAwTTEyIDMzLjVjNi0xIDE1LTEgMjEgMCIgZmlsbD0ibm9uZSIvPjwvZz48L3N2Zz4=')}
+.pc.wK{background-image:url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NSIgaGVpZ2h0PSI0NSI+PGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0yMi41IDExLjYzVjZNMjAgOGg1IiBzdHJva2UtbGluZWpvaW49Im1pdGVyIi8+PHBhdGggZD0iTTIyLjUgMjVzNC41LTcuNSAzLTEwLjVjMCAwLTEtMi41LTMtMi41cy0zIDIuNS0zIDIuNWMtMS41IDMgMyAxMC41IDMgMTAuNSIgZmlsbD0iI2ZmZiIgc3Ryb2tlLWxpbmVjYXA9ImJ1dHQiIHN0cm9rZS1saW5lam9pbj0ibWl0ZXIiLz48cGF0aCBkPSJNMTEuNSAzN2M1LjUgMy41IDE1LjUgMy41IDIxIDB2LTdzOS00LjUgNi0xMC41Yy00LTYuNS0xMy41LTMuNS0xNiA0VjI3di0zLjVjLTMuNS03LjUtMTMtMTAuNS0xNi00LTMgNiA1IDEwIDUgMTBWMzd6IiBmaWxsPSIjZmZmIi8+PHBhdGggZD0iTTExLjUgMzBjNS41LTMgMTUuNS0zIDIxIDBtLTIxIDMuNWM1LjUtMyAxNS41LTMgMjEgMG0tMjEgMy41YzUuNS0zIDE1LjUtMyAyMSAwIi8+PC9nPjwvc3ZnPg==')}
+.pc.bP{background-image:url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NSIgaGVpZ2h0PSI0NSI+PHBhdGggZD0iTTIyLjUgOWMtMi4yMSAwLTQgMS43OS00IDQgMCAuODkuMjkgMS43MS43OCAyLjM4QzE3LjMzIDE2LjUgMTYgMTguNTkgMTYgMjFjMCAyLjAzLjk0IDMuODQgMi40MSA1LjAzLTMgMS4wNi03LjQxIDUuNTUtNy40MSAxMy40N2gyM2MwLTcuOTItNC40MS0xMi40MS03LjQxLTEzLjQ3IDEuNDctMS4xOSAyLjQxLTMgMi40MS01LjAzIDAtMi40MS0xLjMzLTQuNS0zLjI4LTUuNjIuNDktLjY3Ljc4LTEuNDkuNzgtMi4zOCAwLTIuMjEtMS43OS00LTQtNHoiIHN0cm9rZT0iIzAwMCIgc3Ryb2tlLXdpZHRoPSIxLjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjwvc3ZnPg==')}
+.pc.bB{background-image:url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NSIgaGVpZ2h0PSI0NSI+PGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxnIGZpbGw9IiMwMDAiIHN0cm9rZS1saW5lY2FwPSJidXR0Ij48cGF0aCBkPSJNOSAzNmMzLjM5LS45NyAxMC4xMS40MyAxMy41LTIgMy4zOSAyLjQzIDEwLjExIDEuMDMgMTMuNSAyIDAgMCAxLjY1LjU0IDMgMi0uNjguOTctMS42NS45OS0zIC41LTMuMzktLjk3LTEwLjExLjQ2LTEzLjUtMS0zLjM5IDEuNDYtMTAuMTEuMDMtMTMuNSAxLTEuMzU0LjQ5LTIuMzIzLjQ3LTMtLjUgMS4zNTQtMS45NCAzLTIgMy0yeiIvPjxwYXRoIGQ9Ik0xNSAzMmMyLjUgMi41IDEyLjUgMi41IDE1IDAgLjUtMS41IDAtMiAwLTIgMC0yLjUtMi41LTQtMi41LTQgNS41LTEuNSA2LTExLjUtNS0xNS41LTExIDQtMTAuNSAxNC01IDE1LjUgMCAwLTIuNSAxLjUtMi41IDQgMCAwLS41LjUgMCAyeiIvPjxwYXRoIGQ9Ik0yNSA4YTIuNSAyLjUgMCAxIDEtNSAwIDIuNSAyLjUgMCAxIDEgNSAweiIvPjwvZz48cGF0aCBkPSJNMTcuNSAyNmgxME0xNSAzMGgxNW0tNy41LTE0LjV2NU0yMCAxOGg1IiBzdHJva2U9IiNlY2VjZWMiIHN0cm9rZS1saW5lam9pbj0ibWl0ZXIiLz48L2c+PC9zdmc+')}
+.pc.bN{background-image:url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NSIgaGVpZ2h0PSI0NSI+PGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0yMiAxMGMxMC41IDEgMTYuNSA4IDE2IDI5SDE1YzAtOSAxMC02LjUgOC0yMSIgZmlsbD0iIzAwMCIvPjxwYXRoIGQ9Ik0yNCAxOGMuMzggMi45MS01LjU1IDcuMzctOCA5LTMgMi0yLjgyIDQuMzQtNSA0LTEuMDQyLS45NCAxLjQxLTMuMDQgMC0zLTEgMCAuMTkgMS4yMy0xIDItMSAwLTQuMDAzIDEtNC00IDAtMiA2LTEyIDYtMTJzMS44OS0xLjkgMi0zLjVjLS43My0uOTk0LS41LTItLjUtMyAxLTEgMyAyLjUgMyAyLjVoMnMuNzgtMS45OTIgMi41LTNjMSAwIDEgMyAxIDMiIGZpbGw9IiMwMDAiLz48cGF0aCBkPSJNOS41IDI1LjVhLjUuNSAwIDEgMS0xIDAgLjUuNSAwIDEgMSAxIDB6bTUuNDMzLTkuNzVhLjUgMS41IDMwIDEgMS0uODY2LS41LjUgMS41IDMwIDEgMSAuODY2LjV6IiBmaWxsPSIjZWNlY2VjIiBzdHJva2U9IiNlY2VjZWMiLz48cGF0aCBkPSJNMjQuNTUgMTAuNGwtLjQ1IDEuNDUuNS4xNWMzLjE1IDEgNS42NSAyLjQ5IDcuOSA2Ljc1UzM1Ljc1IDI5LjA2IDM1LjI1IDM5bC0uMDUuNWgyLjI1bC4wNS0uNWMuNS0xMC4wNi0uODgtMTYuODUtMy4yNS0yMS4zNC0yLjM3LTQuNDktNS43OS02LjY0LTkuMTktNy4xNmwtLjUxLS4xeiIgZmlsbD0iI2VjZWNlYyIgc3Ryb2tlPSJub25lIi8+PC9nPjwvc3ZnPg==')}
+.pc.bR{background-image:url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NSIgaGVpZ2h0PSI0NSI+PGcgZmlsbC1ydWxlPSJldmVub2RkIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik05IDM5aDI3di0zSDl2M3ptMy41LTdsMS41LTIuNWgxN2wxLjUgMi41aC0yMHptLS41IDR2LTRoMjF2NEgxMnoiIHN0cm9rZS1saW5lY2FwPSJidXR0Ii8+PHBhdGggZD0iTTE0IDI5LjV2LTEzaDE3djEzSDE0eiIgc3Ryb2tlLWxpbmVjYXA9ImJ1dHQiIHN0cm9rZS1saW5lam9pbj0ibWl0ZXIiLz48cGF0aCBkPSJNMTQgMTYuNUwxMSAxNGgyM2wtMyAyLjVIMTR6TTExIDE0VjloNHYyaDVWOWg1djJoNVY5aDR2NUgxMXoiIHN0cm9rZS1saW5lY2FwPSJidXR0Ii8+PHBhdGggZD0iTTEyIDM1LjVoMjFtLTIwLTRoMTltLTE4LTJoMTdtLTE3LTEzaDE3TTExIDE0aDIzIiBmaWxsPSJub25lIiBzdHJva2U9IiNlY2VjZWMiIHN0cm9rZS13aWR0aD0iMSIgc3Ryb2tlLWxpbmVqb2luPSJtaXRlciIvPjwvZz48L3N2Zz4=')}
+.pc.bQ{background-image:url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NSIgaGVpZ2h0PSI0NSI+PGcgZmlsbC1ydWxlPSJldmVub2RkIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxnIHN0cm9rZT0ibm9uZSI+PGNpcmNsZSBjeD0iNiIgY3k9IjEyIiByPSIyLjc1Ii8+PGNpcmNsZSBjeD0iMTQiIGN5PSI5IiByPSIyLjc1Ii8+PGNpcmNsZSBjeD0iMjIuNSIgY3k9IjgiIHI9IjIuNzUiLz48Y2lyY2xlIGN4PSIzMSIgY3k9IjkiIHI9IjIuNzUiLz48Y2lyY2xlIGN4PSIzOSIgY3k9IjEyIiByPSIyLjc1Ii8+PC9nPjxwYXRoIGQ9Ik05IDI2YzguNS0xLjUgMjEtMS41IDI3IDBsMi41LTEyLjVMMzEgMjVsLS4zLTE0LjEtNS4yIDEzLjYtMy0xNC41LTMgMTQuNS01LjItMTMuNkwxNCAyNSA2LjUgMTMuNSA5IDI2eiIgc3Ryb2tlLWxpbmVjYXA9ImJ1dHQiLz48cGF0aCBkPSJNOSAyNmMwIDIgMS41IDIgMi41IDQgMSAxLjUgMSAxIC41IDMuNS0xLjUgMS0xLjUgMi41LTEuNSAyLjUtMS41IDEuNS41IDIuNS41IDIuNSA2LjUgMSAxNi41IDEgMjMgMCAwIDAgMS41LTEgMC0yLjUgMCAwIC41LTEuNS0xLTIuNS0uNS0yLjUtLjUtMiAuNS0zLjUgMS0yIDIuNS0yIDIuNS00LTguNS0xLjUtMTguNS0xLjUtMjcgMHoiIHN0cm9rZS1saW5lY2FwPSJidXR0Ii8+PHBhdGggZD0iTTExIDM4LjVhMzUgMzUgMSAwIDAgMjMgMCIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9ImJ1dHQiLz48cGF0aCBkPSJNMTEgMjlhMzUgMzUgMSAwIDEgMjMgMG0tMjEuNSAyLjVoMjBtLTIxIDNhMzUgMzUgMSAwIDAgMjIgMG0tMjMgM2EzNSAzNSAxIDAgMCAyNCAwIiBmaWxsPSJub25lIiBzdHJva2U9IiNlY2VjZWMiLz48L2c+PC9zdmc+')}
+.pc.bK{background-image:url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NSIgaGVpZ2h0PSI0NSI+PGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0yMi41IDExLjYzVjYiIHN0cm9rZS1saW5lam9pbj0ibWl0ZXIiLz48cGF0aCBkPSJNMjIuNSAyNXM0LjUtNy41IDMtMTAuNWMwIDAtMS0yLjUtMy0yLjVzLTMgMi41LTMgMi41Yy0xLjUgMyAzIDEwLjUgMyAxMC41IiBmaWxsPSIjMDAwIiBzdHJva2UtbGluZWNhcD0iYnV0dCIgc3Ryb2tlLWxpbmVqb2luPSJtaXRlciIvPjxwYXRoIGQ9Ik0xMS41IDM3YzUuNSAzLjUgMTUuNSAzLjUgMjEgMHYtN3M5LTQuNSA2LTEwLjVjLTQtNi41LTEzLjUtMy41LTE2IDRWMjd2LTMuNWMtMy41LTcuNS0xMy0xMC41LTE2LTQtMyA2IDUgMTAgNSAxMFYzN3oiIGZpbGw9IiMwMDAiLz48cGF0aCBkPSJNMjAgOGg1IiBzdHJva2UtbGluZWpvaW49Im1pdGVyIi8+PHBhdGggZD0iTTMyIDI5LjVzOC41LTQgNi4wMy05LjY1QzM0LjE1IDE0IDI1IDE4IDIyLjUgMjQuNWwuMDEgMi4xLS4wMS0yLjFDMjAgMTggOS45MDYgMTQgNi45OTcgMTkuODVjLTIuNDk3IDUuNjUgNC44NTMgOSA0Ljg1MyA5IiBzdHJva2U9IiNlY2VjZWMiLz48cGF0aCBkPSJNMTEuNSAzMGM1LjUtMyAxNS41LTMgMjEgMG0tMjEgMy41YzUuNS0zIDE1LjUtMyAyMSAwbS0yMSAzLjVjNS41LTMgMTUuNS0zIDIxIDAiIHN0cm9rZT0iI2VjZWNlYyIvPjwvZz48L3N2Zz4=')}
+
+/* header */
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:18px;flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:10px;background:none;border:0;padding:0;cursor:pointer}
+.logo .mark{width:42px;height:42px;border-radius:12px;background:var(--accent);display:grid;place-items:center}
+.logo .mark i{width:32px;height:32px;display:block}
+.logo b{font-family:var(--display);font-weight:800;font-size:28px;letter-spacing:-.01em}
+.logo b span{color:var(--accent)}
+.stats{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;background:var(--surface);border:1px solid var(--line);font-weight:600;font-size:14px;font-variant-numeric:tabular-nums}
+.pill .ico{width:18px;height:18px}
+.pill.btn{cursor:pointer}
+.star-ico{background:var(--sun);-webkit-mask:var(--star-mask) center/contain no-repeat;mask:var(--star-mask) center/contain no-repeat;display:inline-block}
+:root{--star-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 1.8l3.1 6.6 7.2.9-5.3 5 1.4 7.1L12 17.9l-6.4 3.5L7 14.3l-5.3-5 7.2-.9z'/%3E%3C/svg%3E")}
+.xp-ico{width:18px;height:18px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font-size:10px;font-weight:700;display:grid;place-items:center}
+
+/* map */
+.hero{display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:24px;padding:22px;margin-top:4px}
+.hero h1{font-size:clamp(28px,5vw,40px);font-weight:800}
+.hero p{margin:6px 0 14px;color:var(--muted);max-width:56ch}
+.avatar{width:76px;height:76px;border-radius:50%;background:var(--accent);display:grid;place-items:center;flex:none;box-shadow:0 0 0 5px var(--accent-soft)}
+.avatar i{width:58px;height:58px;display:block}
+.avatar.sm{width:54px;height:54px;box-shadow:0 0 0 4px var(--accent-soft)}
+.avatar.sm i{width:42px;height:42px}
+.cta{display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:var(--accent-ink);border:0;border-radius:14px;padding:12px 20px;font-family:var(--display);font-weight:700;font-size:19px;cursor:pointer;box-shadow:0 4px 0 color-mix(in srgb,var(--accent) 60%,#000)}
+.cta:active{transform:translateY(3px);box-shadow:0 1px 0 color-mix(in srgb,var(--accent) 60%,#000)}
+.cta:disabled{background:var(--line);color:var(--muted);box-shadow:none;cursor:not-allowed}
+.ghost{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:9px 14px;font-weight:500;font-size:14px;cursor:pointer}
+.ghost:hover{border-color:var(--accent)}
+.proto{font-size:13px;color:var(--muted);margin:14px 4px 0}
+.tahap{margin-top:34px}
+.tahap-head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;border-bottom:2px dashed var(--line);padding-bottom:8px}
+.tahap-head small{font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:600;color:var(--accent)}
+.tahap-head h2{font-size:26px;font-weight:700}
+.tahap-head span{color:var(--muted);font-size:14px}
+.path{display:flex;flex-direction:column;align-items:center;gap:6px;padding-block:20px 4px}
+.stop{display:flex;flex-direction:column;align-items:center;gap:6px;width:150px;transform:translateX(var(--x,0));text-align:center}
+.node{width:76px;height:76px;border-radius:50%;border:0;display:grid;place-items:center;position:relative;cursor:pointer;background:var(--line);box-shadow:0 5px 0 color-mix(in srgb,var(--line) 70%,#000)}
+.node i{width:52px;height:52px;display:block}
+.stop.soon .node, .stop.locked .node{cursor:default}
+.stop.soon .node i,.stop.locked .node i{opacity:.4;filter:grayscale(1)}
+.stop.open .node{background:var(--accent);box-shadow:0 5px 0 color-mix(in srgb,var(--accent) 60%,#000)}
+.stop.open .node::after{content:"";position:absolute;inset:-9px;border-radius:50%;border:3px solid var(--accent);opacity:.5;animation:pulse 1.8s ease-out infinite}
+.stop.done .node{background:var(--sun);box-shadow:0 5px 0 color-mix(in srgb,var(--sun) 60%,#000)}
+.stop .lbl{font-weight:600;font-size:14px;line-height:1.25}
+.stop .sub{font-size:12px;color:var(--muted);display:flex;gap:2px;align-items:center;justify-content:center}
+.stop .sub .star-ico{width:14px;height:14px}
+.stop .sub .star-ico.off{background:var(--line)}
+.lock{position:absolute;right:-2px;bottom:-2px;width:26px;height:26px;border-radius:50%;background:var(--surface);border:2px solid var(--line);display:grid;place-items:center}
+.lock svg{width:13px;height:13px;fill:var(--muted)}
+@keyframes pulse{0%{transform:scale(.9);opacity:.7}100%{transform:scale(1.25);opacity:0}}
+
+/* lesson */
+.lesson-bar{display:flex;align-items:center;gap:14px;padding-block:6px 18px;flex-wrap:wrap}
+.lesson-bar h2{font-size:24px;font-weight:700}
+.prog{flex:1 1 200px;display:flex;gap:5px;min-width:0}
+.prog span{flex:1;height:10px;border-radius:99px;background:var(--line)}
+.prog span.on{background:var(--accent)}
+.prog span.cur{background:var(--sun)}
+.lesson{display:grid;grid-template-columns:minmax(0,560px) minmax(0,1fr);gap:28px;align-items:start}
+@media (max-width:860px){.lesson{grid-template-columns:minmax(0,1fr)}.board-wrap{max-width:520px;margin:0 auto;width:100%}}
+.panel{display:flex;flex-direction:column;gap:14px;min-width:0}
+.coach{display:flex;gap:14px;align-items:flex-start}
+.bubble{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;min-width:0;flex:1}
+.bubble::before{content:"";position:absolute;left:-8px;top:20px;width:14px;height:14px;background:var(--surface);border-left:1px solid var(--line);border-bottom:1px solid var(--line);transform:rotate(45deg)}
+.bubble .who{font-family:var(--display);font-weight:700;color:var(--accent);font-size:15px;line-height:1}
+.bubble p{margin:6px 0 0}
+.step-title{font-size:30px;font-weight:800}
+.task{background:var(--sun-soft);border-radius:var(--r);padding:14px 16px;display:flex;flex-direction:column;gap:6px}
+.task small{font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:600;color:color-mix(in srgb,var(--sun) 55%,var(--ink))}
+.task .row{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.counter{font-weight:600;font-variant-numeric:tabular-nums;background:var(--surface);border-radius:99px;padding:3px 12px;font-size:14px}
+.counter:empty{display:none}
+.status{min-height:52px;border-radius:14px;padding:12px 14px;font-weight:500;background:transparent;transition:background .2s}
+.status:empty{padding:0;min-height:0}
+.status.good{background:var(--good-soft);color:var(--good)}
+.status.bad{background:var(--coral-soft);color:var(--coral)}
+.status.info{background:var(--accent-soft)}
+.actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.actions .spacer{flex:1}
+kbd{font-family:var(--body);font-weight:600;background:var(--accent-soft);padding:1px 6px;border-radius:6px;font-size:.92em}
+
+/* board */
+.board{position:relative;width:100%;aspect-ratio:1;border-radius:14px;border:8px solid var(--frame);overflow:hidden;box-shadow:0 10px 30px -12px rgba(10,30,40,.45);user-select:none;-webkit-user-select:none;touch-action:manipulation}
+.grid{position:absolute;inset:0;display:grid;grid-template-columns:repeat(8,1fr);grid-template-rows:repeat(8,1fr)}
+.sq{border:0;padding:0;margin:0;position:relative;cursor:pointer;border-radius:0}
+.sq.light{background:var(--sq-light)} .sq.dark{background:var(--sq-dark)}
+.sq:focus-visible{outline:3px solid var(--sun);outline-offset:-3px;z-index:2}
+.sq .cr,.sq .cf{position:absolute;font-size:clamp(8px,1.6vw,11px);font-weight:600;line-height:1;pointer-events:none}
+.sq .cr{top:3px;left:3px} .sq .cf{bottom:3px;right:4px}
+.sq.light .cr,.sq.light .cf{color:var(--sq-dark)} .sq.dark .cr,.sq.dark .cf{color:var(--sq-light)}
+.sq.sel{background:color-mix(in srgb,var(--sun) 70%,var(--sq-light))}
+.sq.good{background:color-mix(in srgb,var(--good) 55%,var(--sq-light))}
+.sq.hl{background:color-mix(in srgb,var(--accent) 35%,var(--sq-light))}
+.sq.dot::after{content:"";position:absolute;inset:36%;border-radius:50%;background:rgba(20,40,50,.32)}
+.sq.ring::after{content:"";position:absolute;inset:6%;border-radius:50%;border:4px solid var(--coral);animation:ringp 1s ease-in-out infinite alternate}
+.sq.star::before{content:"";position:absolute;inset:18%;background:var(--sun);-webkit-mask:var(--star-mask) center/contain no-repeat;mask:var(--star-mask) center/contain no-repeat;animation:bob 1.6s ease-in-out infinite;filter:drop-shadow(0 2px 0 rgba(0,0,0,.25))}
+.sq.bad{animation:flashbad .6s}
+@keyframes flashbad{0%,100%{box-shadow:inset 0 0 0 0 var(--coral)}30%{box-shadow:inset 0 0 0 40px var(--coral)}}
+@keyframes bob{0%,100%{transform:translateY(-4%)}50%{transform:translateY(4%)}}
+@keyframes ringp{from{transform:scale(.92)}to{transform:scale(1)}}
+.pieces,.arrows{position:absolute;inset:0;pointer-events:none}
+.piece{position:absolute;left:0;top:0;width:12.5%;height:12.5%;transition:transform .38s cubic-bezier(.3,1.4,.5,1),opacity .3s;will-change:transform}
+.piece.captured{opacity:0}
+.piece.hop{animation:hop .38s}
+@keyframes hop{50%{filter:drop-shadow(0 10px 6px rgba(0,0,0,.35))}}
+.arrows line,.arrows polyline{stroke-linecap:round;stroke-linejoin:round;fill:none}
+.arrows .a-coral{stroke:var(--coral)} .arrows .a-path{stroke:var(--accent)}
+.arrows .m-coral{fill:var(--coral)} .arrows .m-path{fill:var(--accent)}
+.arrows .draw{stroke-dasharray:20;stroke-dashoffset:20;animation:draw .5s forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+
+/* modal */
+.modal{position:fixed;inset:0;background:color-mix(in srgb,var(--ink) 45%,transparent);display:grid;place-items:center;padding:16px;z-index:20}
+.card{background:var(--surface);border-radius:26px;padding:28px 24px;max-width:420px;width:100%;text-align:center;display:flex;flex-direction:column;gap:12px;align-items:center;border:1px solid var(--line)}
+.card h2{font-size:36px;font-weight:800}
+.card .big-stars{display:flex;gap:8px}
+.card .big-stars .star-ico{width:46px;height:46px}
+.card .big-stars .star-ico.off{background:var(--line)}
+.card .big-stars .star-ico:nth-child(2){transform:translateY(-10px)}
+.card p{margin:0;color:var(--muted)}
+.card .xp{font-family:var(--display);font-weight:700;font-size:22px;color:var(--accent)}
+.card .tip{background:var(--accent-soft);border-radius:14px;padding:10px 14px;font-size:14px;color:var(--ink);text-align:left}
+.foot{margin-top:40px;color:var(--muted);font-size:13px;display:flex;gap:12px;flex-wrap:wrap;justify-content:space-between;border-top:1px solid var(--line);padding-top:16px}
+.linkbtn{background:none;border:0;color:var(--muted);text-decoration:underline;cursor:pointer;padding:0;font-size:13px}
+@media (max-width:520px){.hero{grid-template-columns:1fr;text-align:left}.step-title{font-size:26px}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.opts{display:flex;flex-direction:column;gap:8px}
+.opts:empty{display:none}
+.opt{text-align:left;background:var(--surface);border:2px solid var(--line);border-radius:14px;padding:11px 14px;font-weight:500;cursor:pointer;font-size:15px}
+.opt:hover:not(:disabled){border-color:var(--accent)}
+.opt.good{border-color:var(--good);background:var(--good-soft);color:var(--good)}
+.opt.bad{border-color:var(--coral);background:var(--coral-soft);color:var(--coral);text-decoration:line-through}
+.opt:disabled{cursor:default}
+.turn{margin:8px 2px 0;font-size:13px;color:var(--muted);text-align:center}
+.turn:empty{display:none}
+.hero-row{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.meter{width:140px;height:10px;border-radius:99px;background:var(--line);overflow:hidden}
+.meter span{display:block;height:100%;background:var(--sun)}
+.meter-lbl{color:var(--muted);font-size:13px;font-variant-numeric:tabular-nums}
+.guru{display:inline-flex;gap:6px;align-items:center;font-size:13px;color:var(--muted);cursor:pointer}
+.guru input{accent-color:var(--accent);width:16px;height:16px}
+.foot-r{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.status b{font-weight:700}
+.pill.play{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.quick{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-top:14px}
+.qcard{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:14px 16px;cursor:pointer}
+.qcard:hover{border-color:var(--accent)}
+.qcard b{font-family:var(--display);font-size:19px;font-weight:700;display:block;line-height:1.2}
+.qcard small{color:var(--muted);font-size:13px;display:block}
+.qcard.done{background:var(--good-soft)}
+.qico{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;background:var(--accent-soft)}
+.qico i{width:38px;height:38px;display:block}
+.qico svg{width:28px;height:28px;fill:var(--accent)}
+.qico.flame{background:var(--sun-soft)} .qico.flame svg{fill:var(--sun)}
+.qico.big{width:72px;height:72px;border-radius:22px} .qico.big svg{width:44px;height:44px}
+.qnum{font-family:var(--display);font-weight:800;font-size:28px;line-height:1;text-align:center;font-variant-numeric:tabular-nums}
+.qnum small{font-family:var(--body);font-weight:500;font-size:11px}
+.stop.exam .node{border-radius:22px;width:84px;height:84px}
+.medal svg{width:46px;height:46px;fill:#fff}
+.stop.locked.exam .medal svg{fill:var(--muted)}
+.stop.exam .lbl{font-family:var(--display);font-size:17px}
+.exam-note{margin:0;background:var(--coral-soft);color:var(--ink);border-radius:12px;padding:8px 12px;font-size:14px}
+.prog span.miss{background:var(--coral)}
+.cert{border:3px double var(--sun);border-radius:18px;padding:18px 16px;display:flex;flex-direction:column;gap:8px;align-items:center;width:100%;background:var(--sun-soft)}
+.cert > small{letter-spacing:.14em;text-transform:uppercase;font-weight:600;color:var(--muted);font-size:11px}
+.cert h2{font-size:26px}
+.cert p{margin:0;color:var(--muted)}
+.cert-name{font-family:var(--display);font-size:26px;font-weight:700;text-align:center;border:0;border-bottom:2px dashed var(--sun);background:transparent;color:var(--ink);width:100%;max-width:300px;padding:4px}
+.cert-name:focus{outline:none;border-bottom-style:solid}
+.cert-date{color:var(--muted);font-size:12px}
+.setup{display:flex;flex-direction:column;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px}
+.seg{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.seg-l{font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;color:var(--muted);width:64px}
+.seg button{border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:7px 12px;cursor:pointer;font-weight:500;font-size:14px}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.setup .cta{align-self:flex-start}
+.moves small{font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;color:var(--muted)}
+.moves ol{margin:6px 0 0;padding:0 0 0 2.2em;max-height:180px;overflow-y:auto;font-variant-numeric:tabular-nums;columns:1;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding-block:8px}
+.moves li{padding:1px 8px 1px 0}
+.moves li span{display:inline-block;min-width:64px;font-weight:500}
+.moves ol:empty{display:none}
+</style>
+<div class="app">
+  <header class="top">
+    <button class="logo" id="home" type="button" aria-label="ChessFlow, ke peta"><span class="mark"><i class="pc wN"></i></span><b>Chess<span>Flow</span></b></button>
+    <div class="stats">
+      <span class="pill" title="Jumlah bintang"><i class="star-ico ico"></i><span id="st-stars">0</span></span>
+      <span class="pill" title="Mata pengalaman"><span class="xp-ico">XP</span><span id="st-xp">0</span></span>
+      <button class="pill btn play" id="play-top" type="button">Main</button>
+      <button class="pill btn" id="snd" type="button" aria-pressed="true">Bunyi: Hidup</button>
+    </div>
+  </header>
+  <main id="view-map"></main>
+  <main id="view-lesson" hidden></main>
+  <main id="view-game" hidden></main>
+  <footer class="foot">
+    <span>ChessFlow · Belajar catur dalam Bahasa Melayu untuk kanak-kanak dan pemula</span>
+    <span class="foot-r"><label class="guru" for="guru"><input type="checkbox" id="guru"> Mod guru: buka semua pelajaran</label><button class="linkbtn" id="reset" type="button">Padam kemajuan</button></span>
+  </footer>
+</div>
+<div class="modal" id="modal" hidden></div>
+<script src="https://cdn.jsdelivr.net/npm/chess.js@0.10.3/chess.js"></script>
+<script>
+const START='rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
+const TAHAP=[
+ {n:1,name:'Kenal Catur',note:'Papan, buah dan peraturan asas'},
+ {n:2,name:'Main Dengan Betul',note:'Notasi, pembukaan dan mate asas'},
+ {n:3,name:'Taktik',note:'Helah untuk menang buah'},
+ {n:4,name:'Strategi',note:'Rancang permainan tengah'},
+ {n:5,name:'Endgame',note:'Tamatkan permainan dengan yakin'}
+];
+const LESSONS_DATA=[
+/* ================= TAHAP 1 ================= */
+{id:'papan',tahap:1,title:'Papan Catur',icon:'wR',steps:[
+ {type:'explain',title:'64 petak',pcs:'',hl:['file:e','rank:4'],ring:['e4'],
+  say:'Papan catur ada <b>64 petak</b>: 8 lajur (huruf <b>a</b> hingga <b>h</b>) dan 8 baris (nombor <b>1</b> hingga <b>8</b>). Setiap petak ada nama: huruf lajur + nombor baris.',
+  task:'Lajur e dan baris 4 bertemu di petak <kbd>e4</kbd>. Huruf di bawah, nombor di tepi.'},
+ {type:'tap',title:'Cari petak',pcs:'',say:'Jom uji! Cari huruf dulu di bawah papan, kemudian naik ke nombor barisnya.',
+  wrong:'Itu petak {sq}. Cari huruf dulu, kemudian nombor.',
+  seq:[{ask:'Tekan petak <kbd>d5</kbd>.',sq:['d5']},{ask:'Tekan petak <kbd>a1</kbd>.',sq:['a1']},{ask:'Tekan petak <kbd>h8</kbd>.',sq:['h8']},{ask:'Tekan petak <kbd>c6</kbd>.',sq:['c6']},{ask:'Tekan petak <kbd>g2</kbd>.',sq:['g2'],ok:'Hebat! Awak sudah pandai membaca papan catur.'}]},
+ {type:'quiz',title:'Cerah di kanan',pcs:'',ring:['h1'],
+  say:'Sebelum main, pastikan papan diletak dengan betul.',
+  task:'Bila Putih duduk di depan papan, petak di <b>sudut kanan bawah</b> mesti warna apa?',
+  options:[{t:'Cerah',ok:true,why:'Betul! Ingat: <b>cerah di kanan</b>. Kalau papan terbalik, susunan buah pun jadi salah.'},{t:'Gelap',why:'Bukan. Petak h1 mesti cerah. Ingat: cerah di kanan.'}]},
+ {type:'explain',title:'Susunan permulaan',fen:START,ring:['d1','d8'],
+  say:'Tir di sudut, kemudian Kuda, Gajah, dan di tengah Menteri dan Raja. Menteri ikut warna petaknya: Menteri putih di petak cerah <kbd>d1</kbd>, Menteri hitam di petak gelap <kbd>d8</kbd>.',
+  task:'Barisan depan diisi 8 bidak. Putih sentiasa bergerak dahulu.'},
+ {type:'tap',title:'Kenal buah',fen:START,say:'Sekarang cari buah-buah ini.',wrong:'Bukan yang itu. Cuba lagi.',
+  seq:[{ask:'Tekan <b>Raja putih</b>.',sq:['e1']},{ask:'Tekan <b>Menteri hitam</b>.',sq:['d8']},{ask:'Tekan <b>kedua-dua</b> Kuda putih.',sq:['b1','g1'],all:true},{ask:'Tekan <b>Tir hitam</b> di sudut kanan atas.',sq:['h8'],ok:'Bagus! Awak kenal semua buah.'}]}
+]},
+{id:'kuda',tahap:1,title:'Kenal Kuda',icon:'wN',steps:[
+ {type:'explain',title:'Ini Kuda',pcs:'wNd4',showMoves:'d4',initPath:'e6',
+  say:'Saya Pak Kuda! Kuda bergerak macam huruf <b>L</b>: dua petak lurus, kemudian satu petak ke tepi. Dari tengah papan, kuda boleh pergi ke <b>8 petak</b>. Kuda bernilai 3 mata.',
+  task:'Tekan mana-mana titik untuk tengok laluan L kuda.'},
+ {type:'find',title:'Cari 8 petak',pcs:'wNe4',piece:'e4',
+  say:'Sekarang giliran awak. Kuda ada di <kbd>e4</kbd>. Cari <b>semua</b> petak yang kuda boleh pergi.',
+  task:'Tekan semua petak yang kuda boleh pergi.',done:'Hebat! Kesemua 8 petak membentuk bulatan di sekeliling kuda.'},
+ {type:'puzzle',title:'Kuda boleh melompat',fen:START,accept:{piece:'n'},
+  say:'Kuda ialah satu-satunya buah yang boleh <b>melompat</b> melepasi buah lain. Sebab itu kuda boleh keluar sebelum bidak bergerak.',
+  task:'Tekan salah satu kuda putih, kemudian lompat ke petak bertitik.',wrongMsg:'Cuba gerakkan kuda.',
+  win:'Lompat! Kuda melepasi barisan bidak. Tiada buah lain boleh buat begitu.'},
+ {type:'tap',title:'Kuda di tepi, nasibnya sepi',pcs:'wNa1 wNd5',
+  say:'Ada pepatah catur: <b>kuda di tepi, nasibnya sepi</b>. Kuda di tepi papan boleh pergi ke sedikit petak sahaja.',
+  wrongMap:{a1:'Kuda a1 cuma boleh pergi ke 2 petak. Cuba kuda yang satu lagi.'},wrong:'Tekan salah satu kuda.',
+  seq:[{ask:'Kuda mana boleh pergi ke <b>lebih banyak</b> petak? Tekan kuda itu.',sq:['d5'],dotsOf:['a1','d5'],ok:'Betul! Kuda d5 kawal 8 petak, kuda a1 hanya 2. Letak kuda di tengah supaya ia kuat.'}]},
+ {type:'collect',title:'Misi: Kuda Kutip Bintang',pcs:'wNa1',piece:'a1',stars:['c2','e5','b6','g6','h2'],
+  say:'Masa untuk misi! Bawa kuda kutip <b>semua bintang</b>. Cuba guna langkah sesedikit mungkin.',
+  task:'Tekan petak bertitik untuk gerakkan kuda.'}
+]},
+{id:'gajah',tahap:1,title:'Kenal Gajah',icon:'wB',steps:[
+ {type:'explain',title:'Ini Gajah',pcs:'wBd4',showMoves:'d4',
+  say:'Gajah bergerak <b>serong</b> (diagonal), sejauh mana pun selagi tiada halangan. Gajah bernilai 3 mata, sama seperti Kuda.',
+  task:'Tekan mana-mana titik untuk tengok laluan gajah.'},
+ {type:'find',title:'Halangan dan makan',pcs:'wBc3 wPe5 bPa5',piece:'c3',
+  say:'Gajah tak boleh melompat. Bidak putih di e5 menghalang laluannya. Tapi gajah boleh <b>makan</b> bidak hitam di a5.',
+  task:'Tekan semua petak yang gajah boleh pergi, termasuk petak makan.',done:'Betul! Gajah berhenti sebelum bidak sendiri, dan boleh makan buah lawan.'},
+ {type:'quiz',title:'Warna gajah',pcs:'wBc1 wBf1',ring:['c1'],
+  say:'Setiap pemain ada dua Gajah: satu di petak gelap, satu di petak cerah.',
+  task:'Gajah di c1 berdiri di petak gelap. Bolehkah ia sampai ke petak cerah?',
+  options:[{t:'Boleh, kalau bergerak banyak kali',why:'Tidak boleh. Gajah bergerak serong, jadi ia sentiasa kekal pada warna yang sama.'},{t:'Tidak boleh, sampai bila-bila',ok:true,why:'Betul! Gajah petak gelap kekal di petak gelap sepanjang permainan.'}]},
+ {type:'collect',title:'Misi: Gajah Kutip Bintang',pcs:'wBc1',piece:'c1',stars:['a3','e5','h6','f2','b8'],
+  say:'Semua bintang ada di petak gelap, sama warna dengan gajah ini. Kutip semuanya!',task:'Tekan petak bertitik untuk gerakkan gajah.'}
+]},
+{id:'tir',tahap:1,title:'Kenal Tir',icon:'wR',steps:[
+ {type:'explain',title:'Ini Tir',pcs:'wRd4',showMoves:'d4',
+  say:'Tir bergerak <b>lurus</b>: ke depan, belakang, kiri dan kanan, sejauh mana pun. Tir bernilai <b>5 mata</b>.',
+  task:'Tekan mana-mana titik untuk tengok laluan tir.'},
+ {type:'find',title:'Halangan dan makan',pcs:'wRe4 wPe6 bNb4',piece:'e4',
+  say:'Bidak putih di e6 menghalang tir. Kuda hitam di b4 pula boleh dimakan.',
+  task:'Tekan semua petak yang tir boleh pergi, termasuk petak makan.',done:'Betul! Tir kawal banyak petak bila laluannya terbuka.'},
+ {type:'tap',title:'Tir menyerang',pcs:'wRd2 bNd7 bBb4 bPf3 wKg1 bKh8',
+  say:'Tir boleh menyerang dari jauh.',
+  wrongMap:{b4:'Gajah b4 tiada pada laluan lurus tir.',f3:'Bidak f3 di baris 3, bukan baris 2. Tir tak boleh makan serong.'},wrong:'Itu bukan buah hitam yang boleh dimakan.',
+  seq:[{ask:'Tir putih boleh makan <b>satu</b> buah hitam. Tekan buah itu.',sq:['d7'],arrows:[['d2','d7']],ok:'Betul! Tir naik lurus di lajur d dan makan Kuda.'}]},
+ {type:'collect',title:'Misi: Tir Kutip Bintang',pcs:'wRa1 wPd1 wPa5 wPc4',piece:'a1',stars:['h1','c6','e8','b3'],
+  say:'Bidak putih menghalang beberapa laluan. Rancang jalan tir dengan bijak!',task:'Tekan petak bertitik untuk gerakkan tir.'}
+]},
+{id:'menteri',tahap:1,title:'Menteri & Raja',icon:'wQ',steps:[
+ {type:'explain',title:'Ini Menteri',pcs:'wQd4',showMoves:'d4',
+  say:'Menteri ialah buah paling kuat, bernilai <b>9 mata</b>. Ia bergerak macam <b>Tir + Gajah</b>: lurus dan serong.',
+  task:'Tekan mana-mana titik untuk tengok laluan menteri.'},
+ {type:'collect',title:'Misi: Menteri Kutip Bintang',pcs:'wQd1',piece:'d1',stars:['a4','h5','e8','b6','g2'],
+  say:'Menteri boleh pergi jauh dalam satu langkah. Kutip semua bintang dengan langkah paling sedikit!',task:'Tekan petak bertitik untuk gerakkan menteri.'},
+ {type:'explain',title:'Ini Raja',pcs:'wKe4',showMoves:'e4',
+  say:'Raja paling penting tapi bergerak perlahan: <b>1 petak</b> ke mana-mana arah. Kalau Raja tak dapat diselamatkan (sah mati), permainan tamat!',
+  task:'Tekan mana-mana titik untuk tengok langkah raja.'},
+ {type:'tap',title:'Raja mesti selamat',pcs:'wKe1 bRa2 bKh8',arrows:[['a2','h2']],
+  say:'Raja tak boleh masuk ke petak yang <b>diserang</b> buah lawan. Tir hitam kawal seluruh baris 2.',
+  wrongMap:{d2:'d2 diserang Tir hitam!',e2:'e2 diserang Tir hitam!',f2:'f2 diserang Tir hitam!'},wrong:'Raja tak boleh pergi sejauh itu. Raja bergerak 1 petak sahaja.',
+  seq:[{ask:'Tekan <b>semua</b> petak yang selamat untuk Raja putih.',sq:['d1','f1'],all:true,ok:'Betul! Raja hanya selamat di d1 dan f1.'}]},
+ {type:'quiz',title:'Dua Raja',pcs:'wKe4 bKe6',hl:['e5'],
+  say:'Satu peraturan penting tentang dua Raja.',task:'Bolehkah Raja putih bergerak ke e5, betul-betul di sebelah Raja hitam?',
+  options:[{t:'Boleh',why:'Tidak boleh. Raja tak boleh berdiri bersebelahan dengan Raja lawan.'},{t:'Tidak boleh',ok:true,why:'Betul! Mesti ada sekurang-kurangnya satu petak di antara dua Raja.'}]}
+]},
+{id:'bidak',tahap:1,title:'Bidak & Promosi',icon:'wP',steps:[
+ {type:'explain',title:'Ini Bidak',pcs:'wPe2 wPd4 bPc5 bPe5 bPd5',dots:['e3','e4'],ring:['c5','e5'],arrows:[['d4','c5'],['d4','e5']],
+  say:'Bidak bergerak <b>ke depan 1 petak</b>. Pada langkah pertamanya, bidak boleh maju <b>2 petak</b>. Bidak <b>makan secara serong</b> ke depan.',
+  task:'Bidak e2 boleh ke e3 atau e4. Bidak d4 tersekat, tapi boleh makan c5 atau e5.'},
+ {type:'puzzle',title:'Bidak makan serong',fen:'4k3/8/8/3np3/4P3/8/8/4K3 w - - 0 1',line:['e4d5'],
+  say:'Bidak e4 tak boleh maju sebab tersekat bidak e5. Tapi ia boleh makan serong!',task:'Makan Kuda hitam dengan bidak.',
+  wrongMsg:'Cuba gunakan bidak.',win:'Bagus! Bidak makan Kuda secara serong.'},
+ {type:'puzzle',title:'Promosi!',fen:'8/1P2k3/8/8/8/8/8/4K3 w - - 0 1',line:['b7b8q'],
+  say:'Bila bidak sampai ke baris terakhir, ia <b>naik pangkat</b> (promosi) jadi Menteri, Tir, Gajah atau Kuda. Biasanya kita pilih Menteri!',
+  task:'Tolak bidak ke b8.',wrongMsg:'Tolak bidak ke depan.',win:'Promosi! Bidak bertukar jadi Menteri.'},
+ {type:'play',title:'Perlumbaan bidak',fen:'8/8/1k6/6P1/8/8/8/4K3 w - - 0 1',goal:'promote',bot:'chase',maxMoves:6,
+  say:'Raja hitam cuba tangkap bidak awak. Bawa bidak ke baris 8 dahulu!',task:'Tolak bidak sampai promosi.',
+  win:'Menang perlumbaan! Raja hitam terlalu jauh untuk menangkap bidak.'}
+]},
+{id:'nilai',tahap:1,title:'Nilai Buah',icon:'bQ',steps:[
+ {type:'explain',title:'Berapa nilai setiap buah?',pcs:'wPb4 wNc4 wBd4 wRe4 wQf4 wKg4',counter:'1 · 3 · 3 · 5 · 9',
+  say:'Setiap buah ada nilai mata: <b>Bidak 1</b>, <b>Kuda 3</b>, <b>Gajah 3</b>, <b>Tir 5</b>, <b>Menteri 9</b>. Raja tiada nilai sebab Raja tak boleh ditukar.',
+  task:'Hafal nilai ini. Ia membantu kita tahu tukaran mana yang untung.'},
+ {type:'quiz',title:'Untung atau rugi?',fen:'4k3/4p3/3r4/1N6/8/8/8/4K3 w - - 0 1',arrows:[['b5','d6']],
+  say:'Kuda putih makan Tir hitam, kemudian bidak hitam makan Kuda.',task:'Untung atau rugi untuk Putih?',
+  options:[{t:'Untung 2 mata',ok:true,why:'Betul! Dapat Tir (5), hilang Kuda (3). 5 − 3 = untung 2.'},{t:'Rugi 2 mata',why:'Kira lagi: Putih dapat 5 dan hilang 3.'},{t:'Sama sahaja',why:'Tir lebih bernilai daripada Kuda.'}]},
+ {type:'quiz',title:'Bidak beracun',fen:'4k3/8/2n5/4p3/8/8/4Q3/4K3 w - - 0 1',arrows:[['e2','e5']],
+  say:'Menteri putih boleh makan bidak e5, tapi bidak itu dijaga Kuda hitam.',task:'Patutkah Menteri makan bidak itu?',
+  options:[{t:'Ya, dapat bidak percuma',why:'Bukan percuma! Dapat 1, hilang 9.'},{t:'Tidak, rugi 8 mata',ok:true,why:'Betul! 1 − 9 = rugi 8. Selalu semak siapa yang menjaga buah lawan.'}]},
+ {type:'puzzle',title:'Pilih tangkapan terbaik',fen:'4k3/n4p2/4p3/3q4/8/2N5/8/R3K3 w - - 0 1',line:['c3d5','e6d5'],
+  say:'Ada dua buah hitam yang boleh dimakan. Pilih yang paling untung.',task:'Buat tangkapan paling untung.',
+  wrongMsg:'Tangkapan itu kurang untung. Cari buah hitam yang paling bernilai.',win:'Hebat! Kuda (3) ditukar dengan Menteri (9). Untung 6 mata!'}
+]},
+{id:'khas',tahap:1,title:'Castling & En Passant',icon:'wK',steps:[
+ {type:'explain',title:'Castling',fen:'r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w KQkq - 0 1',demo:['e1g1'],demoEnd:'Raja ke g1, Tir melompat ke f1.',
+  say:'<b>Castling</b>: Raja bergerak 2 petak ke arah Tir, kemudian Tir melompat ke sebelah Raja. Ia selamatkan Raja dan aktifkan Tir sekali gus.',
+  task:'Tengok castling ke kanan (castling pendek).'},
+ {type:'puzzle',title:'Buat castling',fen:'r1bqk2r/pppp1ppp/2n2n2/2b1p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 6 5',line:['e1g1'],
+  say:'Syarat castling: Raja dan Tir belum pernah bergerak, tiada buah di antaranya, dan Raja tidak sedang kena sah.',
+  task:'Tekan Raja, kemudian petak g1.',wrongMsg:'Tekan Raja, kemudian petak g1 untuk castling.',win:'Castling berjaya! Raja kini selamat di sudut.'},
+ {type:'quiz',title:'Boleh castling?',fen:'4k3/8/8/8/8/8/6b1/4K2R w K - 0 1',arrows:[['g2','f1']],
+  say:'Satu lagi syarat: Raja tak boleh <b>melalui</b> petak yang diserang.',task:'Bolehkah Putih castling ke kanan sekarang?',
+  options:[{t:'Boleh',why:'Tidak boleh. Gajah hitam kawal f1, dan Raja perlu melalui f1.'},{t:'Tidak boleh',ok:true,why:'Betul! Gajah hitam kawal f1, jadi Raja tak boleh lalu di situ.'}]},
+ {type:'explain',title:'En passant',fen:'4k3/3p4/8/4P3/8/8/8/4K3 b - - 0 1',demo:['d7d5','e5d6'],demoEnd:'Bidak putih makan secara en passant dan berhenti di d6.',
+  say:'<b>En passant</b>: bila bidak lawan maju 2 petak dan berhenti betul-betul di sebelah bidak awak, awak boleh makan ia seolah-olah ia maju 1 petak sahaja.',
+  task:'Peluang ini hanya ada pada langkah yang <b>terus</b> berikutnya.'},
+ {type:'puzzle',title:'Cuba en passant',fen:'4k3/8/8/3pP3/8/8/8/4K3 w - d6 0 1',line:['e5d6'],
+  say:'Bidak hitam baru sahaja maju dari d7 ke d5.',task:'Makan bidak d5 secara en passant.',
+  wrongMsg:'Bukan itu. Bidak e5 boleh makan serong ke d6.',win:'En passant! Bidak hitam d5 hilang dari papan.'}
+]},
+{id:'sah',tahap:1,title:'Sah & Sah Mati',icon:'bK',steps:[
+ {type:'explain',title:'Apa itu sah?',fen:'4k3/8/8/8/8/8/8/4R1K1 b - - 0 1',arrows:[['e1','e8']],
+  say:'<b>Sah</b> (check) bermaksud Raja sedang diserang. Raja mesti diselamatkan dengan salah satu cara: <b>Lari</b>, <b>Halang</b> atau <b>Makan</b>.',
+  task:'Tir putih sedang memberi sah kepada Raja hitam.'},
+ {type:'puzzle',title:'Cara 1: Lari',fen:'4r1k1/8/8/8/8/8/8/4K3 w - - 0 1',accept:{piece:'k'},
+  say:'Raja putih kena sah oleh Tir hitam!',task:'Gerakkan Raja ke petak yang selamat.',win:'Raja lari ke tempat selamat!'},
+ {type:'puzzle',title:'Cara 2: Halang',fen:'4r1k1/8/8/8/8/R7/3P1P2/3QKB2 w - - 0 1',accept:{notPiece:'k'},
+  say:'Raja putih kena sah lagi, tapi kali ini Raja tak boleh lari ke mana-mana.',task:'Letak satu buah di antara Tir hitam dan Raja.',win:'Serangan dihalang!'},
+ {type:'puzzle',title:'Cara 3: Makan',fen:'4k3/8/8/8/8/3n4/2P5/4K3 w - - 0 1',accept:{capture:true},
+  say:'Kuda hitam memberi sah.',task:'Makan buah yang memberi sah.',wrongMsg:'Itu cara lari. Kali ini cuba cara makan.',win:'Kuda yang memberi sah sudah dimakan!'},
+ {type:'explain',title:'Sah mati',fen:'3R2k1/5ppp/8/8/8/8/8/6K1 b - - 0 1',arrows:[['d8','g8']],ring:['g8'],
+  say:'<b>Sah mati</b> (checkmate) = Raja kena sah dan <b>tiada cara</b> untuk lari, halang atau makan. Siapa buat sah mati, dia <b>menang</b>!',
+  task:'Raja hitam terkurung di belakang bidaknya sendiri. Tiada jalan keluar.'},
+ {type:'quiz',title:'Sah, sah mati atau stalemate?',fen:'7k/5Q2/6K1/8/8/8/8/8 b - - 0 1',
+  say:'Hitam yang perlu bergerak.',task:'Apa keadaan Raja hitam?',
+  options:[{t:'Sah',why:'Raja hitam tidak diserang sekarang.'},{t:'Sah mati',why:'Untuk sah mati, Raja mesti sedang diserang. Di sini tidak.'},{t:'Stalemate (seri)',ok:true,why:'Betul! Raja tak diserang, tapi Hitam tiada langkah sah. Itu <b>stalemate</b> dan permainan seri.'}]},
+ {type:'puzzle',title:'Sah mati pertama',fen:'6k1/5ppp/8/8/8/8/8/R5K1 w - - 0 1',acceptMate:true,
+  say:'Masa untuk sah mati pertama awak!',task:'Cari <b>sah mati dalam 1 langkah</b>.',win:'Sah mati! Raja hitam terkurung di belakang bidaknya sendiri.'}
+]},
+{id:'seri',tahap:1,title:'Cara Seri',icon:'wK',steps:[
+ {type:'explain',title:'Stalemate',fen:'7k/5Q2/6K1/8/8/8/8/8 b - - 0 1',hl:['g8','g7','h7'],
+  say:'<b>Stalemate</b>: pemain yang perlu bergerak tiada langkah sah, tetapi Rajanya <b>tidak</b> kena sah. Keputusannya <b>seri</b>, walaupun Putih ada Menteri!',
+  task:'Semua petak di sekeliling Raja hitam diserang, tapi Raja sendiri tidak kena sah.'},
+ {type:'quiz',title:'Jenis-jenis seri',pcs:'wKe1 bKe8',
+  say:'Selain stalemate, ada beberapa lagi cara permainan berakhir seri.',task:'Mana satu <b>bukan</b> seri?',
+  options:[{t:'Kedudukan sama berulang 3 kali',why:'Itu seri (ulangan tiga kali).'},{t:'50 langkah tanpa makan atau gerak bidak',why:'Itu seri (peraturan 50 langkah).'},{t:'Tinggal Raja lawan Raja sahaja',why:'Itu seri (buah tak cukup untuk sah mati).'},{t:'Sah mati',ok:true,why:'Betul! Sah mati bermaksud ada pemenang.'}]},
+ {type:'quiz',title:'Buah tak cukup',fen:'4k3/8/8/8/8/8/8/1N2K3 w - - 0 1',
+  say:'Tak semua buah boleh buat sah mati sendirian.',task:'Putih ada Raja + Kuda. Hitam ada Raja sahaja. Bolehkah Putih menang?',
+  options:[{t:'Boleh',why:'Tidak. Raja + Kuda tak cukup untuk sah mati.'},{t:'Tidak, ini seri',ok:true,why:'Betul! Raja + Kuda, atau Raja + Gajah, tak cukup untuk sah mati. Permainan seri.'}]},
+ {type:'puzzle',title:'Elak stalemate',fen:'7k/8/6K1/8/8/8/8/5Q2 w - - 0 1',acceptMate:true,
+  say:'Hati-hati! Ada langkah yang nampak bagus, tapi sebenarnya stalemate.',task:'Cari <b>sah mati</b>, jangan stalemate.',win:'Sah mati! Awak elak perangkap stalemate.'}
+]},
+{id:'ujian1',tahap:1,exam:true,title:'Ujian Tahap 1',icon:'wK',steps:[
+ {type:'tap',title:'Soalan 1',pcs:'',say:'Ujian! Setiap soalan hanya ada satu peluang.',wrong:'Itu petak {sq}.',seq:[{ask:'Tekan petak <kbd>f6</kbd>.',sq:['f6']}]},
+ {type:'quiz',title:'Soalan 2',pcs:'wRd4',say:'Nilai buah.',task:'Berapa mata nilai Tir?',options:[{t:'3'},{t:'5',ok:true,why:'Betul! Tir bernilai 5 mata.'},{t:'9'}]},
+ {type:'find',title:'Soalan 3',pcs:'wNg3 bPe4',piece:'g3',say:'Kuda boleh makan buah lawan.',task:'Tekan semua petak yang kuda boleh pergi.'},
+ {type:'quiz',title:'Soalan 4',fen:'k7/1Q6/1K6/8/8/8/8/8 b - - 0 1',say:'Hitam yang perlu bergerak.',task:'Apa keadaan Raja hitam?',
+  options:[{t:'Sah mati',ok:true,why:'Betul! Raja kena sah, dan Menteri dijaga Raja putih.'},{t:'Stalemate'},{t:'Sah sahaja, Raja boleh lari'}]},
+ {type:'puzzle',title:'Soalan 5',fen:'r3k2r/8/8/8/8/8/8/R3K2R w KQkq - 0 1',acceptSan:['O-O-O'],say:'Castling ada dua arah.',task:'Buat castling panjang (ke arah Tir a1).',wrongMsg:'Itu bukan castling panjang.',win:'Betul! Raja ke c1, Tir ke d1.'},
+ {type:'puzzle',title:'Soalan 6',fen:'6k1/5ppp/8/8/8/8/1Q3PPP/6K1 w - - 0 1',acceptMate:true,say:'Cari sah mati.',task:'Sah mati dalam 1.',win:'Sah mati!'},
+ {type:'puzzle',title:'Soalan 7',fen:'8/4P1k1/8/8/8/8/8/4K3 w - - 0 1',line:['e7e8q'],say:'Bidak hampir sampai.',task:'Promosikan bidak.',wrongMsg:'Tolak bidak ke baris 8.',win:'Promosi!'}
+]},
+/* ================= TAHAP 2 ================= */
+{id:'notasi',tahap:2,title:'Notasi Catur',icon:'bN',steps:[
+ {type:'explain',title:'Menulis langkah',fen:START,arrows:[['g1','f3']],
+  say:'Setiap langkah boleh ditulis: huruf buah + petak tujuan. <b>K</b> Raja, <b>Q</b> Menteri, <b>R</b> Tir, <b>B</b> Gajah, <b>N</b> Kuda. Bidak tiada huruf. Langkah anak panah ini ditulis <kbd>Nf3</kbd>.',
+  task:'Simbol lain: <kbd>x</kbd> makan, <kbd>+</kbd> sah, <kbd>#</kbd> sah mati, <kbd>O-O</kbd> castling.'},
+ {type:'quiz',title:'Langkah bidak',fen:START,arrows:[['e2','e4']],
+  say:'Bidak bergerak dari e2 ke e4.',task:'Apa notasi langkah ini?',
+  options:[{t:'e4',ok:true,why:'Betul! Bidak tiada huruf, jadi cukup tulis petak tujuan.'},{t:'Pe4',why:'Bidak tidak diberi huruf.'},{t:'e2',why:'Tulis petak tujuan, bukan petak asal.'}]},
+ {type:'quiz',title:'Langkah gajah',fen:'rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2',arrows:[['f1','c4']],
+  say:'Gajah putih bergerak dari f1 ke c4.',task:'Apa notasi langkah ini?',
+  options:[{t:'Bc4',ok:true,why:'Betul! B untuk Bishop (Gajah), c4 petak tujuan.'},{t:'Gc4',why:'Notasi guna huruf antarabangsa: B untuk Bishop (Gajah).'},{t:'Bf1',why:'Tulis petak tujuan, bukan petak asal.'}]},
+ {type:'puzzle',title:'Mainkan Nf3',fen:START,acceptSan:['Nf3'],
+  say:'Sekarang baca notasi dan mainkan langkahnya.',task:'Mainkan <kbd>Nf3</kbd>.',wrongMsg:'Itu bukan Nf3. N = Kuda, f3 = petak tujuan.',win:'Betul, itulah Nf3!'},
+ {type:'puzzle',title:'Mainkan Qxf7#',fen:'r1bqkbnr/ppp2ppp/2np4/4p3/2B1P3/5Q2/PPPP1PPP/RNB1K1NR w KQkq - 0 4',acceptSan:['Qxf7#'],
+  say:'<kbd>Q</kbd> Menteri, <kbd>x</kbd> makan, <kbd>f7</kbd> petak tujuan, <kbd>#</kbd> sah mati.',task:'Mainkan <kbd>Qxf7#</kbd>.',
+  wrongMsg:'Itu bukan Qxf7#. Gerakkan Menteri dan makan di f7.',win:'Qxf7#: Menteri makan di f7 dan sah mati!'}
+]},
+{id:'buka',tahap:2,title:'Prinsip Pembukaan',icon:'wP',steps:[
+ {type:'explain',title:'Tiga prinsip',fen:START,hl:['d4','e4','d5','e5'],
+  say:'Tiga prinsip pembukaan: <b>1. Kawal tengah</b> dengan bidak. <b>2. Keluarkan</b> Kuda dan Gajah. <b>3. Castling</b> untuk selamatkan Raja.',
+  task:'Empat petak bercahaya ini ialah tengah papan. Siapa kawal tengah, dia lebih mudah bergerak.'},
+ {type:'quiz',title:'Langkah pertama',fen:START,
+  say:'Ingat prinsip pertama: kawal tengah.',task:'Langkah pertama mana paling bagus?',
+  options:[{t:'e4',ok:true,why:'Betul! e4 kawal tengah dan buka laluan untuk Gajah dan Menteri.'},{t:'h4',why:'h4 tidak membantu kawal tengah.'},{t:'a3',why:'a3 terlalu jauh dari tengah.'},{t:'Na3',why:'Kuda di tepi, nasibnya sepi!'}]},
+ {type:'puzzle',title:'Keluarkan Kuda',fen:'rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2',accept:{piece:'n',to:['f3','c3']},
+  say:'Prinsip kedua: keluarkan buah ke arah tengah.',task:'Keluarkan Kuda ke petak yang menghala ke tengah.',
+  wrongMsg:'Cuba Kuda ke f3 atau c3, menghala ke tengah.',win:'Bagus! Kuda kini kawal petak tengah.'},
+ {type:'puzzle',title:'Keluarkan Gajah',fen:'r1bqkbnr/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3',accept:{piece:'b',to:['c4','b5']},
+  say:'Gajah pula perlu keluar.',task:'Keluarkan Gajah ke petak aktif.',wrongMsg:'Cuba Gajah f1 ke c4 atau b5.',win:'Gajah aktif! Laluan untuk castling juga sudah terbuka.'},
+ {type:'puzzle',title:'Castling',fen:'r1bqk1nr/pppp1ppp/2n5/2b1p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4',acceptSan:['O-O'],
+  say:'Prinsip ketiga: selamatkan Raja.',task:'Buat castling.',wrongMsg:'Tekan Raja, kemudian petak g1.',win:'Lengkap! Tengah, keluarkan buah, castling.'},
+ {type:'quiz',title:'Menteri terlalu awal',fen:'rnbqkbnr/pppp1ppp/8/4p2Q/4P3/8/PPPP1PPP/RNB1KBNR b KQkq - 1 2',arrows:[['d1','h5']],
+  say:'Ramai pemula suka keluarkan Menteri pada awal permainan.',task:'Kenapa ia kurang bagus?',
+  options:[{t:'Menteri mudah dikejar buah lawan',ok:true,why:'Betul! Lawan keluarkan buah sambil menyerang Menteri, kita pula terpaksa lari dan buang masa.'},{t:'Tak dibenarkan oleh peraturan',why:'Dibenarkan, cuma kurang bijak.'},{t:'Menteri jadi lemah selamanya',why:'Menteri tetap kuat, tapi kita rugi masa bila ia dikejar.'}]}
+]},
+{id:'putih',tahap:2,title:'Pembukaan Putih',icon:'wB',steps:[
+ {type:'explain',title:'Italian Game',fen:START,demo:['e2e4','e7e5','g1f3','b8c6','f1c4'],demoEnd:'Gajah di c4 menghala terus ke f7.',
+  say:'<b>Italian Game</b>: e4, Nf3, kemudian Gajah ke c4. Semua buah keluar dengan cepat dan Raja boleh castling awal.',task:'Tengok susunan Italian Game.'},
+ {type:'puzzle',title:'Main Italian',fen:START,line:['e2e4','e7e5','g1f3','b8c6','f1c4','f8c5','e1g1'],
+  mids:['Hitam balas e5. Keluarkan Kuda yang menyerang bidak e5.','Hitam jaga e5 dengan Kuda. Sekarang Gajah ke c4!','Hitam pun keluarkan Gajah. Masa untuk castling!'],
+  say:'Sekarang awak main Putih. Ikut pelan Italian langkah demi langkah.',task:'Mulakan dengan bidak Raja dua petak.',
+  wrongMsg:'Ikut pelan Italian: e4, Nf3, Bc4, kemudian castling.',win:'Italian Game lengkap! Tengah, buah keluar, Raja selamat.'},
+ {type:'explain',title:'London System',fen:START,demo:['d2d4','d7d5','c1f4'],demoEnd:'Gajah keluar ke f4 sebelum bidak e3.',
+  say:'<b>London System</b>: d4, kemudian Gajah ke f4, diikuti e3 dan Nf3. Susunannya hampir sama setiap permainan, jadi mudah diingat.',task:'Tengok permulaan London System.'},
+ {type:'puzzle',title:'Main London',fen:START,line:['d2d4','d7d5','c1f4','g8f6','e2e3','e7e6','g1f3'],
+  mids:['Hitam main d5. Keluarkan Gajah c1 ke f4 dahulu.','Sekarang e3 untuk sokong d4 dan buka laluan Gajah f1.','Kuda ke f3.'],
+  say:'Giliran awak bina London System.',task:'Mulakan dengan bidak Menteri dua petak.',
+  wrongMsg:'Ikut pelan London: d4, Bf4, e3, Nf3.',win:'Struktur London siap! Seterusnya Bd3, Nbd2 dan castling.'},
+ {type:'quiz',title:'Rahsia London',fen:'rnbqkbnr/ppp1pppp/8/3p4/3P1B2/8/PPP1PPPP/RN1QKBNR b KQkq - 1 2',ring:['f4'],
+  say:'Dalam London, Gajah c1 sentiasa keluar awal.',task:'Kenapa Gajah keluar ke f4 <b>sebelum</b> main e3?',
+  options:[{t:'Kalau e3 dulu, Gajah c1 tersekat di dalam',ok:true,why:'Betul! Bidak e3 akan menutup laluan Gajah c1. Jadi keluarkan Gajah dulu.'},{t:'Sebab Gajah suka petak f4',why:'Bukan sebab itu. Fikir apa jadi pada laluan Gajah selepas e3.'},{t:'Peraturan catur mewajibkannya',why:'Tiada peraturan begitu. Ia soal strategi.'}]}
+]},
+{id:'hitam',tahap:2,title:'Pembukaan Hitam',icon:'bP',steps:[
+ {type:'explain',title:'Main sebagai Hitam',orient:'b',fen:'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1',arrows:[['e2','e4']],
+  say:'Hitam bergerak kedua, tapi prinsipnya sama: kawal tengah, keluarkan buah, castling. Papan diterbalikkan supaya buah awak di bawah.',task:'Putih sudah main 1.e4. Apa balasan kita?'},
+ {type:'puzzle',title:'Balas 1.e4 dengan e5',orient:'b',fen:'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1',line:['e7e5','g1f3','b8c6','f1c4','f8c5'],
+  mids:['Putih serang bidak e5. Jaga dengan Kuda!','Putih keluarkan Gajah. Kita pun sama: Gajah ke c5.'],
+  say:'Cara paling mudah lawan 1.e4: tuntut tengah dengan <b>1...e5</b>.',task:'Balas dengan bidak e dua petak.',
+  wrongMsg:'Ikut prinsip: tuntut tengah, kemudian keluarkan Kuda dan Gajah.',win:'Kedua-dua pihak keluarkan buah dengan baik. Ini dipanggil Giuoco Piano.'},
+ {type:'puzzle',title:'Scandinavian',orient:'b',fen:'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1',line:['d7d5','e4d5','d8d5','b1c3','d5a5'],alts:{4:['Qd6','Qd8']},
+  mids:['Putih makan. Makan balik dengan Menteri!','Kuda serang Menteri. Undur Menteri ke tempat selamat.'],
+  say:'Satu lagi pilihan lawan 1.e4: <b>Scandinavian</b>. Terus cabar bidak e4 dengan d5!',task:'Cabar bidak e4 dengan bidak d.',
+  wrongMsg:'Ikut pelan Scandinavian: d5, makan balik dengan Menteri, kemudian undur Menteri.',win:'Menteri selamat dan Hitam dapat bahagiannya di tengah.'},
+ {type:'puzzle',title:'Balas 1.d4 dengan d5',orient:'b',fen:'rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq d3 0 1',line:['d7d5','c2c4','e7e6','b1c3','g8f6'],alts:{2:['c6']},
+  mids:['Putih tawar bidak c4 (Queen’s Gambit). Kukuhkan d5 dengan bidak e atau c.','Keluarkan Kuda ke f6.'],
+  say:'Lawan 1.d4, balas dengan <b>1...d5</b> untuk kawal tengah.',task:'Balas dengan bidak d dua petak.',
+  wrongMsg:'Lawan d4: main d5, kukuhkan dengan e6, kemudian Nf6.',win:'Bidak d5 kukuh dan buah keluar dengan selamat.'},
+ {type:'explain',title:'Caro-Kann',orient:'b',fen:'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1',demo:['c7c6','d2d4','d7d5'],demoEnd:'Bidak c6 menyokong d5. Hitam kukuh di tengah.',
+  say:'<b>Caro-Kann</b>: main c6 dulu sebagai persediaan, kemudian d5 untuk cabar e4. Pembukaan kukuh dan selamat, sesuai untuk pemain yang suka bertahan.',task:'Tengok susunan Caro-Kann.'},
+ {type:'quiz',title:'Tujuan c6',orient:'b',fen:'rnbqkbnr/pp2pppp/2p5/3p4/3PP3/8/PPP2PPP/RNBQKBNR w KQkq d6 0 3',arrows:[['c6','d5']],
+  say:'Dalam Caro-Kann, Hitam main c6 sebelum d5.',task:'Apa tujuan bidak c6?',
+  options:[{t:'Sokong bidak d5',ok:true,why:'Betul! Kalau Putih makan d5, Hitam boleh makan balik dengan bidak c6.'},{t:'Serang Raja putih',why:'c6 tidak menyerang Raja. Ia menyokong d5.'},{t:'Buka laluan untuk Tir',why:'Bukan. c6 dimainkan untuk menyokong d5.'}]}
+]},
+{id:'gambit',tahap:2,title:'Gambit',icon:'wP',steps:[
+ {type:'explain',title:'Apa itu gambit?',fen:START,demo:['d2d4','d7d5','c2c4'],demoEnd:'Putih tawar bidak c4. Ini Queen’s Gambit.',
+  say:'<b>Gambit</b>: korbankan bidak untuk dapat tengah papan atau keluarkan buah dengan lebih cepat. Gambit yang paling terkenal ialah <b>Queen’s Gambit</b>.',task:'Tengok Putih menawarkan bidak.'},
+ {type:'quiz',title:'Bidak kembali',fen:'rnbqkbnr/ppp1pppp/8/8/2pP4/8/PP2PPPP/RNBQKBNR w KQkq - 0 3',ring:['c4'],
+  say:'Hitam makan bidak c4.',task:'Bolehkah Putih dapat semula bidak itu?',
+  options:[{t:'Ya, biasanya dengan e3 dan Gajah makan c4',ok:true,why:'Betul! Bidak c4 susah dipertahankan. Putih buka laluan Gajah dengan e3, kemudian Bxc4.'},{t:'Tidak, rugi selamanya',why:'Biasanya Putih dapat semula bidak itu dengan mudah.'}]},
+ {type:'puzzle',title:'King’s Gambit',fen:'rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 2',line:['f2f4','e5f4','g1f3'],
+  mids:['Hitam terima gambit. Keluarkan Kuda ke f3: ia kawal tengah dan halang Qh4+.'],
+  say:'<b>King’s Gambit</b>: gambit paling berani! Putih korbankan bidak f untuk buka lajur f dan rebut tengah.',task:'Tawarkan bidak f dua petak.',
+  wrongMsg:'Untuk King’s Gambit, tolak bidak f dua petak. Selepas itu, Kuda ke f3.',win:'King’s Gambit dimainkan! Putih akan rebut tengah dengan d4.'},
+ {type:'puzzle',title:'Hukum ketamakan',fen:'rnbqkbnr/p3pppp/8/1p6/2pP4/4P3/1P3PPP/RNBQKBNR w KQkq - 0 6',acceptSan:['Qf3'],hintRing:['a8'],arrows:[],
+  say:'Hitam cuba simpan bidak gambit dengan b5 dan c6. Tapi garisan serong ke a8 sudah terbuka!',task:'Cari langkah Menteri yang menyerang Tir a8.',
+  wrongMsg:'Cari langkah Menteri yang menyerang sudut a8.',win:'Qf3! Menteri serang Tir a8. Hitam akan rugi bahan kerana tamak simpan bidak.'},
+ {type:'quiz',title:'Terima atau tolak?',pcs:'',
+  say:'Gambit nampak macam hadiah percuma.',task:'Apa sikap terbaik pemula terhadap gambit lawan?',
+  options:[{t:'Boleh terima, tapi utamakan keluarkan buah',ok:true,why:'Betul! Ambil bidak itu kalau selamat, tapi jangan buang masa cuba menyimpannya.'},{t:'Sentiasa ambil dan simpan bidak itu',why:'Terlalu tamak boleh merugikan, macam teka-teki tadi.'},{t:'Jangan sekali-kali terima',why:'Tidak perlu takut. Banyak gambit selamat diterima.'}]}
+]},
+{id:'scholar',tahap:2,title:'Elak Scholar’s Mate',icon:'bQ',steps:[
+ {type:'explain',title:'Perangkap 4 langkah',fen:START,demo:['e2e4','e7e5','f1c4','b8c6','d1h5','g8f6','h5f7'],demoEnd:'Qxf7#. Hitam kalah dalam 4 langkah!',
+  say:'<b>Scholar’s Mate</b>: Menteri dan Gajah putih sama-sama serang petak <b>f7</b>. Kalau Hitam tak perasan, sah mati dalam 4 langkah!',
+  task:'Tengok bagaimana perangkap ini berlaku.'},
+ {type:'explain',title:'Titik lemah f7',fen:'r1bqkb1r/pppp1ppp/2n2n2/4p2Q/2B1P3/8/PPPP1PPP/RNB1K1NR w KQkq - 4 4',ring:['f7'],arrows:[['h5','f7'],['c4','f7']],
+  say:'Kenapa f7? Pada awal permainan, petak f7 hanya dijaga oleh Raja. Ia titik paling lemah Hitam (untuk Putih, f2).',
+  task:'Dua buah putih menyerang f7, hanya satu buah hitam menjaganya.'},
+ {type:'puzzle',title:'Pertahankan f7',orient:'b',fen:'r1bqkbnr/pppp1ppp/2n5/4p2Q/2B1P3/8/PPPP1PPP/RNB1K1NR b KQkq - 3 3',acceptSan:['g6','Qe7','Qf6','Nh6'],
+  say:'Sekarang awak main <b>Hitam</b>. Putih mengancam Qxf7#!',task:'Pertahankan petak f7.',
+  wrongMsg:'Langkah itu tak melindungi f7 dengan baik. Jaga f7, atau halang laluan Menteri.',win:'Selamat! (g6 sangat bagus: halang Menteri sambil menyerangnya.)'},
+ {type:'puzzle',title:'Cubaan kedua',orient:'b',fen:'r1bqkbnr/pppp1ppp/2n5/4p3/2B1P3/5Q2/PPPP1PPP/RNB1K1NR b KQkq - 3 3',acceptSan:['Nf6','Qe7','Qf6','Nh6'],
+  say:'Putih cuba lagi dengan Menteri di f3.',task:'Pertahankan f7 sekali lagi.',
+  wrongMsg:'Langkah itu tak melindungi f7 dengan baik. Jaga f7, atau halang laluan Menteri.',win:'Selamat! (Nf6 paling bagus: halang Menteri sambil keluarkan Kuda.)'},
+ {type:'quiz',title:'Ingat perangkap ini',pcs:'wQh5 wBc4 bKe8 bPf7',ring:['f7'],
+  say:'Kalau awak kenal perangkap ini, awak takkan terkena.',task:'Dua buah putih mana yang digunakan dalam Scholar’s Mate?',
+  options:[{t:'Menteri dan Gajah',ok:true,why:'Betul! Kedua-duanya menyerang f7.'},{t:'Tir dan Kuda',why:'Bukan. Scholar’s Mate guna Menteri dan Gajah.'},{t:'Raja dan Bidak',why:'Bukan. Scholar’s Mate guna Menteri dan Gajah.'}]}
+]},
+{id:'mateq',tahap:2,title:'Mate Raja + Menteri',icon:'wQ',steps:[
+ {type:'explain',title:'Pagar Menteri',fen:'8/8/4k3/8/3Q4/8/8/4K3 w - - 0 1',
+  say:'Teknik: gunakan Menteri sebagai <b>pagar</b>. Letak Menteri satu langkah Kuda dari Raja lawan, dan ruang Raja lawan akan mengecil. Bila Raja lawan di tepi, bawa Raja sendiri untuk bantu.',
+  task:'Ingat: selalu semak supaya Raja lawan masih ada langkah. Jangan stalemate!'},
+ {type:'puzzle',title:'Sah mati di sudut',fen:'k7/8/1K6/8/8/8/7Q/8 w - - 0 1',acceptMate:true,
+  say:'Raja putih sudah datang membantu.',task:'Cari sah mati dalam 1.',win:'Sah mati! Raja putih kawal a7 dan b7, Menteri buat yang lain.'},
+ {type:'puzzle',title:'Perangkap stalemate',fen:'k7/2Q5/1K6/8/8/8/8/8 w - - 0 1',acceptMate:true,
+  say:'Raja hitam sudah hampir tiada ruang.',task:'Sah mati dalam 1. Jangan stalemate!',win:'Sah mati! Awak tidak terperangkap.'},
+ {type:'play',title:'Lawan Pak Kuda',fen:'8/8/8/3k4/8/8/8/Q3K3 w - - 0 1',goal:'mate',bot:'flee',maxMoves:25,
+  say:'Sekarang saya kawal Raja hitam. Kecilkan ruang saya dengan Menteri, kemudian bawa Raja awak!',task:'Sah mati dalam 25 langkah.',
+  win:'Sah mati! Awak sudah kuasai mate Raja + Menteri.'}
+]},
+{id:'mater',tahap:2,title:'Mate Raja + Tir',icon:'wR',steps:[
+ {type:'explain',title:'Ladder mate',fen:'6k1/R7/1R6/8/8/8/8/6K1 w - - 0 1',demo:['b6b8'],demoEnd:'Sah mati! Tir a7 pagar baris 7, Tir b8 beri sah.',
+  say:'<b>Ladder mate</b> (mate tangga): dua Tir bergilir-gilir menolak Raja ke tepi, macam menaiki tangga. Satu Tir pagar satu baris, satu lagi beri sah.',
+  task:'Tengok Tir kedua menamatkan permainan.'},
+ {type:'puzzle',title:'Raja + Tir',fen:'3k4/8/3K4/8/8/8/8/7R w - - 0 1',acceptMate:true,
+  say:'Dengan satu Tir sahaja, Raja sendiri mesti membantu. Raja berdepan Raja, Tir beri sah dari tepi.',task:'Sah mati dalam 1.',win:'Sah mati! Raja putih kawal c7, d7 dan e7.'},
+ {type:'play',title:'Latihan dua Tir',fen:'8/8/8/3k4/8/8/8/R3K2R w - - 0 1',goal:'mate',bot:'flee',maxMoves:15,
+  say:'Cuba ladder mate. Hati-hati: jangan letak Tir dekat Raja hitam, nanti dimakan!',task:'Sah mati dalam 15 langkah.',win:'Ladder mate berjaya!'},
+ {type:'play',title:'Cabaran Raja + Tir',fen:'8/8/8/4k3/8/8/8/4K2R w - - 0 1',goal:'mate',bot:'flee',maxMoves:35,
+  say:'Cabaran besar! Tir pagar Raja hitam, Raja putih maju ke depan, dan beri sah bila dua Raja berdepan.',task:'Sah mati dalam 35 langkah.',win:'Luar biasa! Mate Raja + Tir memang susah, dan awak berjaya.'}
+]},
+{id:'ujian2',tahap:2,exam:true,title:'Ujian Tahap 2',icon:'wK',steps:[
+ {type:'quiz',title:'Soalan 1',fen:START,arrows:[['b1','c3']],say:'Notasi.',task:'Apa notasi langkah ini?',options:[{t:'Nc3',ok:true,why:'Betul!'},{t:'Kc3'},{t:'Bc3'}]},
+ {type:'quiz',title:'Soalan 2',fen:START,say:'Prinsip pembukaan.',task:'Mana satu <b>bukan</b> prinsip pembukaan yang baik?',options:[{t:'Kawal tengah'},{t:'Keluarkan Kuda dan Gajah'},{t:'Gerakkan Menteri awal-awal',ok:true,why:'Betul! Menteri yang keluar awal mudah dikejar.'},{t:'Castling awal'}]},
+ {type:'puzzle',title:'Soalan 3',orient:'b',fen:'rnbqk1nr/pppp1ppp/8/2b1p3/2B1P3/5Q2/PPPP1PPP/RNB1K1NR b KQkq - 3 3',acceptSan:['Nf6','Qe7','Qf6','Nh6'],say:'Awak main Hitam. Putih mengancam Qxf7#.',task:'Pertahankan f7.',wrongMsg:'Putih masih boleh sah mati di f7.',win:'Selamat!'},
+ {type:'puzzle',title:'Soalan 4',fen:'6k1/8/6K1/8/8/8/8/Q7 w - - 0 1',acceptMate:true,say:'Raja + Menteri.',task:'Sah mati dalam 1.',win:'Sah mati!'},
+ {type:'puzzle',title:'Soalan 5',fen:'7k/8/6K1/8/8/8/8/R7 w - - 0 1',acceptMate:true,say:'Raja + Tir.',task:'Sah mati dalam 1.',win:'Sah mati!'},
+ {type:'quiz',title:'Soalan 6',fen:'rnbqkbnr/ppp1pppp/8/3p4/3P4/8/PPP1PPPP/RNBQKBNR w KQkq d6 0 2',say:'London System.',task:'Dalam London System, Gajah c1 keluar ke mana?',options:[{t:'f4',ok:true,why:'Betul! Bf4 sebelum e3.'},{t:'g5'},{t:'Kekal di c1'}]},
+ {type:'quiz',title:'Soalan 7',pcs:'',say:'Gambit.',task:'Apa itu gambit?',options:[{t:'Korban bidak untuk dapat masa atau tengah',ok:true,why:'Betul!'},{t:'Sejenis sah mati'},{t:'Tukar Menteri awal'}]}
+]},
+/* ================= TAHAP 3 ================= */
+{id:'fork',tahap:3,title:'Fork Kuda',icon:'bN',tip:'Ingat <b>CCT</b> sebelum setiap langkah: <b>C</b>heck (sah), <b>C</b>apture (makan), <b>T</b>hreat (ancaman). Banyak fork bermula dengan sah!',steps:[
+ {type:'explain',title:'Apa itu fork?',fen:'8/3q3p/6k1/8/8/5N2/6PP/6K1 w - - 0 1',demo:['f3e5','g6h5','e5d7'],
+  demoNotes:{0:{status:'Kuda serang Raja (sah!) dan Menteri serentak.',arrows:[['e5','g6'],['e5','d7']],ring:['g6','d7']}},
+  demoEnd:'Raja terpaksa lari, jadi Kuda makan Menteri. Menteri bernilai 9, Kuda cuma 3!',
+  say:'<b>Fork</b> bermaksud satu buah menyerang <b>dua buah lawan serentak</b>. Lawan hanya boleh selamatkan satu. Kuda pakar buat fork sebab langkah L-nya susah dijangka.',
+  task:'Tengok Kuda putih melompat ke e5.'},
+ {type:'puzzle',title:'Teka-teki 1: Fork diraja',fen:'2q3k1/5ppp/8/3N4/8/8/5PPP/6K1 w - - 0 1',line:['d5e7','g8h8','e7c8'],hintRing:['g8','c8'],
+  say:'Putih untuk melangkah. Cari langkah Kuda yang serang <b>dua buah</b> hitam serentak.',task:'Tekan Kuda putih, kemudian pilih petak fork.',
+  after1:{arrows:[['e7','g8'],['e7','c8']],status:'Fork! Kuda sah Raja dan serang Menteri.'},mid:'Raja sudah lari. Sekarang makan Menteri!',
+  wrongMsg:'Langkah itu belum serang dua buah serentak. Cari petak yang serang Raja dan Menteri.',win:'Kuda makan Menteri! Fork diraja berjaya.'},
+ {type:'puzzle',title:'Teka-teki 2: Tangkap Tir',fen:'r3k3/1p3ppp/8/1N6/8/8/5PPP/4K3 w - - 0 1',line:['b5c7','e8e7','c7a8'],hintRing:['e8','a8'],
+  say:'Cari fork yang serang Raja dan Tir.',task:'Tekan Kuda putih, kemudian pilih petak fork.',
+  after1:{arrows:[['c7','e8'],['c7','a8']],status:'Fork! Raja dan Tir diserang.'},mid:'Raja lari. Sekarang makan Tir!',
+  wrongMsg:'Belum fork lagi. Cari petak yang serang Raja dan Tir.',win:'Tir ditangkap! Untung 2 mata selepas tukaran pun, Kuda masih hidup.'},
+ {type:'puzzle',title:'Teka-teki 3: Sudut sempit',fen:'3q3k/6pp/8/4N3/8/8/5PPP/6K1 w - - 0 1',line:['e5f7','h8g8','f7d8'],hintRing:['h8','d8'],
+  say:'Raja hitam di sudut. Menteri hitam di d8.',task:'Cari fork.',
+  after1:{arrows:[['f7','h8'],['f7','d8']],status:'Fork! Raja di sudut tak boleh selamatkan Menteri.'},mid:'Sekarang makan Menteri!',
+  wrongMsg:'Belum fork lagi. Cari petak yang serang Raja dan Menteri.',win:'Menteri hitam jatuh!'},
+ {type:'puzzle',title:'Teka-teki 4: Tanpa sah',fen:'6k1/5ppp/1q6/8/5r2/2N5/5PPP/6K1 w - - 0 1',line:['c3d5','b6d8','d5f4'],hintRing:['b6','f4'],
+  say:'Fork tak semestinya sah Raja. Kali ini serang <b>Menteri</b> dan <b>Tir</b> serentak.',task:'Cari fork.',
+  after1:{arrows:[['d5','b6'],['d5','f4']],status:'Fork! Menteri dan Tir diserang serentak.'},mid:'Hitam selamatkan Menteri. Sekarang makan Tir!',
+  wrongMsg:'Belum fork lagi. Cari petak yang serang Menteri dan Tir.',win:'Tir dimakan. Fork berjaya!'}
+]},
+{id:'pin',tahap:3,title:'Pin & Skewer',icon:'wB',steps:[
+ {type:'explain',title:'Apa itu pin?',fen:'4k3/8/2n5/1B6/8/8/8/4K3 b - - 0 1',arrows:[['b5','e8']],ring:['c6'],
+  say:'<b>Pin</b>: buah lawan tak boleh bergerak kerana buah yang lebih berharga di belakangnya akan diserang. Kuda hitam ini dipin ke Raja, jadi ia langsung tak boleh bergerak!',
+  task:'Gajah, Tir dan Menteri boleh buat pin sebab mereka menyerang dari jauh.'},
+ {type:'puzzle',title:'Buat pin',fen:'4k3/8/2n5/8/8/8/8/4KB2 w - - 0 1',acceptSan:['Bb5'],hintRing:['c6','e8'],
+  say:'Kuda hitam dan Raja hitam berada pada satu garis serong.',task:'Pin Kuda hitam ke Rajanya.',
+  wrongMsg:'Belum pin lagi. Letak Gajah supaya Kuda dan Raja berada pada garisannya.',win:'Pin! Kuda hitam kini tak boleh bergerak.'},
+ {type:'puzzle',title:'Serang buah yang dipin',fen:'4k3/8/2n5/1B6/3P4/8/8/4K3 w - - 0 1',acceptSan:['d5'],
+  say:'Kuda hitam dipin. Buah yang dipin ialah sasaran yang mudah!',task:'Serang Kuda dengan bidak.',
+  wrongMsg:'Cari langkah bidak yang menyerang Kuda.',win:'Kuda diserang bidak dan tak boleh lari kerana dipin!'},
+ {type:'explain',title:'Apa itu skewer?',fen:'3k3q/8/8/8/8/8/8/R5K1 w - - 0 1',demo:['a1a8','d8e7','a8h8'],
+  demoNotes:{0:{status:'Sah! Raja mesti lari dari baris 8.',arrows:[['a8','d8']]}},demoEnd:'Raja lari, Menteri di belakangnya dimakan.',
+  say:'<b>Skewer</b> ialah pin terbalik: buah yang <b>lebih berharga di depan</b>. Bila ia lari, buah di belakangnya dimakan.',
+  task:'Tengok Tir buat skewer.'},
+ {type:'puzzle',title:'Buat skewer',fen:'q7/8/8/k7/8/8/8/1R4K1 w - - 0 1',line:['b1a1','a5b5','a1a8'],hintRing:['a5','a8'],
+  say:'Raja dan Menteri hitam berada di lajur a.',task:'Buat skewer dengan Tir.',
+  after1:{arrows:[['a1','a5']],status:'Skewer! Raja kena sah, Menteri di belakangnya.'},mid:'Raja sudah lari. Makan Menteri!',
+  wrongMsg:'Belum skewer. Letak Tir pada lajur yang sama dengan Raja dan Menteri.',win:'Menteri dimakan. Skewer berjaya!'},
+ {type:'quiz',title:'Pin atau skewer?',pcs:'',
+  say:'Mari pastikan awak faham bezanya.',task:'Dalam <b>pin</b>, buah yang lebih berharga berada di mana?',
+  options:[{t:'Di belakang',ok:true,why:'Betul! Dalam pin, buah berharga di belakang. Dalam skewer, ia di depan.'},{t:'Di depan',why:'Itu skewer. Dalam pin, buah berharga di belakang.'}]}
+]},
+{id:'terbuka',tahap:3,title:'Serangan Terbuka',icon:'wR',steps:[
+ {type:'explain',title:'Buka laluan',fen:'4k3/1q6/8/8/4N3/8/8/4R1K1 w - - 0 1',arrows:[['e1','e8']],ring:['e4'],
+  say:'<b>Serangan terbuka</b> (discovered attack): bila satu buah bergerak, ia membuka laluan buah di belakangnya. Dua serangan serentak!',
+  task:'Kuda e4 menghalang Tir. Kalau Kuda bergerak, Tir terus sah Raja hitam.'},
+ {type:'play',title:'Sah terbuka',fen:'4k3/1q6/8/8/4N3/8/8/4R1K1 w - - 0 1',goal:'captureQ',bot:'defend',maxMoves:2,
+  say:'Gerakkan Kuda supaya Tir sah Raja, <b>dan</b> Kuda serang Menteri hitam pada masa yang sama.',task:'Menangi Menteri hitam dalam 2 langkah.',
+  win:'Hebat! Sah terbuka memenangi Menteri.'},
+ {type:'puzzle',title:'Gajah buka laluan',fen:'3q2k1/5ppp/8/8/8/3B4/5PPP/3R2K1 w - - 0 1',line:['d3h7','g8h7','d1d8'],hintRing:['d8','h7'],
+  say:'Tir d1 dan Menteri hitam d8 berada di lajur yang sama. Gajah d3 menghalang.',task:'Gerakkan Gajah dengan sah, buka laluan Tir.',
+  after1:{arrows:[['h7','g8'],['d1','d8']],status:'Gajah makan dengan sah, dan Tir kini serang Menteri!'},mid:'Raja makan Gajah. Sekarang Tir makan Menteri!',
+  wrongMsg:'Cari langkah Gajah yang memberi sah.',win:'Menteri dimakan. Rugi Gajah (3), dapat Menteri (9)!'},
+ {type:'quiz',title:'Sah berganda',pcs:'',
+  say:'Kadang-kadang buah yang bergerak itu juga memberi sah.',task:'Apa itu <b>sah berganda</b> (double check)?',
+  options:[{t:'Dua buah beri sah serentak',ok:true,why:'Betul! Raja tak boleh halang atau makan dua penyerang sekali gus, jadi Raja <b>wajib lari</b>.'},{t:'Sah dua kali berturut-turut',why:'Bukan. Sah berganda ialah dua buah beri sah pada masa yang sama.'}]}
+]},
+{id:'cct',tahap:3,title:'CCT: Semak Setiap Langkah',icon:'wK',steps:[
+ {type:'explain',title:'Tiga soalan',fen:START,
+  say:'Sebelum setiap langkah, tanya 3 soalan <b>CCT</b>:<br><b>C</b>heck: ada sah?<br><b>C</b>apture: ada buah boleh dimakan?<br><b>T</b>hreat: apa ancaman saya, dan apa ancaman lawan?',
+  task:'Pemain kuat buat semakan ini setiap kali sebelum bergerak.'},
+ {type:'tap',title:'Capture: buah tergantung',fen:'r3k3/ppp2ppp/2n5/6b1/8/2N2N2/PPP2PPP/R3K2R w - - 0 1',
+  say:'Buah <b>tergantung</b> (hanging) ialah buah yang diserang tetapi tiada pengawal.',wrong:'Buah itu tidak tergantung. Cari lagi.',
+  seq:[{ask:'Tekan buah hitam yang tergantung.',sq:['g5'],arrows:[['f3','g5']],ok:'Betul! Gajah g5 diserang Kuda f3, dan tiada siapa menjaganya.'}]},
+ {type:'puzzle',title:'Check dahulu',fen:'6k1/5ppp/8/8/8/8/5PPP/3R2K1 w - - 0 1',acceptMate:true,
+  say:'Soalan pertama CCT: ada sah?',task:'Cari sah yang terus menang.',win:'Check adalah soalan pertama CCT, dan kali ini ia terus sah mati!'},
+ {type:'puzzle',title:'Buang pengawal',fen:'6k1/5ppp/5n2/3b2B1/8/8/5PPP/3R2K1 w - - 0 1',line:['g5f6','g7f6','d1d5'],hintRing:['f6','d5'],
+  say:'Gajah hitam d5 dijaga Kuda f6. Kalau kita buang pengawalnya dulu...',task:'Buang pengawal, kemudian menangi Gajah.',
+  after1:{status:'Pengawal dibuang!'},mid:'Sekarang Gajah d5 tergantung. Makan dengan Tir!',
+  wrongMsg:'Kalau terus makan, Kuda f6 akan makan balik. Buang pengawal dulu.',win:'Untung! Tukar Gajah dengan Kuda, kemudian dapat Gajah percuma.'},
+ {type:'puzzle',title:'Threat: ancaman lawan',fen:'3r2k1/5ppp/8/8/2R5/8/5PPP/6K1 w - - 0 1',accept:{noMateInOne:true},arrows:[['d8','d1']],
+  say:'Soalan ketiga: apa ancaman <b>lawan</b>? Hitam mengancam Rd1, sah mati di baris belakang!',task:'Halang ancaman Hitam.',
+  wrongMsg:'Hitam masih boleh main Rd1#. Beri ruang untuk Raja atau jaga baris 1.',win:'Selamat! Awak nampak ancaman lawan sebelum terlambat.'}
+]},
+{id:'mate2',tahap:3,title:'Mate dalam 2',icon:'wQ',steps:[
+ {type:'explain',title:'Corak sah mati',fen:'3R2k1/5ppp/8/8/8/8/8/6K1 b - - 0 1',arrows:[['d8','g8']],
+  say:'Pemain kuat hafal <b>corak</b> sah mati. Ini <b>back-rank mate</b>: Raja terkurung di belakang bidaknya, Tir atau Menteri beri sah di baris belakang.',
+  task:'Bila nampak Raja lawan tiada ruang di baris belakang, cari peluang ini!'},
+ {type:'puzzle',title:'Back-rank dalam 2',fen:'r5k1/5ppp/8/8/8/8/3R1PPP/3R2K1 w - - 0 1',line:['d2d8','a8d8','d1d8'],
+  say:'Tir hitam a8 menjaga baris belakang. Kita ada dua Tir!',task:'Sah mati dalam 2 langkah.',
+  after1:{status:'Sah! Hitam terpaksa makan Tir.'},mid:'Sekarang Tir kedua beri sah mati!',
+  wrongMsg:'Cari langkah sah di baris 8.',win:'Tir pertama dikorbankan, Tir kedua beri sah mati!'},
+ {type:'puzzle',title:'Smothered mate',fen:'6rk/6pp/8/6N1/8/8/8/6K1 w - - 0 1',acceptMate:true,
+  say:'<b>Smothered mate</b> (mate lemas): Raja dikepung buahnya sendiri, Kuda beri sah mati.',task:'Sah mati dalam 1.',win:'Mate lemas! Raja hitam tak boleh bergerak langsung.'},
+ {type:'puzzle',title:'Korban Menteri',fen:'4r2k/6pp/7N/3Q4/8/8/5PPP/6K1 w - - 0 1',line:['d5g8','e8g8','h6f7'],hintRing:['g8','f7'],
+  say:'Teka-teki hebat: korbankan Menteri untuk smothered mate!',task:'Sah mati dalam 2 langkah.',
+  after1:{status:'Menteri dikorbankan! Raja tak boleh makan sebab Kuda h6 menjaga g8.'},mid:'Tir hitam makan Menteri dan menutup g8. Sekarang Kuda!',
+  wrongMsg:'Cuba sesuatu yang berani: beri sah di g8.',win:'Smothered mate! Korban yang cantik.'}
+]},
+{id:'ujian3',tahap:3,exam:true,title:'Ujian Tahap 3',icon:'wK',steps:[
+ {type:'puzzle',title:'Soalan 1',fen:'8/6k1/3q4/8/8/4N3/5PPP/6K1 w - - 0 1',line:['e3f5','g7g8','f5d6'],say:'Cari fork.',task:'Serang dua buah serentak.',mid:'Sekarang makan Menteri!',wrongMsg:'Itu bukan fork.',win:'Fork berjaya!'},
+ {type:'puzzle',title:'Soalan 2',fen:'4k3/8/4n3/8/8/8/8/R5K1 w - - 0 1',acceptSan:['Re1'],say:'Buat pin.',task:'Pin Kuda hitam ke Rajanya.',wrongMsg:'Belum pin.',win:'Pin!'},
+ {type:'puzzle',title:'Soalan 3',fen:'r7/8/2k5/8/8/8/8/1B4K1 w - - 0 1',line:['b1e4','c6c5','e4a8'],say:'Buat skewer.',task:'Sah Raja, kemudian makan buah di belakangnya.',mid:'Makan Tir!',wrongMsg:'Belum skewer.',win:'Skewer berjaya!'},
+ {type:'play',title:'Soalan 4',fen:'3qk3/8/8/4N3/8/8/8/4R1K1 w - - 0 1',goal:'captureQ',bot:'defend',maxMoves:2,say:'Serangan terbuka.',task:'Menangi Menteri hitam dalam 2 langkah.',win:'Menteri dimenangi!'},
+ {type:'puzzle',title:'Soalan 5',fen:'7k/8/5N2/8/8/8/8/K5R1 w - - 0 1',acceptMate:true,say:'Tir dan Kuda bekerjasama.',task:'Sah mati dalam 1.',win:'Sah mati! Kuda kawal g8 dan h7, Tir buat yang lain.'},
+ {type:'quiz',title:'Soalan 6',pcs:'',say:'CCT.',task:'Apa maksud huruf <b>T</b> dalam CCT?',options:[{t:'Threat (ancaman)',ok:true,why:'Betul!'},{t:'Tir'},{t:'Tukar'}]}
+]},
+/* ================= TAHAP 4 ================= */
+{id:'struktur',tahap:4,title:'Struktur Bidak',icon:'wP',steps:[
+ {type:'explain',title:'Jenis bidak',fen:'4k3/5p2/1p6/7P/P1P5/2P5/8/4K3 w - - 0 1',
+  say:'Bidak tak boleh berundur, jadi susunannya penting.<br><b>Berganda</b>: dua bidak di lajur sama.<br><b>Terpencil</b>: tiada bidak kawan di lajur sebelah.<br><b>Lulus</b>: tiada bidak lawan boleh menghalangnya.',
+  task:'Lihat bidak putih di papan ini. Kita akan kenal pasti setiap satu.'},
+ {type:'tap',title:'Kenal pasti bidak',fen:'4k3/5p2/1p6/7P/P1P5/2P5/8/4K3 w - - 0 1',
+  say:'Tengok bidak putih dengan teliti.',wrong:'Bukan bidak itu. Cuba lagi.',
+  seq:[{ask:'Tekan bidak <b>lulus</b> (passed pawn).',sq:['h5'],ok:'Betul! Tiada bidak hitam di lajur g atau h untuk menghalangnya.'},
+       {ask:'Tekan bidak <b>berganda</b>.',sq:['c3','c4'],ok:'Betul! Dua bidak di lajur c susah melindungi satu sama lain.'},
+       {ask:'Tekan bidak <b>terpencil</b> di tepi papan.',sq:['a4'],ok:'Betul! Bidak a4 tiada kawan di lajur b, jadi ia mudah diserang.'}]},
+ {type:'quiz',title:'Bidak bersambung',pcs:'wPd4 wPe4 wPc3 wPc2',hl:['d4','e4'],
+  say:'Bidak yang berdiri bersebelahan dipanggil bidak <b>bersambung</b>.',task:'Mana lebih kuat?',
+  options:[{t:'Bidak bersambung (d4 dan e4)',ok:true,why:'Betul! Bidak bersambung saling melindungi dan sukar dihalang.'},{t:'Bidak berganda (c2 dan c3)',why:'Bidak berganda lemah sebab mereka tak boleh melindungi satu sama lain.'}]},
+ {type:'play',title:'Tolak bidak lulus',fen:'8/8/8/1k5P/8/8/8/4K3 w - - 0 1',goal:'promote',bot:'chase',maxMoves:5,
+  say:'Bidak lulus mesti ditolak! Gunakan <b>peraturan segi empat</b>: kalau Raja lawan tak dapat masuk segi empat bidak, bidak menang.',task:'Bawa bidak h5 ke promosi.',
+  win:'Promosi! Bidak lulus memang berbahaya.'}
+]},
+{id:'buahbaik',tahap:4,title:'Buah Baik, Buah Buruk',icon:'wB',steps:[
+ {type:'puzzle',title:'Tir di lajur terbuka',fen:'r5k1/pp3ppp/8/8/8/8/PP3PPP/R5K1 w - - 0 1',accept:{piece:'r',toFile:['c','d','e']},hl:['file:c','file:d','file:e'],
+  say:'Tir paling kuat di <b>lajur terbuka</b>, iaitu lajur tanpa bidak. Lajur c, d dan e terbuka di sini.',task:'Letak Tir di lajur terbuka.',
+  wrongMsg:'Lajur itu tidak terbuka. Pilih lajur c, d atau e.',win:'Tir di lajur terbuka boleh menyerang hingga ke barisan lawan!'},
+ {type:'explain',title:'Gajah buruk',fen:'4k3/8/8/2P1P3/3P4/8/8/2B1K3 w - - 0 1',ring:['d4','c5','e5'],
+  say:'<b>Gajah buruk</b> tersekat oleh bidak sendiri yang berada pada warna petak yang sama. Gajah c1 ini (petak gelap) tersekat oleh bidak d4, c5 dan e5, semuanya di petak gelap.',
+  task:'Gajah baik pula bebas bergerak kerana bidaknya di warna lain.'},
+ {type:'quiz',title:'Jadikan Gajah baik',pcs:'wBc1 wPd4 wPc5 wPe5',
+  say:'Kita boleh rancang supaya Gajah kita jadi baik.',task:'Di mana patut letak bidak supaya Gajah petak gelap jadi baik?',
+  options:[{t:'Di petak cerah',ok:true,why:'Betul! Bila bidak di petak cerah, laluan gelap Gajah terbuka.'},{t:'Di petak gelap',why:'Itu yang buat Gajah tersekat. Letak bidak di warna yang berlawanan.'}]},
+ {type:'puzzle',title:'Pos kuat Kuda',fen:'4k3/pp3ppp/3p4/4p3/4P3/2N5/PPP2PPP/4K3 w - - 0 1',acceptSan:['Nd5'],ring:['d5'],
+  say:'<b>Pos kuat</b> (outpost): petak yang dijaga bidak kita dan tak boleh diserang bidak lawan. d5 dijaga bidak e4, dan Hitam tiada bidak c atau e yang boleh menghalau Kuda.',
+  task:'Letak Kuda di pos kuat d5.',wrongMsg:'Bawa Kuda ke d5.',win:'Kuda di pos kuat sangat susah dihalau. Ia kawal banyak petak di kubu lawan.'},
+ {type:'quiz',title:'Bila patut tukar buah?',pcs:'',
+  say:'Tukar buah bermaksud kedua-dua pemain makan buah yang sama nilai.',task:'Bila masa terbaik untuk tukar buah?',
+  options:[{t:'Bila kita sudah untung mata',ok:true,why:'Betul! Bila kita di depan, kurangkan buah supaya kelebihan kita lebih jelas.'},{t:'Bila kita ketinggalan mata',why:'Bila ketinggalan, elakkan tukaran. Simpan buah untuk cari peluang.'}]}
+]},
+{id:'ujian4',tahap:4,exam:true,title:'Ujian Tahap 4',icon:'wK',steps:[
+ {type:'tap',title:'Soalan 1',fen:'4k3/p5p1/8/1P6/8/2P4P/2P5/4K3 w - - 0 1',say:'Struktur bidak putih.',wrong:'Bukan bidak itu.',seq:[{ask:'Tekan bidak <b>berganda</b>.',sq:['c2','c3']}]},
+ {type:'tap',title:'Soalan 2',fen:'4k3/p5p1/8/1P6/8/2P4P/2P5/4K3 w - - 0 1',say:'Struktur bidak putih.',wrong:'Bukan bidak itu.',seq:[{ask:'Tekan bidak <b>terpencil</b>.',sq:['h3']}]},
+ {type:'puzzle',title:'Soalan 3',fen:'r5k1/ppp2ppp/8/8/8/8/PPP2PPP/R5K1 w - - 0 1',accept:{piece:'r',toFile:['d','e']},say:'Tir aktif.',task:'Letak Tir di lajur terbuka.',wrongMsg:'Lajur itu tidak terbuka.',win:'Betul!'},
+ {type:'puzzle',title:'Soalan 4',fen:'4k3/pp4pp/2p1p3/3p4/3P4/4PN2/PP4PP/4K3 w - - 0 1',acceptSan:['Ne5'],say:'Pos kuat.',task:'Letak Kuda di pos kuat.',wrongMsg:'Itu bukan pos kuat.',win:'Betul! e5 dijaga d4 dan tak boleh dihalau bidak hitam.'},
+ {type:'quiz',title:'Soalan 5',pcs:'wBc1 wPd4 wPe5 wPc5',say:'Gajah.',task:'Gajah c1 ini baik atau buruk?',options:[{t:'Buruk',ok:true,why:'Betul! Bidak sendiri di petak gelap menyekatnya.'},{t:'Baik'}]},
+ {type:'quiz',title:'Soalan 6',pcs:'',say:'Tukar buah.',task:'Awak sudah untung satu Tir. Patut tukar buah?',options:[{t:'Ya, tukar supaya lebih mudah menang',ok:true,why:'Betul!'},{t:'Tidak, elakkan tukaran'}]}
+]},
+/* ================= TAHAP 5 ================= */
+{id:'opposition',tahap:5,title:'Opposition Raja',icon:'wK',steps:[
+ {type:'explain',title:'Raja berdepan',fen:'8/8/8/4k3/8/4K3/8/8 w - - 0 1',hl:['e4'],
+  say:'Dalam endgame, Raja jadi buah penyerang. <b>Opposition</b>: dua Raja berdepan dengan satu petak kosong di tengah. Pemain yang <b>tidak</b> perlu bergerak memegang opposition, dan Raja lawan terpaksa beri laluan.',
+  task:'Di sini Putih perlu bergerak, jadi Hitam yang pegang opposition.'},
+ {type:'quiz',title:'Peraturan segi empat',fen:'8/8/1k6/6P1/8/8/8/K7 b - - 0 1',hl:['d5','e5','f5','g5','d6','e6','f6','g6','d7','e7','f7','g7','d8','e8','f8','g8'],
+  say:'Bina <b>segi empat</b> dari bidak hingga ke baris promosi. Kalau Raja lawan boleh masuk segi empat itu, ia boleh tangkap bidak.',task:'Hitam bergerak dahulu. Bolehkah Raja hitam tangkap bidak?',
+  options:[{t:'Boleh',why:'Raja hitam di b6. Satu langkah pun tak cukup untuk masuk segi empat.'},{t:'Tidak boleh',ok:true,why:'Betul! Raja hitam di luar segi empat, jadi bidak menang perlumbaan.'}]},
+ {type:'puzzle',title:'Raja di depan bidak',fen:'8/8/4k3/8/8/4K3/4P3/8 w - - 0 1',acceptSan:['Kd4','Ke4','Kf4'],
+  say:'Rahsia endgame Raja + Bidak: <b>Raja jalan di depan bidak</b>, bukan di belakang.',task:'Gerakkan Raja ke depan bidak.',
+  wrongMsg:'Langkah itu terlalu pasif. Maju ke baris 4 di depan bidak.',win:'Bagus! Raja di depan membuka jalan untuk bidak.'},
+ {type:'puzzle',title:'Kekal di baris 6',fen:'4k3/8/4K3/4P3/8/8/8/8 w - - 0 1',acceptSan:['Kd6','Kf6'],
+  say:'Raja putih sudah di baris 6, di depan bidak. Jangan berundur!',task:'Cari langkah yang mengekalkan Raja di baris 6.',
+  wrongMsg:'Raja berundur dan Hitam akan dapat opposition. Kekal di baris 6.',win:'Betul! Raja di baris 6 di depan bidak bermaksud menang.'}
+]},
+{id:'lucena',tahap:5,title:'Lucena & Philidor',icon:'wR',steps:[
+ {type:'explain',title:'Endgame Tir',fen:'3K4/3P2k1/8/8/8/8/2r5/5R2 w - - 0 1',ring:['d8'],
+  say:'Endgame Tir paling kerap berlaku dalam catur. Dua kedudukan wajib tahu: <b>Lucena</b> (cara menang) dan <b>Philidor</b> (cara seri).',
+  task:'Di sini Raja putih di depan bidak, tapi Tir hitam terus beri sah dari tepi.'},
+ {type:'puzzle',title:'Lucena: bina jambatan',fen:'3K4/3P2k1/8/8/8/8/2r5/5R2 w - - 0 1',acceptSan:['Rf4'],ring:['f4'],
+  say:'Rahsia Lucena ialah <b>bina jambatan</b>: Tir ke baris 4. Nanti bila Raja keluar dan kena sah, Tir datang menghalang.',task:'Letak Tir di f4.',
+  wrongMsg:'Untuk bina jambatan, bawa Tir ke f4.',win:'Jambatan siap! Raja putih boleh keluar, dan Tir di f4 akan menghalang sah.'},
+ {type:'explain',title:'Philidor: cara seri',orient:'b',fen:'4k3/1R6/r7/3KP3/8/8/8/8 w - - 0 1',arrows:[['a6','h6']],
+  say:'Sekarang awak di pihak bertahan (Hitam). <b>Philidor</b>: Tir hitam kawal <b>baris 6</b> supaya Raja putih tak boleh maju. Bila bidak putih maju ke e6, Tir terus ke baris 1 dan beri sah dari belakang.',
+  task:'Selagi Tir kawal baris 6, Putih tak boleh menang.'},
+ {type:'puzzle',title:'Philidor: kawal baris 6',orient:'b',fen:'4k3/1R6/8/3KP3/8/8/8/r7 b - - 0 1',acceptSan:['Ra6'],ring:['a6'],
+  say:'Hitam untuk bergerak. Tir hitam di a1 terlalu pasif.',task:'Bawa Tir ke baris 6.',
+  wrongMsg:'Kawal baris 6! Bawa Tir ke a6.',win:'Kedudukan Philidor! Raja putih tak boleh maju, dan permainan menuju seri.'}
+]},
+{id:'ujian5',tahap:5,exam:true,title:'Ujian Tahap 5',icon:'wK',steps:[
+ {type:'quiz',title:'Soalan 1',fen:'8/8/6k1/8/1P6/8/8/7K b - - 0 1',say:'Raja putih terlalu jauh untuk membantu.',task:'Hitam bergerak dahulu. Bolehkah Raja hitam tangkap bidak?',
+  options:[{t:'Boleh',ok:true,why:'Betul! Selepas satu langkah, Raja hitam masuk segi empat bidak.'},{t:'Tidak boleh',why:'Kira segi empat dari b4 ke b8 (5 x 5 petak). Raja hitam boleh masuk dengan satu langkah.'}]},
+ {type:'puzzle',title:'Soalan 2',fen:'8/8/3k4/8/8/3K4/3P4/8 w - - 0 1',acceptSan:['Kc4','Kd4','Ke4'],say:'Raja + Bidak.',task:'Langkah terbaik untuk Putih?',wrongMsg:'Raja mesti di depan bidak.',win:'Betul! Raja di depan bidak.'},
+ {type:'puzzle',title:'Soalan 3',fen:'3k4/8/3K4/3P4/8/8/8/8 w - - 0 1',acceptSan:['Kc6','Ke6'],say:'Raja putih di baris 6.',task:'Cari langkah yang menang.',wrongMsg:'Jangan berundur dari baris 6.',win:'Betul!'},
+ {type:'quiz',title:'Soalan 4',pcs:'',say:'Philidor.',task:'Dalam kedudukan Philidor, Tir bertahan mengawal baris berapa?',options:[{t:'Baris 6',ok:true,why:'Betul!'},{t:'Baris 8'},{t:'Baris 2'}]},
+ {type:'quiz',title:'Soalan 5',pcs:'',say:'Lucena.',task:'Apa nama teknik utama dalam kedudukan Lucena?',options:[{t:'Bina jambatan',ok:true,why:'Betul!'},{t:'Fork diraja'},{t:'Mate tangga'}]}
+]}
+];
+
+(function(){
+const FILES='abcdefgh';
+const nm=i=>FILES[i%8]+((i>>3)+1);
+const S=n=>FILES.indexOf(n[0])+(parseInt(n[1],10)-1)*8;
+const KN=[[1,2],[2,1],[2,-1],[1,-2],[-1,-2],[-2,-1],[-2,1],[-1,2]];
+const DIAG=[[1,1],[1,-1],[-1,1],[-1,-1]],ORTH=[[1,0],[-1,0],[0,1],[0,-1]];
+const VAL={p:1,n:3,b:3,r:5,q:9,k:0};
+const PNAME={K:'Raja',Q:'Menteri',R:'Tir',B:'Gajah',N:'Kuda',P:'Bidak'};
+const $=s=>document.querySelector(s);
+const HAS_CHESS=typeof Chess!=='undefined';
+
+/* ---------- helpers ---------- */
+const pcs=str=>(str||'').trim().split(/\s+/).filter(Boolean).map(t=>({c:t[0],t:t[1],sq:S(t.slice(2))}));
+function fenList(fen){const out=[];const rows=fen.split(' ')[0].split('/');rows.forEach((row,ri)=>{let f=0;for(const ch of row){if(/\d/.test(ch)){f+=+ch;continue}out.push({c:ch===ch.toUpperCase()?'w':'b',t:ch.toUpperCase(),sq:(7-ri)*8+f});f++}});return out}
+function expandSq(list){const out=[];(list||[]).forEach(x=>{if(typeof x!=='string'){out.push(x);return}
+  if(x.startsWith('file:')){const f=FILES.indexOf(x[5]);for(let r=0;r<8;r++)out.push(r*8+f)}
+  else if(x.startsWith('rank:')){const r=+x[5]-1;for(let f=0;f<8;f++)out.push(r*8+f)}
+  else out.push(S(x))});return out}
+function gen(list,sq){const occ=new Map(list.map(p=>[p.sq,p]));const p=occ.get(sq);if(!p)return[];const f=sq%8,r=sq>>3,out=[];
+  const add=(x,y)=>{if(x<0||x>7||y<0||y>7)return false;const i=y*8+x,o=occ.get(i);if(o){if(o.c!==p.c)out.push(i);return false}out.push(i);return true};
+  const slide=d=>d.forEach(([dx,dy])=>{let x=f+dx,y=r+dy;while(add(x,y)){x+=dx;y+=dy}});
+  switch(p.t){case'N':KN.forEach(([a,b])=>add(f+a,r+b));break;case'B':slide(DIAG);break;case'R':slide(ORTH);break;case'Q':slide(DIAG.concat(ORTH));break;
+   case'K':DIAG.concat(ORTH).forEach(([a,b])=>add(f+a,r+b));break;
+   case'P':{const d=p.c==='w'?1:-1,st=p.c==='w'?1:6,y=r+d;if(y>=0&&y<8&&!occ.has(y*8+f)){out.push(y*8+f);if(r===st&&!occ.has((r+2*d)*8+f))out.push((r+2*d)*8+f)}
+     [-1,1].forEach(dx=>{const x=f+dx;if(x>=0&&x<8&&y>=0&&y<8){const o=occ.get(y*8+x);if(o&&o.c!==p.c)out.push(y*8+x)}})}}
+  return out}
+function lpath(a,b){const fa=a%8,ra=a>>3,df=b%8-fa,dr=(b>>3)-ra;const mid=Math.abs(dr)===2?(ra+dr)*8+fa:ra*8+fa+df;return[a,mid,b]}
+function pathFor(t,a,b){return t==='N'?{path:lpath(a,b),kind:'path'}:{from:a,to:b,kind:'path'}}
+function tourOpt(list,start,stars){const piece=list.find(p=>p.sq===start);const others=list.filter(p=>p!==piece);
+  const dist=(a,b)=>{if(a===b)return 0;const d=new Array(64).fill(-1);d[a]=0;const q=[a];while(q.length){const x=q.shift();for(const y of gen(others.concat([{c:piece.c,t:piece.t,sq:x}]),x))if(d[y]<0){d[y]=d[x]+1;if(y===b)return d[y];q.push(y)}}return 99};
+  let best=1e9;const perm=(cur,rest,acc)=>{if(acc>=best)return;if(!rest.length){best=acc;return}rest.forEach((s,i)=>perm(s,rest.filter((_,j)=>j!==i),acc+dist(cur,s)))};perm(start,stars,0);return best}
+const uci=u=>({from:u.slice(0,2),to:u.slice(2,4),promotion:u[4]});
+function oppHasMate(g){const ms=g.moves({verbose:true});for(const m of ms){g.move(m);const mate=g.in_checkmate();g.undo();if(mate)return true}return false}
+
+/* ---------- storage ---------- */
+const KEY='chessflow-v2';
+let P={xp:0,lessons:{},guru:false};
+try{const s=localStorage.getItem(KEY);if(s)P=Object.assign(P,JSON.parse(s))}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(P))}catch(e){}};
+const totalStars=()=>Object.values(P.lessons).reduce((a,l)=>a+(l.stars||0),0);
+function refreshStats(){$('#st-stars').textContent=totalStars();$('#st-xp').textContent=P.xp}
+
+/* ---------- sound ---------- */
+let soundOn=true,ac=null;
+try{if(localStorage.getItem(KEY+'-snd')==='0')soundOn=false}catch(e){}
+function setSndLabel(){const b=$('#snd');b.textContent='Bunyi: '+(soundOn?'Hidup':'Tutup');b.setAttribute('aria-pressed',String(soundOn))}
+function tone(seq){if(!soundOn)return;try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();let t=ac.currentTime;for(const[f,d]of seq){const o=ac.createOscillator(),g=ac.createGain();o.type='triangle';o.frequency.value=f;g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.16,t+.02);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g).connect(ac.destination);o.start(t);o.stop(t+d+.02);t+=d*.8}}catch(e){}}
+const SFX={good:()=>tone([[660,.12],[880,.18]]),bad:()=>tone([[220,.22]]),star:()=>tone([[988,.1],[1318,.16]]),win:()=>tone([[523,.12],[659,.12],[784,.12],[1046,.3]]),move:()=>tone([[420,.06]])};
+
+/* ---------- board ---------- */
+function Board(root,orient){
+  const o=orient||'w';root.innerHTML='';
+  const wrap=document.createElement('div');wrap.className='board';
+  const grid=document.createElement('div');grid.className='grid';grid.setAttribute('aria-label','Papan catur');
+  const pos=i=>{const f=i%8,r=i>>3;return o==='w'?[f,7-r]:[7-f,r]};
+  const els=[];
+  for(let row=0;row<8;row++)for(let col=0;col<8;col++){
+    const i=o==='w'?(7-row)*8+col:row*8+(7-col),f=i%8,r=i>>3,b=document.createElement('button');
+    b.type='button';b.className='sq '+((f+r)%2?'light':'dark');b.dataset.sq=i;b.setAttribute('aria-label','Petak '+nm(i));
+    if(col===0)b.insertAdjacentHTML('beforeend','<span class="cr">'+(r+1)+'</span>');
+    if(row===7)b.insertAdjacentHTML('beforeend','<span class="cf">'+FILES[f]+'</span>');
+    grid.appendChild(b);els[i]=b}
+  const NS='http://www.w3.org/2000/svg',svg=document.createElementNS(NS,'svg');svg.setAttribute('class','arrows');svg.setAttribute('viewBox','0 0 8 8');svg.setAttribute('aria-hidden','true');
+  svg.innerHTML='<defs><marker id="m-coral" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="3.2" markerHeight="3.2" orient="auto-start-reverse"><path class="m-coral" d="M0 0L10 5L0 10z"/></marker><marker id="m-path" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="3.2" markerHeight="3.2" orient="auto-start-reverse"><path class="m-path" d="M0 0L10 5L0 10z"/></marker></defs><g></g>';
+  const g=svg.querySelector('g');const layer=document.createElement('div');layer.className='pieces';
+  wrap.append(grid,svg,layer);root.appendChild(wrap);
+  const pieces=new Map();let uid=0,handler=null,M={};
+  grid.addEventListener('click',e=>{const b=e.target.closest('.sq');if(b&&handler)handler(+b.dataset.sq)});
+  const place=(el,i)=>{const[x,y]=pos(i);el.style.transform='translate('+x*100+'%,'+y*100+'%)'};
+  const ctr=i=>{const[x,y]=pos(i);return[x+.5,y+.5]};
+  const api={orient:o,
+    set(list){layer.innerHTML='';pieces.clear();list.forEach(p=>api.add(p));M={};api.mark({});api.arrows([])},
+    setFen(fen){api.set(fenList(fen))},
+    quiet(fen){const want=fenList(fen),key=p=>p.c+p.t+p.sq;const have=new Set(api.all().map(key));
+      if(want.length===have.size&&want.every(p=>have.has(key(p))))return;layer.innerHTML='';pieces.clear();want.forEach(p=>api.add(p))},
+    add(p){const id=++uid,el=document.createElement('div');el.className='piece pc '+p.c+p.t;el.style.transition='none';place(el,p.sq);layer.appendChild(el);void el.offsetWidth;el.style.transition='';pieces.set(id,{id,t:p.t,c:p.c,sq:p.sq,el});return id},
+    at(i){for(const p of pieces.values())if(p.sq===i)return p;return null},
+    all(){return[...pieces.values()]},
+    remove(i){const p=api.at(i);if(!p)return;pieces.delete(p.id);p.el.classList.add('captured');setTimeout(()=>p.el.remove(),350)},
+    move(from,to){const p=api.at(from);if(!p)return;const cap=api.at(to);if(cap&&cap!==p)api.remove(to);
+      p.sq=to;p.el.classList.remove('hop');void p.el.offsetWidth;if(p.t==='N')p.el.classList.add('hop');place(p.el,to)},
+    applyMove(m){const from=S(m.from),to=S(m.to);
+      if(m.flags.includes('e'))api.remove((from>>3)*8+to%8);
+      api.move(from,to);
+      if(m.flags.includes('k')){const r=from>>3;api.move(r*8+7,r*8+5)}
+      if(m.flags.includes('q')){const r=from>>3;api.move(r*8,r*8+3)}
+      if(m.promotion){const p=api.at(to);if(p){p.t=m.promotion.toUpperCase();setTimeout(()=>{p.el.className='piece pc '+p.c+p.t},260)}}},
+    mark(patch){M=Object.assign({},M,patch);
+      const set=k=>new Set(expandSq(M[k]));const dots=set('dots'),good=set('good'),ring=set('ring'),star=set('stars'),hl=set('hl');
+      const sel=M.sel==null?-1:(typeof M.sel==='string'?S(M.sel):M.sel);
+      els.forEach((b,i)=>{b.classList.toggle('dot',dots.has(i));b.classList.toggle('good',good.has(i));b.classList.toggle('ring',ring.has(i));b.classList.toggle('star',star.has(i));b.classList.toggle('hl',hl.has(i));b.classList.toggle('sel',sel===i)})},
+    flash(i){const b=els[i];b.classList.remove('bad');void b.offsetWidth;b.classList.add('bad')},
+    arrows(list){g.innerHTML='';(list||[]).forEach(a=>{
+      if(Array.isArray(a))a={from:S(a[0]),to:S(a[1])};
+      const kind=a.kind||'coral';let el;
+      if(a.path){el=document.createElementNS(NS,'polyline');el.setAttribute('points',a.path.map(ctr).map(p=>p.join(',')).join(' '))}
+      else{const[x1,y1]=ctr(a.from),[x2,y2]=ctr(a.to),dx=x2-x1,dy=y2-y1,L=Math.hypot(dx,dy),k=(L-.38)/L;
+        el=document.createElementNS(NS,'line');el.setAttribute('x1',x1);el.setAttribute('y1',y1);el.setAttribute('x2',x1+dx*k);el.setAttribute('y2',y1+dy*k)}
+      el.setAttribute('class','a-'+kind+' draw');el.setAttribute('stroke-width','.16');el.setAttribute('pathLength','20');el.setAttribute('marker-end','url(#m-'+kind+')');g.appendChild(el)})},
+    on(fn){handler=fn}};
+  return api}
+
+/* ---------- step types ---------- */
+function base(st,c){
+  const b=c.newBoard(st.orient);
+  if(st.fen)b.setFen(st.fen);else b.set(pcs(st.pcs));
+  b.mark({hl:st.hl||[],ring:st.ring||[],dots:st.dots||[]});
+  if(st.arrows)b.arrows(st.arrows);
+  if(st.counter)c.counter(st.counter);
+  return b}
+
+const TYPES={
+ explain(st,c){const b=base(st,c);
+  if(st.showMoves){const list=pcs(st.pcs),k=S(st.showMoves),t=gen(list,k),pt=list.find(p=>p.sq===k).t;
+    b.mark({sel:k,dots:t});if(st.initPath)b.arrows([pathFor(pt,k,S(st.initPath))]);
+    b.on(i=>{if(!t.includes(i))return;b.arrows([pathFor(pt,k,i)]);SFX.move();c.status(PNAME[pt]+' boleh pergi dari '+nm(k)+' ke '+nm(i)+'.','info')})}
+  if(st.demo&&HAS_CHESS){const play=()=>{c.clear();base(st,c);c.status('','');const g=new Chess(st.fen);let t=800;
+      st.demo.forEach((u,idx)=>{c.later(()=>{const bb=c.board();bb.arrows([]);bb.mark({ring:[]});const m=g.move(uci(u));if(!m)return;bb.applyMove(m);SFX.move();
+        c.later(()=>bb.quiet(g.fen()),420);
+        const n=st.demoNotes&&st.demoNotes[idx];if(n){if(n.arrows)bb.arrows(n.arrows);if(n.ring)bb.mark({ring:n.ring});if(n.status)c.status(n.status,'info')}
+        if(idx===st.demo.length-1&&st.demoEnd)c.status(st.demoEnd,'good')},t);t+=(st.demoNotes&&st.demoNotes[idx])?1700:950});};
+    c.actions([{label:'Tengok semula',fn:play}]);play()}
+  c.done()},
+
+ find(st,c){const b=base(st,c),list=pcs(st.pcs),k=S(st.piece),t=gen(list,k),pt=list.find(p=>p.sq===k).t,found=new Set();
+  b.mark({sel:k});c.counter('Jumpa: 0/'+t.length);
+  b.on(i=>{if(i===k||found.has(i))return;
+   if(t.includes(i)){found.add(i);b.mark({good:[...found]});b.arrows([pathFor(pt,k,i)]);SFX.good();c.counter('Jumpa: '+found.size+'/'+t.length);
+     if(found.size===t.length){c.status(st.done||'Hebat! Awak jumpa semua petak.','good');SFX.win();c.done()}else c.status('Betul! Teruskan cari.','good')}
+   else{b.flash(i);SFX.bad();c.mistake();const o=b.at(i);
+     c.status(o&&o.c===list.find(p=>p.sq===k).c?'Tak boleh. Itu buah sendiri.':nm(i)+' bukan petak yang '+PNAME[pt]+' boleh pergi.','bad')}})},
+
+ collect(st,c){const list0=pcs(st.pcs),start=S(st.piece),STARS=st.stars.map(S),opt=tourOpt(list0,start,STARS);let k,left,moves,fin,b;
+  const draw=()=>{const list=b.all().map(p=>({c:p.c,t:p.t,sq:p.sq}));b.mark({sel:k,dots:fin?[]:gen(list,k),stars:[...left]});c.counter('Langkah: '+moves+' · Bintang: '+(STARS.length-left.size)+'/'+STARS.length)};
+  const reset=()=>{b=base(st,c);k=start;left=new Set(STARS);moves=0;fin=false;draw();c.status('','');
+   b.on(i=>{if(fin)return;const list=b.all().map(p=>({c:p.c,t:p.t,sq:p.sq}));if(!gen(list,k).includes(i))return;b.move(k,i);k=i;moves++;
+    if(left.has(i)){left.delete(i);SFX.star()}else SFX.move();
+    if(!left.size){fin=true;const extra=moves-opt;if(extra>3)c.mistake(2);else if(extra>0)c.mistake(1);
+      c.status('Misi selesai dalam '+moves+' langkah! '+(extra<=0?'Itu jumlah paling sedikit. Hebat!':'Paling sedikit ialah '+opt+' langkah. Tekan "Mula semula" kalau nak cuba lagi.'),'good');SFX.win();c.done()}
+    draw()})};
+  c.actions([{label:'Mula semula',fn:reset}]);reset()},
+
+ tap(st,c){const b=base(st,c);let idx=0,got=new Set(),busy=false;
+  const show=()=>{const it=st.seq[idx];c.task(it.ask);c.counter(st.seq.length>1?'Soalan '+(idx+1)+'/'+st.seq.length:'')};show();
+  b.on(i=>{if(busy)return;const it=st.seq[idx],ok=it.sq.map(S);
+   if(ok.includes(i)){if(got.has(i))return;got.add(i);b.mark({good:[...got]});SFX.good();
+     if(it.all&&got.size<ok.length){c.status('Betul! Ada lagi.','good');return}
+     if(it.arrows)b.arrows(it.arrows);
+     if(it.dotsOf)b.mark({dots:it.dotsOf.flatMap(s=>gen(b.all().map(p=>({c:p.c,t:p.t,sq:p.sq})),S(s)))});
+     c.status(it.ok||'Betul!','good');
+     if(idx<st.seq.length-1){busy=true;c.later(()=>{idx++;got=new Set();b.mark({good:[]});b.arrows(st.arrows||[]);busy=false;show()},1100)}
+     else{SFX.win();c.done()}}
+   else{b.flash(i);SFX.bad();c.mistake();const msg=(st.wrongMap&&st.wrongMap[nm(i)])||it.wrong||st.wrong||'Bukan itu. Cuba lagi.';c.status(msg.replace('{sq}',nm(i)),'bad')}})},
+
+ quiz(st,c){base(st,c);const box=c.opts();
+  st.options.forEach(op=>{const bt=document.createElement('button');bt.type='button';bt.className='opt';bt.innerHTML=op.t;
+   bt.onclick=()=>{if(op.ok){bt.classList.add('good');box.querySelectorAll('button').forEach(x=>x.disabled=true);c.status(op.why||'Betul!','good');c.statusHtml(op.why||'Betul!');SFX.good();c.done()}
+     else{bt.classList.add('bad');bt.disabled=true;c.mistake();SFX.bad();c.status('','bad');c.statusHtml(op.why||'Cuba lagi.')}};
+   box.appendChild(bt)})},
+
+ puzzle(st,c){if(!HAS_CHESS)return c.status('Enjin catur gagal dimuatkan. Semak sambungan internet.','bad');
+  const b=base(st,c),g=new Chess(st.fen),user=g.turn();let ply=0,sel=null,busy=false,wrong=0;
+  const hint=()=>{if(st.hintRing)b.mark({ring:st.hintRing})};
+  if(st.hintRing)c.actions([{label:'Petunjuk',fn:()=>{c.mistake();hint();c.status('Petunjuk: perhatikan petak bulat merah.','info')}}]);
+  const accepts=res=>{
+   if(st.line){const exp=st.line[ply];if(res.from+res.to===exp.slice(0,4))return true;if(st.alts&&st.alts[ply]&&st.alts[ply].includes(res.san))return true;return ply===0&&st.acceptSan&&st.acceptSan.includes(res.san)}
+   if(st.acceptSan)return st.acceptSan.includes(res.san);
+   if(st.acceptMate)return g.in_checkmate();
+   const a=st.accept||{};
+   if(a.piece&&res.piece!==a.piece)return false;if(a.notPiece&&res.piece===a.notPiece)return false;
+   if(a.to&&!a.to.includes(res.to))return false;if(a.toFile&&!a.toFile.includes(res.to[0]))return false;
+   if(a.capture&&!res.captured)return false;if(a.noMateInOne&&oppHasMate(g))return false;return true};
+  b.on(i=>{if(busy)return;const sq=nm(i),p=g.get(sq);
+   if(p&&p.color===user&&g.turn()===user){sel=sq;b.mark({sel:i,dots:g.moves({square:sq,verbose:true}).map(m=>S(m.to))});return}
+   if(!sel)return;const legal=g.moves({square:sel,verbose:true}).filter(m=>m.to===sq);if(!legal.length)return;
+   let pr;if(legal[0].promotion){const exp=st.line&&st.line[ply];pr=exp&&exp.length===5?exp[4]:'q'}
+   const res=g.move({from:legal[0].from,to:sq,promotion:pr});b.applyMove(res);b.mark({sel:null,dots:[],ring:[]});b.arrows([]);sel=null;
+   c.later(()=>b.quiet(g.fen()),420);
+   if(accepts(res)){ply++;SFX.good();b.mark({good:[S(res.to)]});
+     if(st.line&&ply<st.line.length){
+       if(ply===1&&st.after1){if(st.after1.arrows)b.arrows(st.after1.arrows);if(st.after1.status)c.status(st.after1.status,'good')}else c.status('Bagus!','good');
+       busy=true;c.later(()=>{const m=g.move(uci(st.line[ply]));b.arrows([]);b.mark({good:[]});b.applyMove(m);SFX.move();ply++;c.later(()=>b.quiet(g.fen()),420);
+         if(ply>=st.line.length){c.status(st.win||'Betul!','good');SFX.win();c.done();return}
+         busy=false;const mi=(ply-2)/2;c.status((st.mids&&st.mids[mi])||st.mid||'Teruskan!','info')},st.after1&&ply===1?1700:900);return}
+     busy=true;c.status(st.win||'Betul!','good');SFX.win();c.done()}
+   else{wrong++;c.mistake();SFX.bad();b.flash(i);
+     c.status(g.in_stalemate()?'Stalemate! Itu seri, bukan menang. Raja lawan mesti ada langkah atau kena sah mati.':(st.wrongMsg||'Belum betul. Cuba lagi.'),'bad');
+     busy=true;c.later(()=>{g.undo();b.quiet(g.fen());b.mark({good:[]});busy=false;if(wrong>=2)hint()},950)}})},
+
+ play(st,c){if(!HAS_CHESS)return c.status('Enjin catur gagal dimuatkan. Semak sambungan internet.','bad');
+  let g,b,user,n,over,sel;
+  const cnt=()=>c.counter('Langkah: '+n+'/'+st.maxMoves);
+  const fail=msg=>{over=true;c.mistake();SFX.bad();c.status(msg+' Tekan "Cuba lagi".','bad')};
+  const reset=()=>{b=base(st,c);g=new Chess(st.fen);user=g.turn();n=0;over=false;sel=null;cnt();c.status('','');b.on(onTap)};
+  const userPawns=()=>g.board().flat().filter(x=>x&&x.color===user&&x.type==='p').length;
+  function onTap(i){if(over||g.turn()!==user)return;const sq=nm(i),p=g.get(sq);
+   if(p&&p.color===user){sel=sq;b.mark({sel:i,dots:g.moves({square:sq,verbose:true}).map(m=>S(m.to))});return}
+   if(!sel)return;const legal=g.moves({square:sel,verbose:true}).filter(m=>m.to===sq);if(!legal.length)return;
+   const res=g.move({from:sel,to:sq,promotion:legal[0].promotion?'q':undefined});b.applyMove(res);b.mark({sel:null,dots:[]});sel=null;n++;cnt();SFX.move();
+   c.later(()=>b.quiet(g.fen()),420);
+   const won=(st.goal==='mate'&&g.in_checkmate())||(st.goal==='promote'&&res.flags.includes('p'))||(st.goal==='captureQ'&&res.captured==='q');
+   if(won){over=true;b.mark({good:[S(res.to)]});c.status(st.win,'good');SFX.win();c.done();return}
+   if(g.in_stalemate())return fail('Stalemate! Raja hitam tiada langkah tapi tidak kena sah. Itu seri.');
+   if(g.in_draw())return fail('Permainan seri.');
+   if(n>=st.maxMoves)return fail('Sudah '+st.maxMoves+' langkah.');
+   c.later(()=>{const m=bot(g,st.bot,user);if(!m)return;const r=g.move(m);b.applyMove(r);c.later(()=>b.quiet(g.fen()),420);
+     if(st.goal==='promote'&&!userPawns())return fail('Raja hitam tangkap bidak awak!');
+     if(st.goal==='mate'&&r.captured&&r.captured!=='p')return fail('Alamak, '+PNAME[r.captured.toUpperCase()]+' awak dimakan! Jauhkan buah daripada Raja lawan.');
+     if(st.goal==='captureQ'&&n>=st.maxMoves)return fail('Menteri hitam terlepas.');
+     c.status(g.in_check()?'Sah!':'','info')},550)}
+  c.actions([{label:'Cuba lagi',fn:reset}]);reset()}
+};
+
+/* ---------- simple bot ---------- */
+function bot(g,kind,user,noise){const me=g.turn(),ms=g.moves({verbose:true});if(!ms.length)return null;let best=null,bs=-1e9;
+  for(const m of ms){g.move(m);let s=m.captured?VAL[m.captured]*100:0;
+   const rep=g.moves({verbose:true});let threat=0;for(const r of rep){if(r.captured)threat=Math.max(threat,VAL[r.captured]||0)}
+   if(g.in_checkmate())s-=10000;
+   const ksq=g.board().flat().find(x=>x&&x.type==='k'&&x.color===me);
+   let kpos=null;g.board().forEach((row,ri)=>row.forEach((x,fi)=>{if(x&&x.type==='k'&&x.color===me)kpos=[fi,7-ri]}));
+   if(kind==='flee'||kind==='defend'){s-=threat*60;if(kpos)s-=Math.max(Math.abs(kpos[0]-3.5),Math.abs(kpos[1]-3.5))*6;
+     const f=g.fen().split(' ');f[1]=me;f[3]='-';try{const t=new Chess(f.join(' '));s+=t.moves().length*3}catch(e){}}
+   if(kind==='chase'&&kpos){let d=99;g.board().forEach((row,ri)=>row.forEach((x,fi)=>{if(x&&x.type==='p'&&x.color===user){const pr=user==='w'?7:0;d=Math.min(d,Math.max(Math.abs(kpos[0]-fi),Math.abs(kpos[1]-pr)))}}));s-=d*10}
+   g.undo();s+=Math.random()*(noise||1);if(s>bs){bs=s;best=m}}
+  return{from:best.from,to:best.to,promotion:best.promotion}}
+
+/* ---------- data ---------- */
+const LES=LESSONS_DATA;LES.forEach((l,i)=>{l.idx=i;l.xp=l.xp||(l.exam?80:l.steps.length*10)});
+const BYID=Object.fromEntries(LES.map(l=>[l.id,l]));
+const ZIG=[0,55,85,55,0,-55,-85,-55];
+const lockSvg='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a5 5 0 0 0-5 5v3H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-1V7a5 5 0 0 0-5-5zm-3 8V7a3 3 0 0 1 6 0v3z"/></svg>';
+const medalSvg='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 2h4l1 4 1-4h4l-3.2 6.4A7 7 0 1 1 7.2 8.4zM12 10a5 5 0 1 0 0 10 5 5 0 0 0 0-10zm0 2 1.2 2.3 2.6.4-1.9 1.8.5 2.5-2.4-1.2-2.3 1.2.4-2.5-1.9-1.8 2.6-.4z"/></svg>';
+const flameSvg='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2s5 4.5 5 10a5 5 0 0 1-10 0c0-2.4 1.3-4.2 2.4-5.2.2 1.8 1.1 3 2.3 3.4C11 7.6 12 2 12 2zm0 12.5c-1.1.9-1.6 1.8-1.6 2.7a1.6 1.6 0 0 0 3.2 0c0-.9-.5-1.8-1.6-2.7z"/></svg>';
+const starsHtml=n=>[0,1,2].map(i=>'<i class="star-ico'+(i<n?'':' off')+'"></i>').join('');
+const unlocked=l=>P.guru||l.idx===0||!!P.lessons[LES[l.idx-1].id];
+
+/* ---------- daily puzzle ---------- */
+const DAILY_IDS=['fork','pin','terbuka','cct','mate2','gambit','ujian1','ujian2','ujian3','sah','seri','mateq','mater','nilai'];
+const BANK=[];LES.forEach(l=>{if(!DAILY_IDS.includes(l.id))return;l.steps.forEach(st=>{if(st.type==='puzzle'&&st.fen&&!st.orient&&(st.acceptMate||st.acceptSan||(st.line&&st.line.length>=3)))BANK.push(st)})});
+const dstr=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const today=()=>dstr(new Date());
+const yesterday=()=>{const d=new Date();d.setDate(d.getDate()-1);return dstr(d)};
+function dailyStep(){const d=new Date();const n=Math.floor(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())/864e5);const st=BANK[n%BANK.length];
+  return Object.assign({},st,{title:'Teka-teki '+d.toLocaleDateString('ms-MY',{day:'numeric',month:'long'}),say:'Teka-teki baharu setiap hari. Selesaikan untuk kekalkan streak!<br>'+(st.say||'')})}
+const streakNow=()=>{const D=P.daily||{};return(D.last===today()||D.last===yesterday())?(D.streak||0):0};
+
+/* ---------- map ---------- */
+function renderMap(){
+  const next=LES.find(l=>!P.lessons[l.id]&&unlocked(l));const done=LES.filter(l=>P.lessons[l.id]).length;
+  const dDone=(P.daily||{}).last===today(),sk=streakNow();
+  let h='<section class="hero"><div class="avatar"><i class="pc wN"></i></div><div><h1>'+(done?'Selamat kembali!':'Jom main catur!')+'</h1><p>Saya Pak Kuda. Kita belajar catur langkah demi langkah: kenal buah, belajar taktik, kutip bintang dan kumpul XP.</p>'+
+   '<div class="hero-row">'+(next?'<button class="cta" type="button" data-go="'+next.id+'">'+(done?'Sambung: ':'Mula: ')+next.title+'</button>':'<span class="pill">Semua pelajaran selesai!</span>')+
+   '<div class="meter" aria-label="Kemajuan"><span style="width:'+Math.round(done/LES.length*100)+'%"></span></div><small class="meter-lbl">'+done+'/'+LES.length+' pelajaran</small></div></div></section>';
+  h+='<section class="quick">'+
+   '<button class="qcard'+(dDone?' done':'')+'" type="button" id="go-daily"><span class="qico flame">'+flameSvg+'</span><span><b>Teka-teki Hari Ini</b><small>'+(dDone?'Selesai! Datang lagi esok.':'Satu teka-teki baharu setiap hari')+'</small></span><span class="qnum">'+sk+'<small>hari</small></span></button>'+
+   '<button class="qcard" type="button" id="go-game"><span class="qico"><i class="pc bK"></i></span><span><b>Main lawan Pak Kuda</b><small>Permainan penuh: mudah, sederhana atau sukar</small></span><span class="qnum">'+(P.wins||0)+'<small>menang</small></span></button></section>';
+  let zi=0;
+  for(const t of TAHAP){const ls=LES.filter(l=>l.tahap===t.n),dn=ls.filter(l=>P.lessons[l.id]).length;
+    h+='<section class="tahap"><div class="tahap-head"><small>Tahap '+t.n+'</small><h2>'+t.name+'</h2><span>'+t.note+' · '+dn+'/'+ls.length+'</span></div><div class="path">';
+    for(const l of ls){const x=l.exam?0:ZIG[zi++%ZIG.length],d=P.lessons[l.id],lk=!unlocked(l),cls=(d?'done':lk?'locked':'open')+(l.exam?' exam':'');
+      const sub=d?(l.exam?'Lulus · '+d.score:starsHtml(d.stars)):lk?'Terkunci':(l.exam?l.steps.length+' soalan · lulus 70%':l.steps.length+' langkah · '+l.xp+' XP');
+      const ico=l.exam?'<span class="medal">'+medalSvg+'</span>':'<i class="pc '+l.icon+'"></i>';
+      h+='<div class="stop '+cls+'" style="--x:'+x+'px"><button class="node" type="button" '+(lk?'disabled':'data-go="'+l.id+'"')+' aria-label="'+l.title+(lk?', terkunci':'')+'">'+ico+(lk?'<span class="lock">'+lockSvg+'</span>':'')+'</button><span class="lbl">'+l.title+'</span><span class="sub">'+sub+'</span></div>'}
+    h+='</div></section>'}
+  $('#view-map').innerHTML=h;$('#guru').checked=!!P.guru;
+  $('#go-daily').onclick=openDaily;$('#go-game').onclick=openGame}
+$('#view-map').addEventListener('click',e=>{const b=e.target.closest('[data-go]');if(b)openLesson(BYID[b.dataset.go])});
+
+/* ---------- lesson runner ---------- */
+let cur=null;
+const VIEWS=['map','lesson','game'];
+function show(v){VIEWS.forEach(x=>$('#view-'+x).hidden=x!==v);window.scrollTo(0,0)}
+function goMap(){if(cur)cur.clear();cur=null;if(G)G.stop();$('#modal').hidden=true;renderMap();refreshStats();show('map')}
+function openDaily(){openLesson({id:'harian',daily:true,title:'Teka-teki Harian',steps:[dailyStep()],xp:15})}
+function openLesson(L){
+  const V=$('#view-lesson');const id=L.id;
+  V.innerHTML='<div class="lesson-bar"><button class="ghost" type="button" id="back">← Peta</button><h2>'+L.title+'</h2><div class="prog" id="prog"></div></div>'+
+   '<div class="lesson"><div class="board-wrap"><div id="bw"></div><p class="turn" id="turn"></p></div><div class="panel">'+
+   (L.exam?'<p class="exam-note">Ujian: setiap soalan ada <b>satu peluang</b>. Lulus jika betul sekurang-kurangnya 70%.</p>':'')+
+   '<h3 class="step-title" id="stitle"></h3>'+
+   '<div class="coach"><div class="avatar sm"><i class="pc wN"></i></div><div class="bubble"><span class="who">Pak Kuda</span><p id="say"></p></div></div>'+
+   '<div class="task"><small>Tugasan</small><div class="row"><span id="task"></span><span class="counter" id="counter"></span></div><div class="opts" id="opts"></div></div>'+
+   '<div class="status" id="status" role="status" aria-live="polite"></div>'+
+   '<div class="actions"><span id="acts" class="actions"></span><span class="spacer"></span><button class="cta" id="next" type="button" disabled>Teruskan</button></div>'+
+   '</div></div>';
+  show('lesson');
+  let step=0,mistakes=0,timers=[],board=null;const failed=new Set();
+  const examNote=()=>L.exam&&failed.has(step)?' Soalan ini dikira salah. Tekan Teruskan.':'';
+  const c={
+    newBoard(o){board=Board($('#bw'),o);const st=L.steps[step];
+      $('#turn').textContent=st.fen?(st.fen.split(' ')[1]==='w'?'Putih untuk bergerak':'Hitam untuk bergerak'):'';return board},
+    board:()=>board,
+    later(fn,ms){timers.push(setTimeout(fn,ms))},
+    clear(){timers.forEach(clearTimeout);timers=[]},
+    status(t,k){const s=$('#status');s.className='status'+(k?' '+k:'');s.textContent=t+(k==='bad'&&t?examNote():'')},
+    statusHtml(h){$('#status').innerHTML=h+($('#status').classList.contains('bad')?examNote():'')},
+    counter(t){$('#counter').textContent=t},
+    task(h){$('#task').innerHTML=h},
+    opts(){return $('#opts')},
+    mistake(n){mistakes+=n||1;if(L.exam){failed.add(step);$('#next').disabled=false}},
+    actions(list){const a=$('#acts');a.innerHTML='';list.forEach(x=>{if(L.exam&&x.label==='Petunjuk')return;const bt=document.createElement('button');bt.type='button';bt.className='ghost';bt.textContent=x.label;bt.onclick=x.fn;a.appendChild(bt)})},
+    done(){$('#next').disabled=false}};
+  cur=c;$('#back').onclick=goMap;
+  function load(){c.clear();const st=L.steps[step];
+    $('#prog').innerHTML=L.steps.map((_,i)=>'<span class="'+(L.exam&&failed.has(i)?'miss':i<step?'on':i===step?'cur':'')+'"></span>').join('');
+    $('#stitle').textContent=st.title;$('#say').innerHTML=st.say||'';c.task(st.task||'');$('#opts').innerHTML='';
+    c.counter('');c.status('','');c.actions([]);$('#next').disabled=true;$('#next').textContent=step===L.steps.length-1?'Selesai':'Teruskan';
+    TYPES[st.type](st,c)}
+  $('#next').onclick=()=>{if(step<L.steps.length-1){step++;load();$('#stitle').scrollIntoView({block:'nearest'})}else finish()};
+  function modal(html){const m=$('#modal');m.innerHTML='<div class="card" role="dialog" aria-modal="true" aria-labelledby="ct">'+html+'</div>';m.hidden=false;return m}
+  function finish(){c.clear();SFX.win();
+    if(L.daily){const D=P.daily||{};let gained=0;if(D.last!==today()){D.streak=(D.last===yesterday()?(D.streak||0):0)+1;D.last=today();gained=L.xp;P.xp+=gained}P.daily=D;save();refreshStats();
+      modal('<span class="qico flame big">'+flameSvg+'</span><h2 id="ct">'+D.streak+' hari berturut-turut!</h2><p>Teka-teki hari ini selesai. Datang lagi esok untuk teka-teki baharu.</p>'+(gained?'<div class="xp">+'+gained+' XP</div>':'')+'<div class="actions" style="justify-content:center"><button class="cta" type="button" id="m-map">Ke peta</button></div>');
+      $('#m-map').onclick=goMap;$('#m-map').focus();return}
+    if(L.exam){const q=L.steps.length,score=q-failed.size,pass=score>=Math.ceil(q*0.7);
+      if(!pass){modal('<div class="big-stars">'+starsHtml(0)+'</div><h2 id="ct">Hampir!</h2><p>Markah awak <b>'+score+'/'+q+'</b>. Perlu sekurang-kurangnya '+Math.ceil(q*0.7)+' untuk lulus. Ulang kaji pelajaran tahap ini dan cuba lagi.</p><div class="actions" style="justify-content:center"><button class="cta" type="button" id="m-retry">Cuba lagi</button><button class="ghost" type="button" id="m-map">Ke peta</button></div>');
+        $('#m-retry').onclick=()=>{$('#modal').hidden=true;openLesson(L)};$('#m-map').onclick=goMap;$('#m-retry').focus();return}
+      const stars=score===q?3:score>=q-1?2:1,prev=P.lessons[id],gained=prev?Math.round(L.xp*0.2):L.xp;P.xp+=gained;
+      P.lessons[id]={stars:Math.max(stars,prev?prev.stars:0),score:score+'/'+q,date:today()};save();refreshStats();
+      const t=TAHAP.find(t=>t.n===L.tahap),nx=LES[L.idx+1];
+      const m=modal('<div class="cert"><small>Sijil ChessFlow</small><h2 id="ct">Tahap '+t.n+': '+t.name+'</h2><p>Dengan ini disahkan bahawa</p><input id="nama" class="cert-name" type="text" maxlength="40" placeholder="Tulis nama awak" aria-label="Nama"><p>telah lulus Ujian Tahap '+t.n+' dengan markah <b>'+score+'/'+q+'</b>.</p><div class="big-stars">'+starsHtml(stars)+'</div><small class="cert-date">'+new Date().toLocaleDateString('ms-MY',{day:'numeric',month:'long',year:'numeric'})+' · Pak Kuda</small></div>'+
+        '<div class="xp">+'+gained+' XP</div><div class="actions" style="justify-content:center">'+(nx?'<button class="cta" type="button" id="m-next">Seterusnya: '+nx.title+'</button>':'')+'<button class="ghost" type="button" id="m-map">Ke peta</button></div>');
+      const nmEl=$('#nama');nmEl.value=P.name||'';nmEl.oninput=()=>{P.name=nmEl.value;save()};
+      $('#m-map').onclick=goMap;if(nx)$('#m-next').onclick=()=>{m.hidden=true;openLesson(nx)};return}
+    const stars=mistakes<=1?3:mistakes<=4?2:1,prev=P.lessons[id];
+    const gained=prev?Math.round(L.xp*0.2):L.xp;P.xp+=gained;P.lessons[id]={stars:Math.max(stars,prev?prev.stars:0)};save();refreshStats();
+    const nx=LES[L.idx+1];
+    const m=modal('<div class="big-stars">'+starsHtml(stars)+'</div><h2 id="ct">Tahniah!</h2><p>Awak habiskan <b>'+L.title+'</b>'+(mistakes?' dengan '+mistakes+' kesilapan kecil.':' tanpa sebarang kesilapan!')+'</p><div class="xp">+'+gained+' XP</div>'+(L.tip?'<div class="tip">'+L.tip+'</div>':'')+
+      '<div class="actions" style="justify-content:center">'+(nx?'<button class="cta" type="button" id="m-next">Seterusnya: '+nx.title+'</button>':'')+'<button class="ghost" type="button" id="m-map">Ke peta</button></div>');
+    $('#m-map').onclick=goMap;if(nx)$('#m-next').onclick=()=>{m.hidden=true;openLesson(nx)};($('#m-next')||$('#m-map')).focus()}
+  load()}
+
+/* ---------- Stockfish (Web Worker) ---------- */
+let SF=null,sfCb=null,sfFailed=false;
+function sfInit(){if(SF||sfFailed)return;try{SF=new Worker('stockfish.js');
+  SF.onmessage=e=>{const l=typeof e.data==='string'?e.data:'';if(l.startsWith('bestmove')&&sfCb){const cb=sfCb;sfCb=null;cb(l.split(' ')[1])}};
+  SF.onerror=()=>{sfFailed=true;SF=null;if(sfCb){const cb=sfCb;sfCb=null;cb(null)}};
+  SF.postMessage('uci');SF.postMessage('isready')}catch(e){sfFailed=true;SF=null}}
+function sfBest(fen,skill,depth,cb){if(!SF)return cb(null);sfCb=cb;SF.postMessage('setoption name Skill Level value '+skill);SF.postMessage('position fen '+fen);SF.postMessage('go depth '+depth);
+  setTimeout(()=>{if(sfCb===cb){sfCb=null;SF.postMessage('stop');cb(null)}},9000)}
+
+/* ---------- full game ---------- */
+const LEVELS=[{n:'Mudah',xp:20},{n:'Sederhana',xp:50,skill:0,depth:2},{n:'Sukar',xp:100,skill:6,depth:8}];
+let G=null;
+function openGame(){sfInit();show('game');const V=$('#view-game');
+  const pref=P.gamePref||{color:'w',level:0};
+  V.innerHTML='<div class="lesson-bar"><button class="ghost" type="button" id="gback">← Peta</button><h2>Main lawan Pak Kuda</h2></div>'+
+   '<div class="lesson"><div class="board-wrap"><div id="gbw"></div><p class="turn" id="gturn"></p></div><div class="panel">'+
+   '<div class="setup"><div class="seg" role="group" aria-label="Warna"><span class="seg-l">Warna</span><button type="button" data-c="w">Putih</button><button type="button" data-c="b">Hitam</button><button type="button" data-c="r">Rawak</button></div>'+
+   '<div class="seg" role="group" aria-label="Tahap"><span class="seg-l">Tahap</span>'+LEVELS.map((l,i)=>'<button type="button" data-l="'+i+'">'+l.n+'</button>').join('')+'</div>'+
+   '<button class="cta" type="button" id="gnew">Permainan baru</button></div>'+
+   '<div class="status" id="gstatus" role="status" aria-live="polite"></div>'+
+   '<div class="moves"><small>Langkah</small><ol id="gmoves"></ol></div>'+
+   '<div class="actions"><button class="ghost" type="button" id="gundo">Undur</button><button class="ghost" type="button" id="ghint">Petunjuk</button><span class="spacer"></span><button class="ghost" type="button" id="gresign">Mengaku kalah</button></div>'+
+   '</div></div>';
+  let color=pref.color,level=pref.level;
+  const segs=()=>{V.querySelectorAll('[data-c]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.c===color)));V.querySelectorAll('[data-l]').forEach(b=>b.setAttribute('aria-pressed',String(+b.dataset.l===level)))};
+  V.querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>{color=b.dataset.c;segs()});
+  V.querySelectorAll('[data-l]').forEach(b=>b.onclick=()=>{level=+b.dataset.l;segs()});segs();
+  let g,b,user,over,busy,sel,tm=[];
+  const st=(t,k)=>{const s=$('#gstatus');s.className='status'+(k?' '+k:'');s.textContent=t};
+  const later=(f,ms)=>tm.push(setTimeout(f,ms));
+  const moves=()=>{const h=g.history();let out='';for(let i=0;i<h.length;i+=2)out+='<li><span>'+h[i]+'</span><span>'+(h[i+1]||'')+'</span></li>';const ol=$('#gmoves');ol.innerHTML=out;ol.scrollTop=ol.scrollHeight;
+    $('#gturn').textContent=over?'':(g.turn()===user?'Giliran awak':'Pak Kuda sedang berfikir…')};
+  const end=()=>{if(!g.game_over())return false;over=true;
+    if(g.in_checkmate()){if(g.turn()!==user){const xp=LEVELS[level].xp;P.xp+=xp;P.wins=(P.wins||0)+1;save();refreshStats();st('Sah mati! Awak menang lawan Pak Kuda ('+LEVELS[level].n+'). +'+xp+' XP','good');SFX.win()}
+      else{st('Sah mati. Pak Kuda menang kali ini. Cuba lagi!','bad');SFX.bad()}}
+    else st(g.in_stalemate()?'Stalemate. Permainan seri.':g.in_threefold_repetition()?'Ulangan tiga kali. Seri.':g.insufficient_material()?'Buah tak cukup untuk sah mati. Seri.':'Seri (peraturan 50 langkah).','info');
+    moves();return true};
+  const apply=m=>{const r=g.move(m);b.applyMove(r);b.mark({last:null,hl:[S(r.from),S(r.to)],sel:null,dots:[]});b.arrows([]);later(()=>b.quiet(g.fen()),420);moves();return r};
+  const botMove=()=>{if(over)return;busy=true;moves();const L=LEVELS[level],fen=g.fen();
+    const fallback=()=>bot(g,'defend',user,level===0?260:40);
+    const go=mv=>{later(()=>{if(over||!G)return;const r=apply(mv||fallback());SFX.move();busy=false;if(!end()){if(g.in_check())st('Sah! Selamatkan Raja awak.','bad');else st('','')}moves()},level===0?500:150)};
+    if(L.skill==null||!SF)go(null);
+    else sfBest(fen,L.skill,L.depth,u=>go(u?{from:u.slice(0,2),to:u.slice(2,4),promotion:u[4]}:null))};
+  function onTap(i){if(over||busy||g.turn()!==user)return;const sq=nm(i),p=g.get(sq);
+    if(p&&p.color===user){sel=sq;b.mark({sel:i,dots:g.moves({square:sq,verbose:true}).map(m=>S(m.to))});return}
+    if(!sel)return;const legal=g.moves({square:sel,verbose:true}).filter(m=>m.to===sq);if(!legal.length)return;
+    apply({from:sel,to:sq,promotion:legal[0].promotion?'q':undefined});sel=null;SFX.move();st('','');if(!end())botMove()}
+  function start(){tm.forEach(clearTimeout);tm=[];user=color==='r'?(Math.random()<.5?'w':'b'):color;P.gamePref={color,level};save();
+    g=new Chess();b=Board($('#gbw'),user);b.setFen(g.fen());b.on(onTap);over=false;busy=false;sel=null;
+    st('Awak main '+(user==='w'?'Putih':'Hitam')+' · tahap '+LEVELS[level].n+'.'+(level>0&&sfFailed?' (Enjin kuat tidak dapat dimuatkan, Pak Kuda guna otak sendiri.)':''),'info');moves();
+    if(user==='b')botMove()}
+  $('#gnew').onclick=start;$('#gback').onclick=goMap;
+  $('#gundo').onclick=()=>{if(busy||!g.history().length)return;g.undo();if(g.turn()!==user)g.undo();over=false;b.quiet(g.fen());b.mark({hl:[],sel:null,dots:[]});b.arrows([]);sel=null;st('Langkah diundur.','info');moves()};
+  $('#ghint').onclick=()=>{if(busy||over||g.turn()!==user)return;busy=true;st('Pak Kuda sedang fikir petunjuk…','info');
+    const show=mv=>{busy=false;if(!mv)return st('Tiada petunjuk.','info');b.arrows([{from:S(mv.from),to:S(mv.to),kind:'path'}]);st('Cuba langkah anak panah ini.','info')};
+    if(SF)sfBest(g.fen(),20,10,u=>show(u?{from:u.slice(0,2),to:u.slice(2,4)}:bot(g,'defend',g.turn()==='w'?'b':'w',1)));else show(bot(g,'defend',g.turn()==='w'?'b':'w',1))};
+  $('#gresign').onclick=()=>{if(over)return;over=true;st('Awak mengaku kalah. Tekan "Permainan baru" untuk cuba lagi.','bad');moves()};
+  G={stop(){tm.forEach(clearTimeout);tm=[];G=null}};
+  start()}
+
+/* ---------- boot ---------- */
+$('#home').onclick=goMap;
+$('#play-top').onclick=openGame;
+$('#snd').onclick=()=>{soundOn=!soundOn;try{localStorage.setItem(KEY+'-snd',soundOn?'1':'0')}catch(e){}setSndLabel();SFX.good()};
+$('#guru').onchange=e=>{P.guru=e.target.checked;save();renderMap()};
+let resetArm=false;
+$('#reset').onclick=e=>{if(!resetArm){resetArm=true;e.target.textContent='Tekan sekali lagi untuk padam';setTimeout(()=>{resetArm=false;e.target.textContent='Padam kemajuan'},3000);return}
+  P={xp:0,lessons:{},guru:P.guru};save();resetArm=false;e.target.textContent='Padam kemajuan';goMap()};
+setSndLabel();renderMap();refreshStats();
+if(!HAS_CHESS)$('#view-map').insertAdjacentHTML('afterbegin','<p class="status bad">Enjin catur gagal dimuatkan. Sesetengah pelajaran tidak akan berfungsi.</p>');
+})();
+
+</script>

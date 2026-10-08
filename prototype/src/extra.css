@@ -1,0 +1,55 @@
+.opts{display:flex;flex-direction:column;gap:8px}
+.opts:empty{display:none}
+.opt{text-align:left;background:var(--surface);border:2px solid var(--line);border-radius:14px;padding:11px 14px;font-weight:500;cursor:pointer;font-size:15px}
+.opt:hover:not(:disabled){border-color:var(--accent)}
+.opt.good{border-color:var(--good);background:var(--good-soft);color:var(--good)}
+.opt.bad{border-color:var(--coral);background:var(--coral-soft);color:var(--coral);text-decoration:line-through}
+.opt:disabled{cursor:default}
+.turn{margin:8px 2px 0;font-size:13px;color:var(--muted);text-align:center}
+.turn:empty{display:none}
+.hero-row{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.meter{width:140px;height:10px;border-radius:99px;background:var(--line);overflow:hidden}
+.meter span{display:block;height:100%;background:var(--sun)}
+.meter-lbl{color:var(--muted);font-size:13px;font-variant-numeric:tabular-nums}
+.guru{display:inline-flex;gap:6px;align-items:center;font-size:13px;color:var(--muted);cursor:pointer}
+.guru input{accent-color:var(--accent);width:16px;height:16px}
+.foot-r{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.status b{font-weight:700}
+.pill.play{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.quick{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-top:14px}
+.qcard{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:14px 16px;cursor:pointer}
+.qcard:hover{border-color:var(--accent)}
+.qcard b{font-family:var(--display);font-size:19px;font-weight:700;display:block;line-height:1.2}
+.qcard small{color:var(--muted);font-size:13px;display:block}
+.qcard.done{background:var(--good-soft)}
+.qico{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;background:var(--accent-soft)}
+.qico i{width:38px;height:38px;display:block}
+.qico svg{width:28px;height:28px;fill:var(--accent)}
+.qico.flame{background:var(--sun-soft)} .qico.flame svg{fill:var(--sun)}
+.qico.big{width:72px;height:72px;border-radius:22px} .qico.big svg{width:44px;height:44px}
+.qnum{font-family:var(--display);font-weight:800;font-size:28px;line-height:1;text-align:center;font-variant-numeric:tabular-nums}
+.qnum small{font-family:var(--body);font-weight:500;font-size:11px}
+.stop.exam .node{border-radius:22px;width:84px;height:84px}
+.medal svg{width:46px;height:46px;fill:#fff}
+.stop.locked.exam .medal svg{fill:var(--muted)}
+.stop.exam .lbl{font-family:var(--display);font-size:17px}
+.exam-note{margin:0;background:var(--coral-soft);color:var(--ink);border-radius:12px;padding:8px 12px;font-size:14px}
+.prog span.miss{background:var(--coral)}
+.cert{border:3px double var(--sun);border-radius:18px;padding:18px 16px;display:flex;flex-direction:column;gap:8px;align-items:center;width:100%;background:var(--sun-soft)}
+.cert > small{letter-spacing:.14em;text-transform:uppercase;font-weight:600;color:var(--muted);font-size:11px}
+.cert h2{font-size:26px}
+.cert p{margin:0;color:var(--muted)}
+.cert-name{font-family:var(--display);font-size:26px;font-weight:700;text-align:center;border:0;border-bottom:2px dashed var(--sun);background:transparent;color:var(--ink);width:100%;max-width:300px;padding:4px}
+.cert-name:focus{outline:none;border-bottom-style:solid}
+.cert-date{color:var(--muted);font-size:12px}
+.setup{display:flex;flex-direction:column;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px}
+.seg{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.seg-l{font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;color:var(--muted);width:64px}
+.seg button{border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:7px 12px;cursor:pointer;font-weight:500;font-size:14px}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.setup .cta{align-self:flex-start}
+.moves small{font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;color:var(--muted)}
+.moves ol{margin:6px 0 0;padding:0 0 0 2.2em;max-height:180px;overflow-y:auto;font-variant-numeric:tabular-nums;columns:1;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding-block:8px}
+.moves li{padding:1px 8px 1px 0}
+.moves li span{display:inline-block;min-width:64px;font-weight:500}
+.moves ol:empty{display:none}

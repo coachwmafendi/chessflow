@@ -1,0 +1,20 @@
+<div class="app">
+  <header class="top">
+    <button class="logo" id="home" type="button" aria-label="ChessFlow, ke peta"><span class="mark"><i class="pc wN"></i></span><b>Chess<span>Flow</span></b></button>
+    <div class="stats">
+      <span class="pill" title="Jumlah bintang"><i class="star-ico ico"></i><span id="st-stars">0</span></span>
+      <span class="pill" title="Mata pengalaman"><span class="xp-ico">XP</span><span id="st-xp">0</span></span>
+      <button class="pill btn play" id="play-top" type="button">Main</button>
+      <button class="pill btn" id="snd" type="button" aria-pressed="true">Bunyi: Hidup</button>
+    </div>
+  </header>
+  <main id="view-map"></main>
+  <main id="view-lesson" hidden></main>
+  <main id="view-game" hidden></main>
+  <footer class="foot">
+    <span>ChessFlow · Belajar catur dalam Bahasa Melayu untuk kanak-kanak dan pemula</span>
+    <span class="foot-r"><label class="guru" for="guru"><input type="checkbox" id="guru"> Mod guru: buka semua pelajaran</label><button class="linkbtn" id="reset" type="button">Padam kemajuan</button></span>
+  </footer>
+</div>
+<div class="modal" id="modal" hidden></div>
+<script src="https://cdn.jsdelivr.net/npm/chess.js@0.10.3/chess.js"></script>
