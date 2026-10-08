@@ -8,7 +8,8 @@
         "typecheck": "tsc --noEmit",
         "test:ts": "vitest run",
         "test:ts:watch": "vitest",
-        "validate:lessons": "node tools/validate-lessons.cjs data/lessons.json"
+        "validate:lessons": "node tools/validate-lessons.cjs data/lessons.json",
+        "test:e2e": "playwright test"
     },
     "dependencies": {
         "@laravel/passkeys": "^0.2.0",
@@ -29,6 +30,7 @@
     "devDependencies": {
         "@playwright/test": "^1.64.0",
         "@types/node": "^26.6.4",
+        "jsdom": "^29.1.1",
         "typescript": "^5.9.3",
         "vitest": "^4.1.11"
     }

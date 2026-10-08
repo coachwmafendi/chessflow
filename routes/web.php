@@ -9,3 +9,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 require __DIR__.'/settings.php';
+
+if (app()->environment('local')) {
+    Route::livewire('dev/playground', 'pages::dev.playground')->name('dev.playground');
+}
