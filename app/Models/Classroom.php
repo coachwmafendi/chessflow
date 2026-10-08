@@ -19,6 +19,17 @@ use Illuminate\Support\Carbon;
 #[Fillable(['teacher_id', 'name', 'join_code'])]
 class Classroom extends Model
 {
+    public static function newJoinCode(): string
+    {
+        do {
+            $code = collect(range(1, 6))
+                ->map(fn () => '23456789ABCDEFGHJKLMNPQRSTUVWXYZ'[random_int(0, 31)])
+                ->implode('');
+        } while (self::where('join_code', $code)->exists());
+
+        return $code;
+    }
+
     /**
      * @return BelongsTo<User, $this>
      */

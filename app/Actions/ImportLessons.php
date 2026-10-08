@@ -10,7 +10,8 @@ use JsonException;
 
 /**
  * Upserts levels and lessons from data/lessons.json, keyed by level number and lesson slug.
- * The JSON file is the source of truth for content; admin-owned fields (is_published) are kept.
+ * The JSON file is the source of truth for content; admin-owned fields (is_published, and
+ * position once a lesson exists — admins reorder in Filament) are kept.
  */
 class ImportLessons
 {
@@ -64,6 +65,7 @@ class ImportLessons
                     continue;
                 }
 
+                unset($attrs['position']);
                 $lesson->fill($attrs);
                 if (! $lesson->isDirty()) {
                     $stats['unchanged']++;

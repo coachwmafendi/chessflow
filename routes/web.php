@@ -13,6 +13,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::livewire('pelajaran/{lesson:slug}', 'pages::pelajaran')->name('pelajaran');
     Route::livewire('harian', 'pages::harian')->name('harian');
     Route::livewire('main', 'pages::main')->name('main');
+    Route::livewire('sertai', 'pages::sertai')->name('sertai');
+
+    Route::livewire('anak', 'pages::anak')->middleware('can:guardian')->name('anak');
+
+    Route::middleware('can:create,App\Models\Classroom')->group(function () {
+        Route::livewire('guru', 'pages::guru.index')->name('guru');
+        Route::livewire('guru/kelas/{classroom}', 'pages::guru.kelas')->name('guru.kelas');
+    });
+
+    Route::livewire('pratonton/{lesson:slug}', 'pages::admin.pratonton')->middleware('can:admin')->name('pratonton');
 });
 
 require __DIR__.'/settings.php';

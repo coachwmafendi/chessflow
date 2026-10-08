@@ -23,6 +23,15 @@
                         <span class="pill" title="Jumlah bintang"><i class="star-ico ico"></i><span data-stat="stars">{{ $user->totalStars() }}</span></span>
                         <span class="pill" title="Mata pengalaman"><span class="xp-ico">XP</span><span data-stat="xp">{{ $user->xp }}</span></span>
                         <a class="pill btn play" href="{{ route('main') }}">Main</a>
+                        @if ($user->isStaff())
+                            <a class="pill btn" href="{{ route('guru') }}">Kelas</a>
+                        @endif
+                        @can('guardian')
+                            <a class="pill btn" href="{{ route('anak') }}">Anak</a>
+                        @endcan
+                        @can('admin')
+                            <a class="pill btn" href="{{ url('/admin') }}">Admin</a>
+                        @endcan
                     @endauth
                     <button class="pill btn" type="button" data-sound-toggle aria-pressed="true">Bunyi: Hidup</button>
                     @auth

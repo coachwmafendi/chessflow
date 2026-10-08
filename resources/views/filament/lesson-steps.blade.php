@@ -1,0 +1,1 @@
+<pre style="max-height: 600px; overflow: auto; font-size: 12px; line-height: 1.5; padding: 12px; border-radius: 8px; background: rgb(0 0 0 / .04)">{{ json_encode($getRecord()->steps, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) }}</pre>

@@ -261,7 +261,7 @@ Setiap fasa ada **matlamat**, **siap bila** dan **arahan untuk CC**. Mulakan set
 - Guru cipta kelas → kod sertai → tambah murid (cipta akaun murid secara pukal).
 - `guru/⚡kelas`: jadual murid × pelajaran (bintang), XP, streak, ujian lulus, aktiviti terakhir.
 - Ibu bapa: pautkan anak, lihat kemajuan.
-- Filament v5: urus pelajaran (editor JSON langkah + pratonton pulau TS), terbitkan atau sembunyikan, susun semula.
+- Filament v5: urus pelajaran (lihat JSON langkah baca sahaja + pratonton pulau TS), terbitkan atau sembunyikan, susun semula. *Keputusan: kandungan kekal dalam `data/lessons.json`; import tidak menimpa `position` dan `is_published`.*
 
 ### Fasa 6: Produksi dan pilihan masa depan
 - Sandaran DB harian (Coolify → S3/R2), Sentry atau log ralat, had kadar (rate limit) pada tindakan kemajuan.
@@ -315,7 +315,7 @@ Setiap fasa ada **matlamat**, **siap bila** dan **arahan untuk CC**. Mulakan set
 
 ## 10. Cara tambah pelajaran baharu (selepas migrasi)
 
-1. Tambah objek pelajaran dalam `data/lessons.json`, atau melalui Filament dalam Fasa 5.
+1. Tambah objek pelajaran dalam `data/lessons.json` (sumber kandungan tunggal; Filament hanya untuk pratonton, terbit/sembunyi dan susun semula).
 2. `npm run validate:lessons`: menyemak FEN, langkah dan jawapan.
 3. Untuk teka-teki taktik atau endgame, sahkan dengan `node tools/stockfish-analyse.cjs "<FEN>" 20 6`.
 4. `php artisan chessflow:import-lessons` → cuba di `/dev/playground` → terbitkan.

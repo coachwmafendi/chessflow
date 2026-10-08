@@ -19,3 +19,26 @@ a.cta, a.ghost { display: inline-flex; align-items: center; justify-content: cen
     .top, .foot, .no-print { display: none !important; }
     body { background: #fff; }
 }
+
+.page-head { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; margin-block: 16px; }
+.panel-card { background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 18px; margin-block: 16px; }
+.panel-card h2 { margin-bottom: 8px; font-size: 22px; }
+.panel-card form { display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-end; }
+.panel-card input, .panel-card textarea { padding: 10px 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--bg); color: var(--ink); font: inherit; }
+.panel-card textarea { width: 100%; min-height: 120px; }
+.panel-card .err { color: var(--coral); font-size: 14px; width: 100%; }
+.class-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+.code { font-family: ui-monospace, monospace; font-size: 22px; letter-spacing: .15em; font-weight: 700; }
+.creds { width: 100%; border-collapse: collapse; margin-top: 8px; }
+.creds th, .creds td { border: 1px solid var(--line); padding: 6px 10px; text-align: left; }
+.progress-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 16px; background: var(--surface); }
+.progress-table { border-collapse: collapse; font-size: 14px; }
+.progress-table th, .progress-table td { padding: 6px 8px; border-bottom: 1px solid var(--line); white-space: nowrap; text-align: center; }
+.progress-table .sticky { position: sticky; left: 0; background: var(--surface); text-align: left; z-index: 1; }
+.progress-table th.sticky small { display: block; color: var(--muted); font-weight: 400; }
+.progress-table .lesson-col { vertical-align: bottom; height: 120px; }
+.progress-table .lesson-col span { writing-mode: vertical-rl; transform: rotate(180deg); font-weight: 500; }
+.progress-table .cell { color: var(--sun); }
+.progress-table .cell.empty { color: var(--line); }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+.page-head h1 { font-size: 32px; }

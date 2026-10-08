@@ -67,13 +67,14 @@ it('bumps content_version only for lessons whose content changed', function () {
         ->and(Lesson::where('content_version', 2)->count())->toBe(1);
 });
 
-it('keeps is_published set by admins on re-import', function () {
+it('keeps is_published and position set by admins on re-import', function () {
     $this->artisan('chessflow:import-lessons')->assertSuccessful();
-    Lesson::where('slug', 'kuda')->update(['is_published' => false]);
+    Lesson::where('slug', 'kuda')->update(['is_published' => false, 'position' => 99]);
 
     $this->artisan('chessflow:import-lessons')->assertSuccessful();
 
-    expect(Lesson::where('slug', 'kuda')->value('is_published'))->toBeFalse();
+    expect(Lesson::where('slug', 'kuda')->value('is_published'))->toBeFalse()
+        ->and(Lesson::where('slug', 'kuda')->value('position'))->toBe(99);
 });
 
 it('refuses to import lessons that fail validation', function () {

@@ -5,6 +5,8 @@ namespace App\Models;
 use App\Enums\Role;
 use App\Support\Chessflow;
 use Database\Factories\UserFactory;
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -42,7 +44,7 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
  */
 #[Fillable(['name', 'username', 'email', 'password', 'role', 'pin', 'preferences'])]
 #[Hidden(['password', 'pin', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
-class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
+class User extends Authenticatable implements FilamentUser, MustVerifyEmail, PasskeyUser
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable, PasskeyAuthenticatable, TwoFactorAuthenticatable;
@@ -75,6 +77,29 @@ class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
     public function totalStars(): int
     {
         return (int) $this->lessonProgress()->sum('best_stars');
+    }
+
+    public function isStudent(): bool
+    {
+        return $this->role === Role::Murid;
+    }
+
+    /**
+     * Teachers see students in their classrooms; guardians see linked children.
+     */
+    public function canSeeStudent(User $student): bool
+    {
+        if ($this->role === Role::Admin) {
+            return true;
+        }
+
+        return $this->students()->whereKey($student->id)->exists()
+            || $this->taughtClassrooms()->whereHas('students', fn ($q) => $q->whereKey($student->id))->exists();
+    }
+
+    public function canAccessPanel(Panel $panel): bool
+    {
+        return $this->role === Role::Admin;
     }
 
     public function isStaff(): bool
