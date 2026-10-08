@@ -87,5 +87,5 @@ Log ke `stderr` → Coolify → Logs. Sentry boleh ditambah kemudian (`sentry/se
 
 ## Belum dibuat (MIGRATION_PLAN Fasa 6 / §9)
 
-- **Set buah sendiri** untuk ganti ikon cburnett (GPLv2+) sebelum lancar secara komersial, dan maskot Pak Kuda ilustrasi.
+- **Maskot Pak Kuda** ilustrasi. (Ikon buah cburnett sudah diganti dengan set rhosgfx, CC0.)
 - **REST API `/api/v1`**: hanya jika app mobile diperlukan.

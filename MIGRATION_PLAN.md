@@ -15,7 +15,7 @@ Setiap fasa boleh diserahkan kepada Claude Code (CC) sebagai satu sesi kerja. Fa
 | `prototype/chessflow.html` | Prototaip yang berfungsi. Buka dalam browser sebagai rujukan tingkah laku |
 | `prototype/src/engine.js` | Enjin prototaip: papan, 7 jenis langkah, bot, Stockfish, mod ujian, teka-teki harian |
 | `prototype/src/content.js` | Kandungan asal (sama dengan `lessons.json`) |
-| `prototype/src/*.css` | Gaya prototaip: token warna, papan, peta. Ikon buah ada dalam `pieces.css` |
+| `prototype/src/*.css` | Gaya prototaip: token warna, papan, peta. Ikon buah ada dalam `pieces.css` (set rhosgfx, CC0) |
 | `public/stockfish/` | Stockfish 10 (WASM + fallback asm.js). Letak di `public/stockfish/` dalam Laravel |
 | `tools/validate-lessons.cjs` | Penyemak kandungan (chess.js v1): FEN sah, langkah sah, jawapan wujud. Sudah diuji: 32 pelajaran, 0 ralat |
 | `tools/stockfish-analyse.cjs` | Analisis kedudukan dengan Stockfish di Node (perlu `npm i -D stockfish@16.0.0`) |
@@ -304,7 +304,7 @@ Setiap fasa ada **matlamat**, **siap bila** dan **arahan untuk CC**. Mulakan set
 
 | Perkara | Status | Tindakan |
 |---|---|---|
-| Ikon buah cburnett (dalam `pieces.css`) | GPLv2+ | Sebelum lancar secara komersial, lukis set buah sendiri atau guna set berlesen bebas (cth CC0) |
+| Ikon buah "rhosgfx" oleh RhosGFX (dalam `pieces.css`, dari repo lichess-org/lila) | CC0 1.0 (domain awam) | Selesai: menggantikan set cburnett (GPLv2+). Tiada syarat atribusi, tetapi dikreditkan di halaman "Tentang" |
 | Stockfish | GPLv3 | Dihantar sebagai fail berasingan. Paparkan notis lesen dan pautan kod sumber di halaman "Tentang" |
 | chess.js | BSD-2 | Selamat. Kekalkan notis lesen |
 | Kandungan pelajaran | Asli, ditulis untuk ChessFlow | Buku Levy Rozman hanya rujukan struktur. Jangan salin teks atau diagram buku |
