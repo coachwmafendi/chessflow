@@ -4,11 +4,16 @@
     "type": "module",
     "scripts": {
         "build": "vp build",
-        "dev": "vp dev"
+        "dev": "vp dev",
+        "typecheck": "tsc --noEmit",
+        "test:ts": "vitest run",
+        "test:ts:watch": "vitest",
+        "validate:lessons": "node tools/validate-lessons.cjs data/lessons.json"
     },
     "dependencies": {
         "@laravel/passkeys": "^0.2.0",
         "@tailwindcss/vite": "^4.1.11",
+        "chess.js": "^1.4.0",
         "concurrently": "^10.0.3",
         "laravel-vite-plugin": "^3.1",
         "tailwindcss": "^4.0.7",
@@ -20,5 +25,11 @@
         "@rollup/rollup-linux-x64-gnu": "4.9.5",
         "@tailwindcss/oxide-linux-x64-gnu": "^4.0.1",
         "lightningcss-linux-x64-gnu": "^1.29.1"
+    },
+    "devDependencies": {
+        "@playwright/test": "^1.64.0",
+        "@types/node": "^26.6.4",
+        "typescript": "^5.9.3",
+        "vitest": "^4.1.11"
     }
 }
