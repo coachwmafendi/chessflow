@@ -1,4 +1,4 @@
-<x-layouts::auth :title="__('Log in')">
+<x-layouts::auth.split art-heading="Selamat kembali!" :title="__('Log in')">
     <div class="flex flex-col gap-6">
         <x-auth-header :title="__('Log in to your account')" :description="__('Enter your email and password below to log in')" />
 
@@ -61,4 +61,4 @@
             <flux:link :href="route('murid.login')">Masuk dengan nama pengguna dan PIN</flux:link>
         </div>
     </div>
-</x-layouts::auth>
+</x-layouts::auth.split>
