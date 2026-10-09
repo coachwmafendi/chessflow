@@ -23,11 +23,21 @@ return [
         'rewarded_wins_per_day' => 10,
     ],
 
+    // "Latih semula": steps answered wrongly come back the next day, then after these gaps (days) once
+    // answered right; a right answer in the last box retires the step. XP per right answer on a due step.
+    'review' => [
+        'intervals' => [3, 7, 14],
+        'xp' => 5,
+        // Step types that stand on their own and can be asked again.
+        'step_types' => ['puzzle', 'quiz', 'find', 'tap', 'play', 'collect'],
+    ],
+
     // Results are reported by the browser, so the server limits how often they count.
     'limits' => [
         'lessons_per_minute' => 6,
         'daily_per_minute' => 5,
         'games_per_minute' => 6,
+        'review_per_minute' => 8,
         // A lesson finished faster than this (per step) is not recorded.
         'min_seconds_per_step' => 2,
     ],

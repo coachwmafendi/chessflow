@@ -127,6 +127,8 @@ export interface Lesson {
     icon: string;
     exam?: boolean;
     daily?: boolean;
+    /** "Latih semula": one step the student got wrong before. */
+    review?: boolean;
     tip?: string | null;
     steps: Step[];
     position?: number;
@@ -166,6 +168,8 @@ export interface ServerLessonResult {
     retryUrl?: string | null;
     // Set when the server refused to record the result (rate limit / too fast).
     message?: string;
+    // "Latih semula" outcome: right/wrong, retired after the last box, steps still due today.
+    review?: { correct: boolean; mastered: boolean; remaining: number };
 }
 
 // Context handed to each step-type runner by LessonRunner.

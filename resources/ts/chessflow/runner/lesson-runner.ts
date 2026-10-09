@@ -154,10 +154,9 @@ export class LessonRunner {
             opts: () => this.els.opts,
             mistake: (n) => {
                 this.mistakes += n || 1;
-                if (this.lesson.exam) {
-                    this.failed.add(this.step);
-                    this.els.next.disabled = false;
-                }
+                // Reported for every lesson: the server queues these steps for "Latih semula".
+                this.failed.add(this.step);
+                if (this.lesson.exam) this.els.next.disabled = false;
             },
             actions: (list) => {
                 this.els.acts.innerHTML = '';
@@ -208,7 +207,13 @@ export class LessonRunner {
 
         if (this.lesson.daily) {
             this.showDailyModal();
-            this.handlers.complete?.({ slug: this.lesson.id, mistakes: this.mistakes, failedSteps: [], durationMs });
+            this.handlers.complete?.({ slug: this.lesson.id, mistakes: this.mistakes, failedSteps: [...this.failed], durationMs });
+            return;
+        }
+
+        if (this.lesson.review) {
+            this.showReviewModal();
+            this.handlers.complete?.({ slug: this.lesson.id, mistakes: this.mistakes, failedSteps: [...this.failed], durationMs });
             return;
         }
 
@@ -228,7 +233,7 @@ export class LessonRunner {
 
         const stars = this.mistakes <= 1 ? 3 : this.mistakes <= 4 ? 2 : 1;
         this.showLessonModal(stars);
-        this.handlers.complete?.({ slug: this.lesson.id, mistakes: this.mistakes, failedSteps: [], durationMs });
+        this.handlers.complete?.({ slug: this.lesson.id, mistakes: this.mistakes, failedSteps: [...this.failed], durationMs });
     }
 
     /**
@@ -242,6 +247,20 @@ export class LessonRunner {
         if (this.lesson.daily && r.streak) {
             const h = card.querySelector('h2');
             if (h) h.textContent = r.streak + ' hari berturut-turut!';
+        }
+
+        if (this.lesson.review && r.review) {
+            const h = card.querySelector('h2');
+            const p = card.querySelector('p');
+            if (h) h.textContent = r.review.correct ? (r.review.mastered ? 'Dah mahir!' : 'Betul!') : 'Hampir!';
+            if (p) {
+                p.textContent = r.review.correct
+                    ? r.review.mastered
+                        ? 'Awak dah jawab soalan ini dengan betul beberapa kali. Pak Kuda tak akan tanya lagi.'
+                        : 'Pak Kuda akan tanya soalan ini sekali lagi beberapa hari nanti, supaya awak tak lupa.'
+                    : 'Tak apa. Pak Kuda akan bawa soalan ini semula esok.';
+            }
+            if (r.review.remaining > 0) card.insertAdjacentHTML('beforeend', '<p class="review-count">Lagi ' + r.review.remaining + ' latihan hari ini.</p>');
         }
 
         card.querySelector('.xp')?.remove();
@@ -258,7 +277,7 @@ export class LessonRunner {
         const links: string[] = [];
         if (r.certificateUrl) links.push(link(r.certificateUrl, 'Lihat sijil', 'cta'));
         if (r.retryUrl) links.push(link(r.retryUrl, 'Cuba lagi', 'cta'));
-        if (r.next) links.push(link(r.next.url, 'Seterusnya: ' + r.next.title, r.certificateUrl ? 'ghost' : 'cta'));
+        if (r.next) links.push(link(r.next.url, this.lesson.review ? 'Latihan seterusnya' : 'Seterusnya: ' + r.next.title, r.certificateUrl ? 'ghost' : 'cta'));
         if (r.mapUrl) links.push(link(r.mapUrl, 'Ke peta', 'ghost'));
         if (links.length) {
             card.insertAdjacentHTML('beforeend', '<div class="actions" style="justify-content:center">' + links.join('') + '</div>');
@@ -271,6 +290,16 @@ export class LessonRunner {
         if (typeof r.totalStars === 'number') {
             document.querySelectorAll('[data-stat="stars"]').forEach((el) => (el.textContent = String(r.totalStars)));
         }
+    }
+
+    private showReviewModal(): void {
+        this.els.modal.hidden = false;
+        this.els.modal.innerHTML =
+            '<div class="card" role="dialog" aria-modal="true"><span class="qico big">' +
+            '<i class="pc pk" style="width:52px;height:52px;display:block"></i>' +
+            '</span><h2>' +
+            (this.mistakes ? 'Hampir!' : 'Betul!') +
+            '</h2><p>Pak Kuda sedang menyimpan keputusan awak…</p></div>';
     }
 
     private showDailyModal(): void {

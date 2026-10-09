@@ -53,3 +53,8 @@
 .moves li{padding:1px 8px 1px 0}
 .moves li span{display:inline-block;min-width:64px;font-weight:500}
 .moves ol:empty{display:none}
+.qico.review{background:var(--accent-soft)} .qico.review svg{fill:var(--accent)}
+.review-left{font-size:14px;color:var(--muted);margin:8px 0 0}
+.review-empty{max-width:560px;margin:32px auto;text-align:center;display:flex;flex-direction:column;gap:12px;align-items:center}
+.review-empty p{color:var(--muted);margin:0}
+.review-count{margin:0;font-weight:600;color:var(--accent)}

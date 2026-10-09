@@ -1,6 +1,7 @@
 <?php
 
 use App\Actions\CompleteLesson;
+use App\Actions\ScheduleReview;
 use App\Actions\SubmitExam;
 use App\Models\Lesson;
 use App\Support\Curriculum;
@@ -40,6 +41,9 @@ new #[Layout('layouts::chessflow')] class extends Component {
 
             return;
         }
+
+        // Steps answered wrongly come back in "Latih semula" (lessons and exams alike).
+        app(ScheduleReview::class)->handle($user, $this->lesson, $failedSteps);
 
         $next = app(Curriculum::class)->next($this->lesson);
 

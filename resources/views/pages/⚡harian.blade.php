@@ -1,6 +1,7 @@
 <?php
 
 use App\Actions\CompleteDaily;
+use App\Actions\ScheduleReview;
 use App\Actions\PickDailyPuzzle;
 use App\Models\DailyPuzzle;
 use App\Support\Chessflow;
@@ -19,8 +20,11 @@ new #[Layout('layouts::chessflow')] #[Title('Teka-teki Harian')] class extends C
         $this->puzzleId = $pick->handle()->id;
     }
 
+    /**
+     * @param  array<mixed>  $failedSteps  index 0 = the puzzle itself
+     */
     #[On('lesson-completed')]
-    public function complete(): void
+    public function complete(array $failedSteps = []): void
     {
         $user = auth()->user();
         if (! ProgressGuard::allow($user, 'daily')) {
@@ -30,6 +34,11 @@ new #[Layout('layouts::chessflow')] #[Title('Teka-teki Harian')] class extends C
         }
 
         $r = app(CompleteDaily::class)->handle($user);
+
+        if (in_array(0, $failedSteps, true)) {
+            $puzzle = DailyPuzzle::with('lesson')->findOrFail($this->puzzleId);
+            app(ScheduleReview::class)->handle($user, $puzzle->lesson, [$puzzle->step_index]);
+        }
 
         $this->dispatch('lesson-result', ...[
             'xp' => $r['xp'],

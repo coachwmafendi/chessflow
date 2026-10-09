@@ -39,6 +39,8 @@ new #[Layout('layouts::chessflow')] #[Title('Peta')] class extends Component {
             'dailyDone' => $user->dailyCompletions()->whereDate('date', Chessflow::today())->exists(),
             'streak' => $user->currentStreak(),
             'wins' => $user->games()->where('result', GameResult::Win)->count(),
+            'reviewDue' => $user->reviewItems()->due()->count(),
+            'reviewTotal' => $user->reviewItems()->count(),
         ];
     }
 }; ?>
@@ -72,6 +74,13 @@ new #[Layout('layouts::chessflow')] #[Title('Peta')] class extends Component {
             <span><b>Teka-teki Hari Ini</b><small>{{ $dailyDone ? 'Selesai! Datang lagi esok.' : 'Satu teka-teki baharu setiap hari' }}</small></span>
             <span class="qnum">{{ $streak }}<small>hari</small></span>
         </a>
+        @if ($reviewTotal > 0)
+            <a class="qcard{{ $reviewDue ? '' : ' done' }}" href="{{ route('latih') }}">
+                <span class="qico review"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4a8 8 0 1 0 7.75 10h-2.1A6 6 0 1 1 12 6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35A7.97 7.97 0 0 0 12 4z"/></svg></span>
+                <span><b>Latih semula</b><small>{{ $reviewDue ? 'Soalan yang awak tersilap sebelum ini' : 'Tiada latihan hari ini. Bagus!' }}</small></span>
+                <span class="qnum">{{ $reviewDue }}<small>hari ini</small></span>
+            </a>
+        @endif
         <a class="qcard" href="{{ route('main') }}">
             <span class="qico"><i class="pc bK"></i></span>
             <span><b>Main lawan Pak Kuda</b><small>Permainan penuh: mudah, sederhana atau sukar</small></span>

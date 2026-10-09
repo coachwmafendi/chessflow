@@ -148,6 +148,14 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail, Pas
     }
 
     /**
+     * @return HasMany<ReviewItem, $this>
+     */
+    public function reviewItems(): HasMany
+    {
+        return $this->hasMany(ReviewItem::class);
+    }
+
+    /**
      * @return HasMany<XpEvent, $this>
      */
     public function xpEvents(): HasMany
