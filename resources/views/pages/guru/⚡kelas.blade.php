@@ -2,8 +2,13 @@
 
 use App\Actions\CreateStudents;
 use App\Actions\ResetStudentPin;
+use App\Models\Assignment;
 use App\Models\Classroom;
+use App\Models\Lesson;
+use App\Models\Level;
 use App\Models\User;
+use App\Support\AssignmentReport;
+use App\Support\Chessflow;
 use App\Support\Curriculum;
 use App\Support\ProgressReport;
 use Livewire\Attributes\Layout;
@@ -16,6 +21,15 @@ new #[Layout('layouts::chessflow')] class extends Component {
 
     /** Credentials of accounts just created / reset, shown once. */
     public array $credentials = [];
+
+    /** New assignment form. */
+    public ?int $lessonId = null;
+
+    public string $dueOn = '';
+
+    public string $note = '';
+
+    public ?string $assignedMsg = null;
 
     public function mount(Classroom $classroom): void
     {
@@ -47,6 +61,35 @@ new #[Layout('layouts::chessflow')] class extends Component {
         $this->classroom->students()->detach($studentId);
     }
 
+    /** Set (or update) a lesson for the whole class; it opens for every student in the class. */
+    public function assign(): void
+    {
+        $this->authorize('manage', $this->classroom);
+        $this->validate([
+            'lessonId' => ['required', 'integer', 'exists:lessons,id'],
+            'dueOn' => ['nullable', 'date_format:Y-m-d', 'after_or_equal:'.Chessflow::today()],
+            'note' => ['nullable', 'string', 'max:200'],
+        ], [
+            'dueOn.after_or_equal' => 'Tarikh akhir tidak boleh sebelum hari ini.',
+        ], ['lessonId' => 'pelajaran', 'dueOn' => 'tarikh akhir', 'note' => 'nota']);
+
+        $lesson = Lesson::where('is_published', true)->findOrFail($this->lessonId);
+        $assignment = Assignment::updateOrCreate(
+            ['classroom_id' => $this->classroom->id, 'lesson_id' => $lesson->id],
+            ['due_on' => $this->dueOn ?: null, 'note' => trim($this->note) ?: null],
+        );
+
+        $this->assignedMsg = ($assignment->wasRecentlyCreated ? 'Tugasan diberi: ' : 'Tugasan dikemas kini: ').$lesson->title.'.';
+        $this->reset('lessonId', 'dueOn', 'note');
+    }
+
+    public function unassign(int $assignmentId): void
+    {
+        $this->authorize('manage', $this->classroom);
+        $this->classroom->assignments()->findOrFail($assignmentId)->delete();
+        $this->assignedMsg = null;
+    }
+
     public function actionsHtml(User $student): string
     {
         return '<button class="ghost" type="button" wire:click="resetPin('.$student->id.')">PIN baru</button> '
@@ -61,6 +104,9 @@ new #[Layout('layouts::chessflow')] class extends Component {
         return $this->view([
             'rows' => app(ProgressReport::class)->forStudents($students),
             'lessons' => app(Curriculum::class)->lessons(),
+            'assignments' => app(AssignmentReport::class)->forClassroom($this->classroom),
+            'levels' => Level::orderBy('position')->get(),
+            'today' => Chessflow::today(),
         ])->title($this->classroom->name);
     }
 }; ?>
@@ -89,6 +135,70 @@ new #[Layout('layouts::chessflow')] class extends Component {
                 <button class="ghost" type="button" wire:click="$set('credentials', [])">Tutup</button></p>
         </section>
     @endif
+
+    <section class="panel-card assign-panel">
+        <h2>Tugasan</h2>
+        @if ($assignments->isEmpty())
+            <p class="muted">Beri pelajaran atau ujian kepada seluruh kelas. Pelajaran itu terus terbuka untuk semua murid kelas ini, walaupun mereka belum sampai di peta.</p>
+        @else
+            <ul class="assign-list">
+                @foreach ($assignments as $row)
+                    @php
+                        $a = $row['assignment'];
+                        $complete = $row['total'] > 0 && $row['done'] === $row['total'];
+                    @endphp
+                    <li wire:key="assign-{{ $a->id }}" class="{{ $complete ? 'complete' : ($a->isOverdue() ? 'overdue' : '') }}">
+                        <div class="assign-main">
+                            <i class="pc {{ $a->lesson->icon }}" aria-hidden="true"></i>
+                            <div>
+                                <b>{{ $a->lesson->title }}</b>
+                                <small>
+                                    {{ $a->dueLabel() ?? 'Tiada tarikh akhir' }}@if ($a->isOverdue() && ! $complete) · <span class="late">Lewat</span>@endif
+                                    @if ($a->note) · {{ $a->note }}@endif
+                                </small>
+                            </div>
+                            <span class="assign-count">{{ $row['done'] }}/{{ $row['total'] }}<small>siap</small></span>
+                        </div>
+                        <div class="meter" aria-hidden="true"><span style="width: {{ $row['total'] ? round($row['done'] / $row['total'] * 100) : 0 }}%"></span></div>
+                        <div class="assign-foot">
+                            @if ($row['pending']->isNotEmpty() && ! $complete)
+                                <details><summary>Belum siap ({{ $row['pending']->count() }})</summary><p>{{ $row['pending']->pluck('name')->implode(', ') }}</p></details>
+                            @elseif ($complete)
+                                <span class="good-text">Semua murid sudah siap.</span>
+                            @endif
+                            <button class="ghost no-print" type="button" wire:click="unassign({{ $a->id }})" wire:confirm="{{ 'Padam tugasan '.$a->lesson->title.'? Kemajuan murid tidak dipadam.' }}">Padam</button>
+                        </div>
+                    </li>
+                @endforeach
+            </ul>
+        @endif
+
+        <form wire:submit="assign" class="assign-form no-print">
+            <label><span>Pelajaran</span>
+                <select wire:model="lessonId" required>
+                    <option value="">Pilih pelajaran…</option>
+                    @foreach ($levels as $level)
+                        <optgroup label="Tahap {{ $level->number }}: {{ $level->name }}">
+                            @foreach ($lessons->where('level_id', $level->id) as $l)
+                                <option value="{{ $l->id }}">{{ $l->title }}</option>
+                            @endforeach
+                        </optgroup>
+                    @endforeach
+                </select>
+            </label>
+            <label><span>Tarikh akhir <small>(pilihan)</small></span>
+                <input type="date" wire:model="dueOn" min="{{ $today }}">
+            </label>
+            <label class="grow"><span>Nota untuk murid <small>(pilihan)</small></span>
+                <input type="text" wire:model="note" maxlength="200" placeholder="Contoh: Siapkan sebelum kelab Jumaat">
+            </label>
+            <button class="cta" type="submit">Beri tugasan</button>
+            @error('lessonId') <p class="err">{{ $message }}</p> @enderror
+            @error('dueOn') <p class="err">{{ $message }}</p> @enderror
+            @error('note') <p class="err">{{ $message }}</p> @enderror
+            @if ($assignedMsg) <p class="status good assign-msg">{{ $assignedMsg }}</p> @endif
+        </form>
+    </section>
 
     <x-chessflow.progress-table :rows="$rows" :lessons="$lessons" :actions="fn ($s) => $this->actionsHtml($s)" />
 

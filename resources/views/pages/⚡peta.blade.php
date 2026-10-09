@@ -3,6 +3,7 @@
 use App\Enums\GameResult;
 use App\Models\Lesson;
 use App\Models\Level;
+use App\Support\AssignmentReport;
 use App\Support\Chessflow;
 use App\Support\Curriculum;
 use Livewire\Attributes\Layout;
@@ -39,6 +40,7 @@ new #[Layout('layouts::chessflow')] #[Title('Peta')] class extends Component {
             'dailyDone' => $user->dailyCompletions()->whereDate('date', Chessflow::today())->exists(),
             'streak' => $user->currentStreak(),
             'wins' => $user->games()->where('result', GameResult::Win)->count(),
+            'assignments' => app(AssignmentReport::class)->forStudent($user),
             'reviewDue' => $user->reviewItems()->due()->count(),
             'reviewTotal' => $user->reviewItems()->count(),
         ];
@@ -67,6 +69,35 @@ new #[Layout('layouts::chessflow')] #[Title('Peta')] class extends Component {
             </div>
         </div>
     </section>
+
+    @if ($assignments->isNotEmpty())
+        <section class="tasks" aria-labelledby="tasks-h">
+            <h2 id="tasks-h">Tugasan daripada guru</h2>
+            <ul>
+                @foreach ($assignments as $t)
+                    @php $a = $t['assignment']; @endphp
+                    <li>
+                        <a class="task-card{{ $t['done'] ? ' done' : ($a->isOverdue() ? ' overdue' : '') }}" href="{{ route('pelajaran', $a->lesson) }}">
+                            <span class="qico"><i class="pc {{ $a->lesson->icon }}"></i></span>
+                            <span class="task-body">
+                                <b>{{ $a->lesson->title }}</b>
+                                <small>{{ $a->classroom->name }}@if ($a->note) · {{ $a->note }}@endif</small>
+                            </span>
+                            <span class="task-state">
+                                @if ($t['done'])
+                                    Siap
+                                @elseif ($a->isOverdue())
+                                    Lewat
+                                @else
+                                    {{ $a->dueLabel() ?? 'Buat sekarang' }}
+                                @endif
+                            </span>
+                        </a>
+                    </li>
+                @endforeach
+            </ul>
+        </section>
+    @endif
 
     <section class="quick">
         <a class="qcard{{ $dailyDone ? ' done' : '' }}" href="{{ route('harian') }}">

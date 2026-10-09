@@ -73,3 +73,40 @@
 .mistake .tag{align-self:flex-start;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;border-radius:99px;padding:2px 8px}
 .mistake .tag.besar{background:var(--coral-soft);color:var(--coral)}
 .mistake .tag.kecil{background:var(--sun-soft);color:color-mix(in srgb,var(--sun) 55%,var(--ink))}
+/* teacher assignments: map (student) and class page (teacher) */
+.tasks{margin-top:14px}
+.tasks h2{font-size:22px;margin-bottom:8px}
+.tasks ul{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:10px}
+.task-card{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;background:var(--surface);border:2px solid var(--accent);border-radius:18px;padding:12px 14px;text-decoration:none;color:inherit}
+.task-card:hover{background:var(--accent-soft)}
+.task-card.overdue{border-color:var(--coral)}
+.task-card.done{border-color:var(--line);background:var(--good-soft)}
+.task-body b{font-family:var(--display);font-size:18px;display:block;line-height:1.2}
+.task-body small{color:var(--muted);font-size:13px}
+.task-state{font-size:13px;font-weight:600;color:var(--accent);text-align:right}
+.task-card.overdue .task-state{color:var(--coral)}
+.task-card.done .task-state{color:var(--good)}
+.assign-panel .muted{color:var(--muted);margin:0 0 8px}
+.assign-list{list-style:none;margin:0 0 14px;padding:0;display:flex;flex-direction:column;gap:10px}
+.assign-list li{border:1px solid var(--line);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:8px;background:var(--bg)}
+.assign-list li.overdue{border-color:var(--coral)}
+.assign-list li.complete{background:var(--good-soft)}
+.assign-main{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center}
+.assign-main i.pc{width:36px;height:36px;display:block}
+.assign-main b{font-family:var(--display);font-size:18px;display:block;line-height:1.2}
+.assign-main small{color:var(--muted);font-size:13px}
+.assign-main .late{color:var(--coral);font-weight:600}
+.assign-count{font-family:var(--display);font-weight:800;font-size:22px;text-align:center;line-height:1;font-variant-numeric:tabular-nums}
+.assign-count small{display:block;font-family:var(--body);font-weight:500;font-size:11px;color:var(--muted)}
+.assign-list .meter{width:100%}
+.assign-foot{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;font-size:14px}
+.assign-foot details{flex:1}
+.assign-foot summary{color:var(--muted)}
+.assign-foot details p{margin:4px 0 0}
+.good-text{color:var(--good);font-weight:600}
+.assign-form{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end}
+.assign-form label{display:flex;flex-direction:column;gap:4px;font-weight:600;font-size:14px}
+.assign-form label small{font-weight:400;color:var(--muted)}
+.assign-form .grow{flex:1;min-width:200px}
+.assign-form select,.assign-form input{padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink);font:inherit}
+.assign-msg{width:100%;margin:0}
