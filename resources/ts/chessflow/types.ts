@@ -192,6 +192,10 @@ export interface MarkPatch {
     ring?: SquareSpecOrIndex[];
     stars?: SquareSpecOrIndex[];
     hl?: SquareSpecOrIndex[];
+    /** From/to squares of the last move played on the board. */
+    last?: SquareSpecOrIndex[];
+    /** Square of a king in check. */
+    check?: SquareSpecOrIndex[];
     sel?: SquareSpecOrIndex | null;
 }
 
@@ -213,7 +217,7 @@ export interface BoardApi {
     all(): (Piece & { id: number; el: HTMLElement })[];
     remove(i: number): void;
     move(from: number, to: number): void;
-    applyMove(m: { from: string; to: string; flags: string; promotion?: string }): void;
+    applyMove(m: { from: string; to: string; flags: string; promotion?: string; san?: string }): void;
     mark(patch: MarkPatch): void;
     flash(i: number): void;
     arrows(list: (ArrowSpec | ArrowDrawSpec)[]): void;

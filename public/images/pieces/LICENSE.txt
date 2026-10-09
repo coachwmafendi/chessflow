@@ -1,3 +1,4 @@
 Piece set "rhosgfx" by RhosGFX, CC0 1.0 (public domain).
 Source: https://github.com/lichess-org/lila/tree/5b44d719ec5913dd62aa965f4b8d21e60a00c2c1/public/piece/rhosgfx
 Extracted from resources/css/chessflow/pieces.css for use outside the board (auth page illustration).
+Black pieces recoloured from terracotta to charcoal (#5b6069 / #484c54 / #363940).

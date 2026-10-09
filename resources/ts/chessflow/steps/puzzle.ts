@@ -148,7 +148,7 @@ export function puzzle(st: PuzzleStep, c: StepContext): void {
             c.later(() => {
                 g.undo();
                 b.quiet(g.fen());
-                b.mark({ good: [] });
+                b.mark({ good: [], last: [], check: [] });
                 busy = false;
                 if (wrong >= 2) hint();
             }, 950);

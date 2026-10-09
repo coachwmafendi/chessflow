@@ -153,22 +153,33 @@ export function createBoard(root: HTMLElement, orient: 'w' | 'b' = 'w'): BoardAp
                     }, 260);
                 }
             }
+            // A "+" or "#" in the SAN means the other side's king is now attacked.
+            const mover = api.at(to);
+            const king = mover && m.san && /[+#]$/.test(m.san) ? api.all().find((p) => p.t === 'K' && p.c !== mover.c) : undefined;
+            api.mark({ last: [from, to], check: king ? [king.sq] : [] });
         },
         mark(patch) {
             mark = Object.assign({}, mark, patch);
-            const set = (k: 'dots' | 'good' | 'ring' | 'stars' | 'hl') => new Set(expandSq(mark[k]));
+            const set = (k: 'dots' | 'good' | 'ring' | 'stars' | 'hl' | 'last' | 'check') => new Set(expandSq(mark[k]));
             const dots = set('dots');
             const good = set('good');
             const ring = set('ring');
             const star = set('stars');
             const hl = set('hl');
+            const last = set('last');
+            const check = set('check');
             const sel = mark.sel == null ? -1 : typeof mark.sel === 'string' ? sq(mark.sel) : mark.sel;
             els.forEach((b, i) => {
-                b.classList.toggle('dot', dots.has(i));
+                // A target with a piece on it is a capture: drawn as a ring around the piece instead of a dot.
+                const cap = dots.has(i) && api.at(i) !== null;
+                b.classList.toggle('dot', dots.has(i) && !cap);
+                b.classList.toggle('cap', cap);
                 b.classList.toggle('good', good.has(i));
                 b.classList.toggle('ring', ring.has(i));
                 b.classList.toggle('star', star.has(i));
                 b.classList.toggle('hl', hl.has(i));
+                b.classList.toggle('last', last.has(i));
+                b.classList.toggle('check', check.has(i));
                 b.classList.toggle('sel', sel === i);
             });
         },

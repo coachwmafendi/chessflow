@@ -77,4 +77,45 @@ describe('Board', () => {
         sqEl.dispatchEvent(new MouseEvent('click', { bubbles: true }));
         expect(clicked).toBe(sq('e4'));
     });
+    const cls = (name: string) => (root.querySelector(`[data-sq="${sq(name)}"]`) as HTMLElement).classList;
+
+    it('applyMove() highlights the last move and clears the previous one', () => {
+        const b = createBoard(root);
+        b.setFen('4k3/8/8/8/8/8/4P3/4K3 w - - 0 1');
+        b.applyMove({ from: 'e2', to: 'e4', flags: 'b', san: 'e4' });
+        expect(cls('e2').contains('last')).toBe(true);
+        expect(cls('e4').contains('last')).toBe(true);
+        b.applyMove({ from: 'e8', to: 'd8', flags: 'n', san: 'Kd8' });
+        expect(cls('e2').contains('last')).toBe(false);
+        expect(cls('d8').contains('last')).toBe(true);
+    });
+
+    it('applyMove() lights up the king that is put in check, and clears it after the reply', () => {
+        const b = createBoard(root);
+        b.setFen('4k3/8/8/8/8/8/8/R3K3 w - - 0 1');
+        b.applyMove({ from: 'a1', to: 'a8', flags: 'n', san: 'Ra8+' });
+        expect(cls('e8').contains('check')).toBe(true);
+        b.applyMove({ from: 'e8', to: 'e7', flags: 'n', san: 'Ke7' });
+        expect(root.querySelectorAll('.sq.check').length).toBe(0);
+    });
+
+    it('draws capture targets as rings and empty targets as dots', () => {
+        const b = createBoard(root);
+        b.set([
+            { c: 'w', t: 'N', sq: sq('d4') },
+            { c: 'b', t: 'P', sq: sq('f5') },
+        ]);
+        b.mark({ dots: [sq('f5'), sq('e6')] });
+        expect(cls('f5').contains('cap')).toBe(true);
+        expect(cls('f5').contains('dot')).toBe(false);
+        expect(cls('e6').contains('dot')).toBe(true);
+    });
+
+    it('set() clears last-move and check marks', () => {
+        const b = createBoard(root);
+        b.setFen('4k3/8/8/8/8/8/8/R3K3 w - - 0 1');
+        b.applyMove({ from: 'a1', to: 'a8', flags: 'n', san: 'Ra8+' });
+        b.setFen('4k3/8/8/8/8/8/8/R3K3 w - - 0 1');
+        expect(root.querySelectorAll('.sq.last, .sq.check').length).toBe(0);
+    });
 });

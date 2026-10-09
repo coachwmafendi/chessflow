@@ -232,7 +232,7 @@ export class GameRunner {
     private apply(m: { from: string; to: string; promotion?: string }): Move {
         const r = this.g.move(m);
         this.board.applyMove(r);
-        this.board.mark({ hl: [sq(r.from), sq(r.to)], sel: null, dots: [] });
+        this.board.mark({ sel: null, dots: [] });
         this.board.arrows([]);
         const fen = this.g.fen();
         this.later(() => this.board.quiet(fen), 420);
@@ -304,7 +304,7 @@ export class GameRunner {
         if (this.g.turn() !== this.user) this.g.undo();
         this.over = false;
         this.board.quiet(this.g.fen());
-        this.board.mark({ hl: [], sel: null, dots: [] });
+        this.board.mark({ hl: [], last: [], check: [], sel: null, dots: [] });
         this.board.arrows([]);
         this.sel = null;
         this.status('Langkah diundur.', 'info');

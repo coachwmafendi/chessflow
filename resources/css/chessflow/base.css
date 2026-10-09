@@ -7,6 +7,7 @@
   --display:"Baloo 2", "Trebuchet MS", system-ui, sans-serif;
   --body:"Lexend", "Segoe UI", system-ui, sans-serif;
   --r:18px;
+  --last-move:rgba(246,214,60,.5);
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#0E1622; --surface:#172234; --ink:#E7EEF6; --muted:#9BABC0; --line:#26354B;
@@ -122,10 +123,14 @@ kbd{font-family:var(--body);font-weight:600;background:var(--accent-soft);paddin
 .sq .cr,.sq .cf{position:absolute;font-size:clamp(8px,1.6vw,11px);font-weight:600;line-height:1;pointer-events:none}
 .sq .cr{top:3px;left:3px} .sq .cf{bottom:3px;right:4px}
 .sq.light .cr,.sq.light .cf{color:var(--sq-dark)} .sq.dark .cr,.sq.dark .cf{color:var(--sq-light)}
+/* last move + king in check: overlays, so they work on both square colours; sel/good/hl below still win */
+.sq.last{background-image:linear-gradient(var(--last-move),var(--last-move))}
+.sq.check{background-image:radial-gradient(circle,var(--coral) 0,var(--coral) 34%,color-mix(in srgb,var(--coral) 55%,transparent) 58%,transparent 82%)}
 .sq.sel{background:color-mix(in srgb,var(--sun) 70%,var(--sq-light))}
 .sq.good{background:color-mix(in srgb,var(--good) 55%,var(--sq-light))}
 .sq.hl{background:color-mix(in srgb,var(--accent) 35%,var(--sq-light))}
 .sq.dot::after{content:"";position:absolute;inset:36%;border-radius:50%;background:rgba(20,40,50,.32)}
+.sq.cap::after{content:"";position:absolute;inset:0;background:radial-gradient(transparent 62%,rgba(20,40,50,.34) 64%)}
 .sq.ring::after{content:"";position:absolute;inset:6%;border-radius:50%;border:4px solid var(--coral);animation:ringp 1s ease-in-out infinite alternate}
 .sq.star::before{content:"";position:absolute;inset:18%;background:var(--sun);-webkit-mask:var(--star-mask) center/contain no-repeat;mask:var(--star-mask) center/contain no-repeat;animation:bob 1.6s ease-in-out infinite;filter:drop-shadow(0 2px 0 rgba(0,0,0,.25))}
 .sq.bad{animation:flashbad .6s}
