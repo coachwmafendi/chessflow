@@ -169,3 +169,9 @@ kbd{font-family:var(--body);font-weight:600;background:var(--accent-soft);paddin
 .btn-ico.half{display:inline-grid;place-items:center;border-radius:50%;background:var(--accent-soft);color:var(--accent);font-family:var(--display);font-weight:800;font-size:14px;line-height:1}
 [data-act="resign"] .btn-ico{color:var(--coral)}
 .actions-end{display:flex;gap:8px;flex-wrap:wrap;margin-left:auto}
+/* resign confirmation */
+.confirm-actions{justify-content:center;margin-top:6px}
+.ghost.danger{color:var(--coral);border-color:color-mix(in srgb,var(--coral) 45%,var(--line))}
+.ghost.danger:hover{border-color:var(--coral);background:var(--coral-soft)}
+.qico.resign-ico{background:var(--coral-soft)}
+.qico.resign-ico svg{fill:none;color:var(--coral)}

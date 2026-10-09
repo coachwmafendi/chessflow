@@ -68,6 +68,8 @@ export class GameRunner {
     private gameId = 0;
     /** Ply count when Pak Kuda last refused a draw offer. */
     private drawRefusedAt: number | null = null;
+    /** Closes the open confirm dialog, if any. */
+    private closeDialog: (() => void) | null = null;
 
     constructor(root: HTMLElement, handlers: GameHandlers = {}, engine: StockfishEngine = sharedEngine()) {
         this.root = root;
@@ -81,6 +83,7 @@ export class GameRunner {
     }
 
     destroy(): void {
+        this.closeDialog?.();
         this.clearTimers();
         this.gameId++;
     }
@@ -140,7 +143,7 @@ export class GameRunner {
         this.$('[data-act="undo"]').onclick = () => this.undo();
         this.$('[data-act="hint"]').onclick = () => this.hint();
         this.$('[data-act="draw"]').onclick = () => this.offerDraw();
-        this.$('[data-act="resign"]').onclick = () => this.resign();
+        this.$('[data-act="resign"]').onclick = () => this.confirmResign();
         this.segs();
     }
 
@@ -166,6 +169,7 @@ export class GameRunner {
     }
 
     private start(): void {
+        this.closeDialog?.();
         this.clearTimers();
         this.gameId++;
         this.user = this.color === 'r' ? (Math.random() < 0.5 ? 'w' : 'b') : this.color;
@@ -351,6 +355,49 @@ export class GameRunner {
         this.status(v.message, 'info');
         this.report('draw');
         this.showMoves();
+    }
+
+    /** A tap on "Mengaku kalah" ends the game, so ask first; "Teruskan main" is the default. */
+    private confirmResign(): void {
+        if (this.over || this.closeDialog) return;
+        const opener = this.$('[data-act="resign"]');
+        const modal = document.createElement('div');
+        modal.className = 'modal';
+        modal.innerHTML =
+            '<div class="card" role="alertdialog" aria-modal="true" aria-labelledby="resign-t" aria-describedby="resign-d">' +
+            '<span class="qico big resign-ico">' + ICON_RESIGN + '</span>' +
+            '<h2 id="resign-t">Mengaku kalah?</h2>' +
+            '<p id="resign-d">Permainan ini akan tamat dan dikira kalah. Tak apa, pemain hebat pun pernah kalah. Atau awak boleh teruskan dan cuba bertahan!</p>' +
+            '<div class="actions confirm-actions"><button class="ghost danger" type="button" data-r="yes">Ya, mengaku kalah</button><button class="cta" type="button" data-r="no">Teruskan main</button></div>' +
+            '</div>';
+        const yes = modal.querySelector('[data-r="yes"]') as HTMLButtonElement;
+        const no = modal.querySelector('[data-r="no"]') as HTMLButtonElement;
+        const onKey = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') close();
+            if (e.key === 'Tab') {
+                // Keep focus inside the dialog: only two buttons to cycle through.
+                e.preventDefault();
+                (document.activeElement === no ? yes : no).focus();
+            }
+        };
+        const close = () => {
+            modal.remove();
+            document.removeEventListener('keydown', onKey);
+            this.closeDialog = null;
+            if (opener.isConnected) opener.focus();
+        };
+        yes.onclick = () => {
+            close();
+            this.resign();
+        };
+        no.onclick = close;
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) close();
+        });
+        document.addEventListener('keydown', onKey);
+        this.closeDialog = close;
+        this.root.appendChild(modal);
+        no.focus();
     }
 
     private resign(): void {
