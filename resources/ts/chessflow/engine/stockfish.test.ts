@@ -36,6 +36,39 @@ describe('StockfishEngine', () => {
         await expect(p).resolves.toBe('e2e4');
     });
 
+    it('analyse() searches at full strength and returns the last exact score', async () => {
+        const p = engine.analyse({ fen: 'F', depth: 10 });
+        expect(fake.sent).toContain('setoption name Skill Level value 20');
+        fake.emit('info depth 9 seldepth 12 score cp 40 nodes 100 pv e2e4');
+        fake.emit('info depth 10 seldepth 14 score cp 95 lowerbound nodes 200 pv d2d4');
+        fake.emit('info depth 10 seldepth 14 score cp 61 nodes 300 pv d2d4');
+        fake.emit('bestmove d2d4 ponder d7d5');
+        await expect(p).resolves.toEqual({ best: 'd2d4', cp: 61, mate: null });
+    });
+
+    it('analyse() reports mate scores and finished positions', async () => {
+        const a = engine.analyse({ fen: 'A', depth: 10 });
+        fake.emit('info depth 5 score mate -2 pv e8f8');
+        fake.emit('bestmove e8f8');
+        await expect(a).resolves.toEqual({ best: 'e8f8', cp: null, mate: -2 });
+        const b = engine.analyse({ fen: 'B', depth: 10 });
+        fake.emit('info depth 0 score mate 0');
+        fake.emit('bestmove (none)');
+        await expect(b).resolves.toEqual({ best: null, cp: null, mate: 0 });
+    });
+
+    it('does not mix the score of a timed-out search into the next one', async () => {
+        const slow = engine.analyse({ fen: 'A', depth: 20, timeoutMs: 500 });
+        const next = engine.analyse({ fen: 'B', depth: 10 });
+        vi.advanceTimersByTime(500);
+        await expect(slow).resolves.toBeNull();
+        fake.emit('info depth 18 score cp 900'); // still the old search
+        fake.emit('bestmove a2a3');
+        fake.emit('info depth 10 score cp -15');
+        fake.emit('bestmove b7b6');
+        await expect(next).resolves.toEqual({ best: 'b7b6', cp: -15, mate: null });
+    });
+
     it('queues requests and runs them one at a time', async () => {
         const a = engine.bestMove({ fen: 'A', skill: 0, depth: 2 });
         const b = engine.bestMove({ fen: 'B', skill: 0, depth: 2 });

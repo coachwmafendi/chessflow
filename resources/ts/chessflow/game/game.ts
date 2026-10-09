@@ -1,11 +1,12 @@
 import { Chess, type Move, type Square } from 'chess.js';
-import type { BoardApi } from '../types';
+import type { ArrowDrawSpec, BoardApi } from '../types';
 import { createBoard } from '../core/board';
 import { nm, sq } from '../core/squares';
 import { SFX } from '../core/sound';
 import { bot } from '../engine/simple-bot';
 import { sharedEngine, type StockfishEngine } from '../engine/stockfish';
 import { judgeDrawOffer } from './draw';
+import { analyseGame, type Mistake } from './analysis';
 
 export type GameOutcome = 'win' | 'loss' | 'draw' | 'resign';
 
@@ -122,6 +123,7 @@ export class GameRunner {
             '</div><button class="cta" type="button" data-act="new">Permainan baru</button></div>' +
             '<div class="status" role="status" aria-live="polite"></div>' +
             '<div class="moves"><small>Langkah</small><ol></ol></div>' +
+            '<div class="analysis" aria-live="polite" hidden></div>' +
             '<div class="actions"><button class="ghost" type="button" data-act="undo">Undur</button><button class="ghost" type="button" data-act="hint">Petunjuk</button><span class="spacer"></span><span class="actions-end"><button class="ghost" type="button" data-act="draw">' + ICON_DRAW + 'Minta seri</button><button class="ghost" type="button" data-act="resign">' + ICON_RESIGN + 'Mengaku kalah</button></span></div>' +
             '</div></div>';
 
@@ -187,6 +189,7 @@ export class GameRunner {
         this.sel = null;
         this.reported = false;
         this.drawRefusedAt = null;
+        this.hideAnalysis();
         this.status(
             'Awak main ' +
                 (this.user === 'w' ? 'Putih' : 'Hitam') +
@@ -240,6 +243,7 @@ export class GameRunner {
             this.report('draw');
         }
         this.showMoves();
+        this.offerAnalysis();
         return true;
     }
 
@@ -321,6 +325,7 @@ export class GameRunner {
         this.board.mark({ hl: [], last: [], check: [], sel: null, dots: [] });
         this.board.arrows([]);
         this.sel = null;
+        this.hideAnalysis();
         this.status('Langkah diundur.', 'info');
         this.showMoves();
     }
@@ -355,6 +360,7 @@ export class GameRunner {
         this.status(v.message, 'info');
         this.report('draw');
         this.showMoves();
+        this.offerAnalysis();
     }
 
     /** A tap on "Mengaku kalah" ends the game, so ask first; "Teruskan main" is the default. */
@@ -406,5 +412,106 @@ export class GameRunner {
         this.status('Awak mengaku kalah. Tekan "Permainan baru" untuk cuba lagi.', 'bad');
         this.report('resign');
         this.showMoves();
+        this.offerAnalysis();
+    }
+
+    // ---- post-game analysis ----
+
+    private hideAnalysis(): void {
+        const box = this.$('.analysis');
+        box.hidden = true;
+        box.innerHTML = '';
+    }
+
+    /** After the game: offer a review once the player has made a few moves. */
+    private offerAnalysis(): void {
+        const mine = this.g.history({ verbose: true }).filter((m) => m.color === this.user).length;
+        if (mine < 3) return;
+        const box = this.$('.analysis');
+        box.hidden = false;
+        box.innerHTML =
+            '<button class="cta" type="button" data-act="analyse">Semak permainan dengan Pak Kuda</button>' +
+            '<small>Pak Kuda tunjuk langkah yang paling penting untuk dipelajari.</small>';
+        (box.querySelector('[data-act="analyse"]') as HTMLElement).onclick = () => void this.runAnalysis();
+    }
+
+    private async runAnalysis(): Promise<void> {
+        const box = this.$('.analysis');
+        if (!this.engine.available) {
+            box.innerHTML = '<p class="analysis-note">Analisis perlukan enjin catur, tetapi enjin tidak dapat dimuatkan pada peranti ini.</p>';
+            return;
+        }
+        const id = this.gameId;
+        box.innerHTML =
+            '<p class="analysis-note">Pak Kuda sedang menyemak permainan… <b class="pct">0%</b></p><div class="meter analysis-meter"><span style="width:0%"></span></div>';
+        const bar = box.querySelector('.analysis-meter span') as HTMLElement;
+        const pct = box.querySelector('.pct') as HTMLElement;
+        const result = await analyseGame(
+            this.g.history({ verbose: true }),
+            this.user,
+            (fen) => this.engine.analyse({ fen, depth: 12, timeoutMs: 4000 }),
+            (done) => {
+                const v = Math.round(done * 100) + '%';
+                bar.style.width = v;
+                pct.textContent = v;
+            },
+            () => id !== this.gameId,
+        );
+        if (result === null || id !== this.gameId) return;
+        this.showMistakes(result);
+    }
+
+    private showMistakes(list: Mistake[]): void {
+        const box = this.$('.analysis');
+        if (!list.length) {
+            box.innerHTML = '<p class="analysis-good">Tiada kesilapan besar dalam permainan ini. Syabas!</p>';
+            return;
+        }
+        box.innerHTML =
+            '<small>Langkah untuk dipelajari</small><ol class="mistakes">' +
+            list
+                .map(
+                    (m, k) =>
+                        '<li><button type="button" class="mistake" data-k="' +
+                        k +
+                        '" aria-pressed="false"><span class="tag ' +
+                        m.severity +
+                        '">' +
+                        (m.severity === 'besar' ? 'Kesilapan besar' : 'Silap kecil') +
+                        '</span><b>Langkah ' +
+                        m.moveNo +
+                        ': ' +
+                        m.san +
+                        '</b><span>' +
+                        m.text +
+                        '</span></button></li>',
+                )
+                .join('') +
+            '</ol><p class="analysis-legend" hidden>Anak panah merah: langkah awak. Hijau: cadangan Pak Kuda.</p>' +
+            '<button class="ghost" type="button" data-act="final" hidden>Kembali ke kedudukan akhir</button>';
+        box.querySelectorAll<HTMLElement>('.mistake').forEach((b) => (b.onclick = () => this.showMistake(list, Number(b.dataset.k))));
+        (box.querySelector('[data-act="final"]') as HTMLElement).onclick = () => this.showFinalPosition();
+    }
+
+    /** Put the position before the mistake on the board, with the move played and the better one. */
+    private showMistake(list: Mistake[], k: number): void {
+        const m = list[k];
+        this.board.setFen(m.fenBefore);
+        const arrows: ArrowDrawSpec[] = [{ from: sq(m.from), to: sq(m.to), kind: 'coral' }];
+        if (m.best) arrows.push({ from: sq(m.best.from), to: sq(m.best.to), kind: 'path' });
+        this.board.arrows(arrows);
+        const box = this.$('.analysis');
+        box.querySelectorAll<HTMLElement>('.mistake').forEach((b) => b.setAttribute('aria-pressed', String(Number(b.dataset.k) === k)));
+        (box.querySelector('.analysis-legend') as HTMLElement).hidden = false;
+        (box.querySelector('[data-act="final"]') as HTMLElement).hidden = false;
+    }
+
+    private showFinalPosition(): void {
+        this.board.setFen(this.g.fen());
+        this.board.arrows([]);
+        const box = this.$('.analysis');
+        box.querySelectorAll<HTMLElement>('.mistake').forEach((b) => b.setAttribute('aria-pressed', 'false'));
+        (box.querySelector('.analysis-legend') as HTMLElement).hidden = true;
+        (box.querySelector('[data-act="final"]') as HTMLElement).hidden = true;
     }
 }

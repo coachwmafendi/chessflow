@@ -16,10 +16,19 @@ export interface EngineRequest {
     timeoutMs?: number;
 }
 
+/** Engine verdict for a position, from the side to move: centipawns, or moves to mate (negative = being mated). */
+export interface Evaluation {
+    best: string | null;
+    cp: number | null;
+    mate: number | null;
+}
+
 interface Job {
     req: EngineRequest;
-    resolve: (uci: string | null) => void;
+    resolve: (r: Evaluation | null) => void;
     timer?: ReturnType<typeof setTimeout>;
+    cp: number | null;
+    mate: number | null;
 }
 
 const WORKER_URL = '/stockfish/stockfish.js';
@@ -42,9 +51,18 @@ export class StockfishEngine {
     }
 
     bestMove(req: EngineRequest): Promise<string | null> {
+        return this.run(req).then((r) => r?.best ?? null);
+    }
+
+    /** Full-strength search that also returns the score (post-game analysis). */
+    analyse(req: { fen: string; depth: number; timeoutMs?: number }): Promise<Evaluation | null> {
+        return this.run({ ...req, skill: 20 });
+    }
+
+    private run(req: EngineRequest): Promise<Evaluation | null> {
         if (!this.ensure()) return Promise.resolve(null);
         return new Promise((resolve) => {
-            this.queue.push({ req, resolve });
+            this.queue.push({ req, resolve, cp: null, mate: null });
             this.pump();
         });
     }
@@ -94,6 +112,15 @@ export class StockfishEngine {
     }
 
     private onLine(line: string): void {
+        if (line.startsWith('info') && this.current && this.discard === 0) {
+            // Keep the deepest score seen; "score cp 34" / "score mate -2" (side to move).
+            const m = / score (cp|mate) (-?\d+)/.exec(line);
+            if (m && !/ (lowerbound|upperbound)/.test(line)) {
+                this.current.cp = m[1] === 'cp' ? Number(m[2]) : null;
+                this.current.mate = m[1] === 'mate' ? Number(m[2]) : null;
+            }
+            return;
+        }
         if (!line.startsWith('bestmove')) return;
         if (this.discard > 0) {
             this.discard--;
@@ -104,7 +131,7 @@ export class StockfishEngine {
         clearTimeout(job.timer);
         this.current = null;
         const move = line.split(' ')[1];
-        job.resolve(move && move !== '(none)' ? move : null);
+        job.resolve({ best: move && move !== '(none)' ? move : null, cp: job.cp, mate: job.mate });
         this.pump();
     }
 

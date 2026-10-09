@@ -58,3 +58,18 @@
 .review-empty{max-width:560px;margin:32px auto;text-align:center;display:flex;flex-direction:column;gap:12px;align-items:center}
 .review-empty p{color:var(--muted);margin:0}
 .review-count{margin:0;font-weight:600;color:var(--accent)}
+/* post-game analysis (game.ts) */
+.analysis{display:flex;flex-direction:column;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px}
+.analysis > small{font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;color:var(--muted)}
+.analysis .cta{align-self:flex-start}
+.analysis-note,.analysis-good,.analysis-legend{margin:0;font-size:14px;color:var(--muted)}
+.analysis-good{color:var(--good);font-weight:600}
+.analysis-meter{width:100%}
+.mistakes{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.mistake{width:100%;text-align:left;display:flex;flex-direction:column;gap:3px;background:var(--bg);border:2px solid var(--line);border-radius:12px;padding:10px 12px;font-size:14px}
+.mistake:hover{border-color:var(--accent)}
+.mistake[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.mistake b{font-family:var(--display);font-size:17px}
+.mistake .tag{align-self:flex-start;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;border-radius:99px;padding:2px 8px}
+.mistake .tag.besar{background:var(--coral-soft);color:var(--coral)}
+.mistake .tag.kecil{background:var(--sun-soft);color:color-mix(in srgb,var(--sun) 55%,var(--ink))}
