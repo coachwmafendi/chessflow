@@ -45,6 +45,22 @@
     ::file-selector-button {
         border-color: var(--color-gray-200, currentColor);
     }
+
+    /* Tailwind v4 resets buttons to the default arrow; show the hand on everything clickable. */
+    button:not(:disabled),
+    [role='button']:not([aria-disabled='true']),
+    input:is([type='submit'], [type='button'], [type='reset'], [type='checkbox'], [type='radio']):not(:disabled),
+    select:not(:disabled),
+    summary,
+    ui-checkbox,
+    ui-radio,
+    ui-switch {
+        cursor: pointer;
+    }
+
+    :is(button, input, select):disabled {
+        cursor: not-allowed;
+    }
 }
 
 [data-flux-field]:not(ui-radio, ui-checkbox) {

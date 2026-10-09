@@ -27,6 +27,9 @@ body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16p
 .app{max-width:1080px;margin:0 auto}
 button{font:inherit;color:inherit}
 button:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+/* hand cursor on everything clickable, arrow + "not allowed" when disabled */
+button:not(:disabled),[role="button"],summary,select:not(:disabled),input:is([type="submit"],[type="button"],[type="checkbox"],[type="radio"]):not(:disabled){cursor:pointer}
+:is(button,input,select):disabled{cursor:not-allowed}
 h1,h2,h3{font-family:var(--display);line-height:1.1;margin:0;text-wrap:balance}
 
 /* PIECES */
