@@ -31,3 +31,11 @@ it('clamps an unknown level', function () {
     expect($result['xp'])->toBe(100)
         ->and($this->student->games()->first()->level)->toBe(2);
 });
+
+it('records an agreed draw without XP', function () {
+    $result = app(RecordGame::class)->handle($this->student, 'w', 1, GameResult::Draw, '1. Nf3 Nf6', 40);
+
+    expect($result['xp'])->toBe(0)
+        ->and($this->student->games()->first()->result)->toBe(GameResult::Draw)
+        ->and($this->student->fresh()->xp)->toBe(0);
+});

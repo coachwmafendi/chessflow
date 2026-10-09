@@ -163,3 +163,9 @@ kbd{font-family:var(--body);font-weight:600;background:var(--accent-soft);paddin
 .linkbtn{background:none;border:0;color:var(--muted);text-decoration:underline;cursor:pointer;padding:0;font-size:13px}
 @media (max-width:520px){.hero{grid-template-columns:1fr;text-align:left}.step-title{font-size:26px}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+/* icons inside ghost buttons (game actions) */
+.ghost:has(.btn-ico){display:inline-flex;align-items:center;gap:6px}
+.btn-ico{width:18px;height:18px;flex:none;display:inline-block}
+.btn-ico.half{display:inline-grid;place-items:center;border-radius:50%;background:var(--accent-soft);color:var(--accent);font-family:var(--display);font-weight:800;font-size:14px;line-height:1}
+[data-act="resign"] .btn-ico{color:var(--coral)}
+.actions-end{display:flex;gap:8px;flex-wrap:wrap;margin-left:auto}

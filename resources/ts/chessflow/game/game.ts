@@ -5,6 +5,7 @@ import { nm, sq } from '../core/squares';
 import { SFX } from '../core/sound';
 import { bot } from '../engine/simple-bot';
 import { sharedEngine, type StockfishEngine } from '../engine/stockfish';
+import { judgeDrawOffer } from './draw';
 
 export type GameOutcome = 'win' | 'loss' | 'draw' | 'resign';
 
@@ -28,6 +29,11 @@ const LEVELS: { n: string; skill?: number; depth?: number }[] = [
 ];
 
 const PREF_KEY = 'chessflow-game';
+
+// White flag (resign) and ½ (draw), the usual chess symbols.
+const ICON_RESIGN =
+    '<svg class="btn-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 21V3" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/><path d="M6 4h12l-2.5 4.5L18 13H6z" fill="currentColor" fill-opacity=".18" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>';
+const ICON_DRAW = '<span class="btn-ico half" aria-hidden="true">½</span>';
 
 type ColorChoice = 'w' | 'b' | 'r';
 
@@ -60,6 +66,8 @@ export class GameRunner {
     private sel: Square | null = null;
     private reported = false;
     private gameId = 0;
+    /** Ply count when Pak Kuda last refused a draw offer. */
+    private drawRefusedAt: number | null = null;
 
     constructor(root: HTMLElement, handlers: GameHandlers = {}, engine: StockfishEngine = sharedEngine()) {
         this.root = root;
@@ -111,7 +119,7 @@ export class GameRunner {
             '</div><button class="cta" type="button" data-act="new">Permainan baru</button></div>' +
             '<div class="status" role="status" aria-live="polite"></div>' +
             '<div class="moves"><small>Langkah</small><ol></ol></div>' +
-            '<div class="actions"><button class="ghost" type="button" data-act="undo">Undur</button><button class="ghost" type="button" data-act="hint">Petunjuk</button><span class="spacer"></span><button class="ghost" type="button" data-act="resign">Mengaku kalah</button></div>' +
+            '<div class="actions"><button class="ghost" type="button" data-act="undo">Undur</button><button class="ghost" type="button" data-act="hint">Petunjuk</button><span class="spacer"></span><span class="actions-end"><button class="ghost" type="button" data-act="draw">' + ICON_DRAW + 'Minta seri</button><button class="ghost" type="button" data-act="resign">' + ICON_RESIGN + 'Mengaku kalah</button></span></div>' +
             '</div></div>';
 
         this.root.querySelectorAll<HTMLElement>('[data-c]').forEach(
@@ -131,6 +139,7 @@ export class GameRunner {
         this.$('[data-act="new"]').onclick = () => this.start();
         this.$('[data-act="undo"]').onclick = () => this.undo();
         this.$('[data-act="hint"]').onclick = () => this.hint();
+        this.$('[data-act="draw"]').onclick = () => this.offerDraw();
         this.$('[data-act="resign"]').onclick = () => this.resign();
         this.segs();
     }
@@ -173,6 +182,7 @@ export class GameRunner {
         this.busy = false;
         this.sel = null;
         this.reported = false;
+        this.drawRefusedAt = null;
         this.status(
             'Awak main ' +
                 (this.user === 'w' ? 'Putih' : 'Hitam') +
@@ -326,6 +336,21 @@ export class GameRunner {
         const local = () => bot(this.g, 'defend', this.g.turn() === 'w' ? 'b' : 'w', 1);
         if (!this.engine.available) return show(local());
         this.engine.bestMove({ fen: this.g.fen(), skill: 20, depth: 10 }).then((u) => show((u && this.legalUci(u)) || local()));
+    }
+
+    private offerDraw(): void {
+        if (this.over || this.busy || this.g.turn() !== this.user) return;
+        const v = judgeDrawOffer(this.g, this.user, this.drawRefusedAt);
+        if (!v.accept) {
+            if (v.reason === 'material') this.drawRefusedAt = this.g.history().length;
+            this.status(v.message, 'info');
+            return;
+        }
+        this.over = true;
+        this.board.arrows([]);
+        this.status(v.message, 'info');
+        this.report('draw');
+        this.showMoves();
     }
 
     private resign(): void {
