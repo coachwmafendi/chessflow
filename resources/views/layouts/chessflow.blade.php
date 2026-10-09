@@ -27,6 +27,7 @@
         <link rel="icon" href="/favicon.ico" sizes="any">
         <link rel="icon" href="/favicon.svg" type="image/svg+xml">
         <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+        @include('partials.theme-init')
         @fonts
         @vite(['resources/css/chessflow.css', 'resources/ts/app.ts'])
     </head>
@@ -59,6 +60,7 @@
                             <a class="pill btn" href="{{ route('login') }}">Log masuk</a>
                         @endunless
                     @endguest
+                    <button class="pill btn" type="button" data-theme-toggle title="Tukar tema warna">Tema: Sistem</button>
                     <button class="pill btn" type="button" data-sound-toggle aria-pressed="true">Bunyi: Hidup</button>
                     @auth
                         <form method="POST" action="{{ route('logout') }}">

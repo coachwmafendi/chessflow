@@ -215,3 +215,10 @@ it('serves robots.txt and a sitemap of public pages', function () {
         ->assertSee('<loc>'.route('tentang').'</loc>', false)
         ->assertDontSee(route('peta'));
 });
+
+it('applies the saved colour theme before paint and offers a theme toggle', function () {
+    $this->get(route('home'))
+        ->assertOk()
+        ->assertSee("localStorage.getItem('flux.appearance')", false)
+        ->assertSee('data-theme-toggle', false);
+});

@@ -2,6 +2,7 @@ import { LessonRunner } from './runner/lesson-runner';
 import { GameRunner } from './game/game';
 import { destroySharedEngine } from './engine/stockfish';
 import { isSoundOn, setSoundOn, SFX } from './core/sound';
+import { THEME_KEY, THEME_LABEL, applyTheme, getTheme, nextTheme, setTheme } from './core/theme';
 import type { Lesson, ServerLessonResult } from './types';
 
 declare global {
@@ -59,6 +60,14 @@ function syncSoundButtons(): void {
     });
 }
 
+function syncThemeButtons(): void {
+    const t = getTheme();
+    document.querySelectorAll<HTMLElement>('[data-theme-toggle]').forEach((b) => {
+        b.textContent = 'Tema: ' + THEME_LABEL[t];
+        b.setAttribute('aria-label', 'Tema warna: ' + THEME_LABEL[t] + '. Tekan untuk tukar.');
+    });
+}
+
 // Server replies arrive as Livewire browser events (bubbling to window).
 window.addEventListener('lesson-result', (e) => {
     const detail = (e as CustomEvent<ServerLessonResult>).detail;
@@ -75,6 +84,19 @@ window.addEventListener('game-result', (e) => {
 });
 
 document.addEventListener('click', (e) => {
+    if (!(e.target as HTMLElement).closest('[data-theme-toggle]')) return;
+    setTheme(nextTheme(getTheme()));
+    syncThemeButtons();
+});
+
+// Another tab (or the Flux settings page) changed the theme.
+window.addEventListener('storage', (e) => {
+    if (e.key !== THEME_KEY && e.key !== null) return;
+    applyTheme(getTheme());
+    syncThemeButtons();
+});
+
+document.addEventListener('click', (e) => {
     const btn = (e.target as HTMLElement).closest('[data-sound-toggle]');
     if (!btn) return;
     setSoundOn(!isSoundOn());
@@ -84,8 +106,11 @@ document.addEventListener('click', (e) => {
 
 mountAll();
 syncSoundButtons();
+syncThemeButtons();
 document.addEventListener('livewire:navigated', () => {
+    applyTheme(getTheme());
     mountAll();
     syncSoundButtons();
+    syncThemeButtons();
 });
 document.addEventListener('livewire:navigating', unmountAll);
