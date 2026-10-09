@@ -48,3 +48,6 @@ a.cta, a.ghost { display: inline-flex; align-items: center; justify-content: cen
 .prose-page ul { padding-left: 20px; display: grid; gap: 8px; }
 .prose-page a { color: var(--accent); }
 .foot a { color: inherit; }
+.join-link { text-align: right; margin-block: 8px; font-size: 14px; }
+.join-link a { color: var(--accent); font-weight: 600; text-decoration: none; }
+.join-link a:hover { text-decoration: underline; }

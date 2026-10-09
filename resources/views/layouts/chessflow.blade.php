@@ -1,5 +1,7 @@
 @php
     $user = auth()->user();
+    $pageTitle = isset($title) ? $title.' · ChessFlow' : 'ChessFlow';
+    $description = 'ChessFlow: belajar catur langkah demi langkah dalam Bahasa Melayu untuk kanak-kanak dan pemula. Papan interaktif, teka-teki harian, main lawan Pak Kuda, ujian dan sijil.';
 @endphp
 <!DOCTYPE html>
 <html lang="ms">
@@ -7,9 +9,24 @@
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta name="csrf-token" content="{{ csrf_token() }}" />
-        <title>{{ isset($title) ? $title.' · ChessFlow' : 'ChessFlow' }}</title>
-        <meta name="description" content="ChessFlow: belajar catur langkah demi langkah dalam Bahasa Melayu untuk kanak-kanak dan pemula. Papan interaktif, teka-teki harian, main lawan Pak Kuda, ujian dan sijil." />
+        <title>{{ $pageTitle }}</title>
+        <meta name="description" content="{{ $description }}" />
+        <link rel="canonical" href="{{ url()->current() }}" />
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="ChessFlow" />
+        <meta property="og:locale" content="ms_MY" />
+        <meta property="og:title" content="{{ $pageTitle }}" />
+        <meta property="og:description" content="{{ $description }}" />
+        <meta property="og:url" content="{{ url()->current() }}" />
+        <meta property="og:image" content="{{ asset('images/og-chessflow.png') }}" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:alt" content="ChessFlow: belajar catur dalam Bahasa Melayu" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="theme-color" content="#0B8577" />
+        <link rel="icon" href="/favicon.ico" sizes="any">
         <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png">
         @fonts
         @vite(['resources/css/chessflow.css', 'resources/ts/app.ts'])
     </head>
@@ -34,6 +51,14 @@
                             <a class="pill btn" href="{{ url('/admin') }}">Admin</a>
                         @endcan
                     @endauth
+                    @guest
+                        @unless (request()->routeIs('murid.login'))
+                            <a class="pill btn play" href="{{ route('murid.login') }}">Masuk murid</a>
+                        @endunless
+                        @unless (request()->routeIs('login'))
+                            <a class="pill btn" href="{{ route('login') }}">Log masuk</a>
+                        @endunless
+                    @endguest
                     <button class="pill btn" type="button" data-sound-toggle aria-pressed="true">Bunyi: Hidup</button>
                     @auth
                         <form method="POST" action="{{ route('logout') }}">

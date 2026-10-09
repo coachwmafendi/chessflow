@@ -189,3 +189,29 @@ it('checks a certificate code from the landing page', function () {
         ->assertHasErrors('certCode')
         ->assertNoRedirect();
 });
+
+it('shares a preview image and canonical url', function () {
+    $this->get(route('home'))
+        ->assertOk()
+        ->assertSee('<meta property="og:image" content="'.asset('images/og-chessflow.png').'"', false)
+        ->assertSee('<link rel="canonical" href="'.url('/').'"', false)
+        ->assertSee('<link rel="apple-touch-icon"', false);
+});
+
+it('offers sign-in links to guests in the header only', function () {
+    $this->get(route('tentang'))->assertSee('>Log masuk</a>', false);
+    $this->actingAs($this->student)->get(route('tentang'))->assertDontSee('>Log masuk</a>', false);
+});
+
+it('serves robots.txt and a sitemap of public pages', function () {
+    $this->get('/robots.txt')
+        ->assertOk()
+        ->assertHeader('Content-Type', 'text/plain; charset=UTF-8')
+        ->assertSee('Disallow: /admin')
+        ->assertSee('Sitemap: '.route('sitemap'));
+
+    $this->get('/sitemap.xml')
+        ->assertOk()
+        ->assertSee('<loc>'.route('tentang').'</loc>', false)
+        ->assertDontSee(route('peta'));
+});

@@ -10,7 +10,7 @@ body:has(.lp) { overflow-x: clip; }
 /* shared bits */
 .lp-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; border-radius: 14px; padding: 12px 20px; font-family: var(--display); font-weight: 700; font-size: 18px; background: var(--surface); border: 2px solid var(--line); transition: border-color .2s, transform .2s; }
 .lp-btn:hover { border-color: var(--accent); transform: translateY(-2px); }
-.lp .cta { text-decoration: none; transition: transform .2s, box-shadow .2s; }
+.lp .cta { color: var(--accent-ink); text-decoration: none; transition: transform .2s, box-shadow .2s; }
 .lp .cta:hover { transform: translateY(-2px); box-shadow: 0 6px 0 color-mix(in srgb, var(--accent) 60%, #000); }
 .lp-actions { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
 .lp-head { max-width: 640px; margin-bottom: 32px; }
@@ -171,7 +171,7 @@ body:has(.lp) { overflow-x: clip; }
 .lp-cta p { max-width: 50ch; opacity: .9; font-size: 17px; margin-bottom: 10px !important; }
 .lp-cta-piece { width: 84px; height: 84px; border-radius: 26px; background: var(--surface); display: grid; place-items: center; rotate: -8deg; box-shadow: 0 10px 0 color-mix(in srgb, var(--accent) 50%, #000); animation: lp-float 4s ease-in-out infinite; }
 .lp-cta-piece i { width: 64px; height: 64px; display: block; }
-.lp-btn-sun { background: var(--sun); border-color: var(--sun); color: #3A2A00; box-shadow: 0 4px 0 color-mix(in srgb, var(--sun) 55%, #000); }
+.lp .lp-btn-sun { background: var(--sun); border-color: var(--sun); color: #3A2A00; box-shadow: 0 4px 0 color-mix(in srgb, var(--sun) 55%, #000); }
 .lp-btn-sun:hover { border-color: var(--sun); }
 .lp-btn-line { background: transparent; border-color: color-mix(in srgb, var(--accent-ink) 55%, transparent); color: var(--accent-ink); }
 .lp-btn-line:hover { border-color: var(--accent-ink); }
@@ -253,3 +253,22 @@ body:has(.lp) { overflow-x: clip; }
     .lp-cta-in { padding: 48px 20px; border-radius: 24px; }
     .lp-section { padding-top: 56px; }
 }
+
+/* product screenshots */
+.lp-shots { position: relative; display: grid; grid-template-columns: repeat(12, 1fr); align-items: start; padding-bottom: 24px; }
+.lp-shot { margin: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 18px; overflow: hidden; box-shadow: 0 30px 60px -28px rgb(0 0 0 / .35); }
+.lp-shot img { display: block; width: 100%; height: auto; }
+.lp-shot-back { grid-column: 1 / span 8; grid-row: 1; transform: rotate(-1.5deg); }
+.lp-shot-front { grid-column: 5 / span 8; grid-row: 1; margin-top: 90px; transform: rotate(1.2deg); z-index: 1; }
+.lp-shot-bar { display: flex; align-items: center; gap: 6px; padding: 10px 14px; border-bottom: 1px solid var(--line); background: var(--bg); }
+.lp-shot-bar i { width: 10px; height: 10px; border-radius: 50%; background: var(--line); }
+.lp-shot-bar i:first-child { background: var(--coral); } .lp-shot-bar i:nth-child(2) { background: var(--sun); } .lp-shot-bar i:nth-child(3) { background: var(--good); }
+.lp-shot-bar span { margin-left: 10px; font-size: 13px; color: var(--muted); font-weight: 500; }
+@media (max-width: 760px) {
+    .lp-shots { grid-template-columns: 1fr; gap: 16px; }
+    .lp-shot-back, .lp-shot-front { grid-column: 1; grid-row: auto; margin-top: 0; transform: none; }
+}
+
+/* the landing has its own links section, so the layout footer is dropped here */
+.app:has(.lp) > .foot { display: none; }
+.lp-legal { grid-column: 1 / -1; margin-top: 16px !important; padding-top: 16px; border-top: 1px dashed var(--line); font-size: 13px; color: var(--muted); }

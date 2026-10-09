@@ -116,6 +116,27 @@ new #[Layout('layouts::chessflow')] #[Title('Belajar catur dalam Bahasa Melayu')
         </div>
     @endif
 
+    {{-- SHOTS --}}
+    <section class="lp-section" id="lihat">
+        <header class="lp-head">
+            <small>Lihat di dalam</small>
+            <h2>Peta yang jelas. Pelajaran yang hidup.</h2>
+            <p>Murid nampak di mana mereka berada, apa seterusnya, dan Pak Kuda menerangkan setiap langkah di papan.</p>
+        </header>
+        <div class="lp-shots">
+            <figure class="lp-shot lp-shot-back">
+                <div class="lp-shot-bar" aria-hidden="true"><i></i><i></i><i></i><span>Peta pelajaran</span></div>
+                <img src="{{ asset('images/landing/peta.jpg') }}" width="1650" height="1080" loading="lazy" decoding="async"
+                     alt="Peta pelajaran ChessFlow: sambung ke pelajaran seterusnya, streak teka-teki harian dan pelajaran yang sudah dapat bintang.">
+            </figure>
+            <figure class="lp-shot lp-shot-front">
+                <div class="lp-shot-bar" aria-hidden="true"><i></i><i></i><i></i><span>Pelajaran: Fork Kuda</span></div>
+                <img src="{{ asset('images/landing/pelajaran.jpg') }}" width="1650" height="1080" loading="lazy" decoding="async"
+                     alt="Skrin pelajaran Fork Kuda: papan catur dengan anak panah serangan dan penerangan Pak Kuda di sebelah.">
+            </figure>
+        </div>
+    </section>
+
     {{-- PATH --}}
     <section class="lp-section" id="laluan">
         <header class="lp-head">
@@ -373,5 +394,6 @@ new #[Layout('layouts::chessflow')] #[Title('Belajar catur dalam Bahasa Melayu')
             </form>
             @error('certCode') <p class="lp-err">{{ $message }}</p> @enderror
         </div>
+        <p class="lp-legal">© {{ now()->year }} ChessFlow · Belajar catur dalam Bahasa Melayu untuk kanak-kanak dan pemula</p>
     </section>
 </div>

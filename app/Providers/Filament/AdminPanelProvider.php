@@ -28,6 +28,7 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->login()
             ->brandName('ChessFlow Admin')
+            ->favicon(asset('favicon.svg'))
             ->colors([
                 'primary' => Color::Teal,
             ])

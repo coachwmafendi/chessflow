@@ -79,7 +79,7 @@ new #[Layout('layouts::chessflow')] #[Title('Peta')] class extends Component {
         </a>
     </section>
     @if (auth()->user()->isStudent())
-        <p style="text-align: right; margin-block: 0 8px"><a href="{{ route('sertai') }}">Ada kod kelas daripada guru? Sertai kelas</a></p>
+        <p class="join-link"><a href="{{ route('sertai') }}">Ada kod kelas daripada guru? Sertai kelas</a></p>
     @endif
 
     @foreach ($levels as $level)
