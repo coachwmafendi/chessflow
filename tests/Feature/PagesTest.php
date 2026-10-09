@@ -162,3 +162,30 @@ it('creates students from the console', function () {
 
     $this->artisan('chessflow:create-student', ['username' => 'aina', 'name' => 'X', '--pin' => '12'])->assertFailed();
 });
+
+it('shows the landing page with live curriculum numbers and support email', function () {
+    $this->get(route('home'))
+        ->assertOk()
+        ->assertSee('Kenal Catur')
+        ->assertSee('Endgame')
+        ->assertSee('Fork Kuda')
+        ->assertSee('mailto:wmafendi@gmail.com', false)
+        ->assertSee(route('murid.login'), false);
+});
+
+it('sends signed-in users from the landing page to the map', function () {
+    $this->actingAs($this->student)->get(route('home'))->assertRedirect(route('peta'));
+});
+
+it('checks a certificate code from the landing page', function () {
+    Livewire::test('pages::utama')
+        ->set('certCode', ' abc234 ')
+        ->call('checkCertificate')
+        ->assertRedirect(route('sijil', 'ABC234'));
+
+    Livewire::test('pages::utama')
+        ->set('certCode', 'ab-12')
+        ->call('checkCertificate')
+        ->assertHasErrors('certCode')
+        ->assertNoRedirect();
+});

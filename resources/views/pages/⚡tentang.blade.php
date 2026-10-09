@@ -10,7 +10,7 @@ new #[Layout('layouts::chessflow')] #[Title('Tentang')] class extends Component 
     <h1>Tentang ChessFlow</h1>
     <p>ChessFlow ialah laman pembelajaran catur interaktif dalam Bahasa Melayu untuk kanak-kanak dan pemula. Semua kandungan pelajaran ditulis khas untuk ChessFlow.</p>
 
-    <h2>Privasi</h2>
+    <h2 id="privasi">Privasi</h2>
     <ul>
         <li>Akaun murid tidak memerlukan e-mel. Murid masuk dengan nama pengguna dan PIN yang dicipta oleh guru atau ibu bapa.</li>
         <li>Kami simpan nama, kemajuan pelajaran, XP, streak, keputusan ujian dan permainan. Data ini hanya untuk pembelajaran dan dilihat oleh murid, guru kelasnya dan ibu bapa yang dipautkan.</li>
@@ -18,7 +18,7 @@ new #[Layout('layouts::chessflow')] #[Title('Tentang')] class extends Component 
         <li>Untuk memadam akaun murid, hubungi guru atau ibu bapa yang mencipta akaun itu, atau pentadbir ChessFlow.</li>
     </ul>
 
-    <h2>Perisian dan lesen</h2>
+    <h2 id="lesen">Perisian dan lesen</h2>
     <ul>
         <li><b>Stockfish</b> (enjin catur untuk permainan dan petunjuk) — lesen GNU GPL v3. Kami guna <a href="https://github.com/nmrugg/stockfish.js">Stockfish.js 10</a>, versi WebAssembly; kod sumber Stockfish di <a href="https://github.com/official-stockfish/Stockfish">github.com/official-stockfish/Stockfish</a>. Fail enjin dihantar tanpa diubah di <a href="/stockfish/stockfish.js">/stockfish/</a>.</li>
         <li><b>chess.js</b> (peraturan catur) — lesen BSD-2-Clause, oleh Jeff Hlywa. <a href="https://github.com/jhlywa/chess.js">github.com/jhlywa/chess.js</a></li>

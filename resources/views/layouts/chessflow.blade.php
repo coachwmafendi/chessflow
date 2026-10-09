@@ -8,6 +8,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta name="csrf-token" content="{{ csrf_token() }}" />
         <title>{{ isset($title) ? $title.' · ChessFlow' : 'ChessFlow' }}</title>
+        <meta name="description" content="ChessFlow: belajar catur langkah demi langkah dalam Bahasa Melayu untuk kanak-kanak dan pemula. Papan interaktif, teka-teki harian, main lawan Pak Kuda, ujian dan sijil." />
         <link rel="icon" href="/favicon.svg" type="image/svg+xml">
         @fonts
         @vite(['resources/css/chessflow.css', 'resources/ts/app.ts'])
