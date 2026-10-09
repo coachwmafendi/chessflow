@@ -34,7 +34,7 @@
         <div class="app">
             <header class="top">
                 <a class="logo" href="{{ $user ? route('peta') : route('home') }}" aria-label="ChessFlow, ke peta">
-                    <span class="mark"><i class="pc wN"></i></span><b>Chess<span>Flow</span></b>
+                    <span class="mark"><i class="pc pk"></i></span><b>Chess<span>Flow</span></b>
                 </a>
                 <div class="stats">
                     @auth

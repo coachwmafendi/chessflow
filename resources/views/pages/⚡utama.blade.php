@@ -86,7 +86,7 @@ new #[Layout('layouts::chessflow')] #[Title('Belajar catur dalam Bahasa Melayu')
                 <i class="pc wN lp-knight"></i>
             </div>
             <div class="lp-bubble">
-                <span class="lp-av"><i class="pc wN"></i></span>
+                <span class="lp-av"><i class="pc pk"></i></span>
                 <span><b>Fork!</b> Kuda serang raja dan tir serentak.</span>
             </div>
             <div class="lp-chip lp-chip-xp"><span class="xp-ico">XP</span> +20 XP</div>
@@ -181,14 +181,14 @@ new #[Layout('layouts::chessflow')] #[Title('Belajar catur dalam Bahasa Melayu')
         <div class="lp-bento">
             <article class="lp-tile lp-tile-big">
                 <div class="lp-tile-text">
-                    <span class="lp-ico"><i class="pc wN"></i></span>
+                    <span class="lp-ico"><i class="pc pk"></i></span>
                     <h3>Papan interaktif dengan jurulatih sendiri</h3>
                     <p>Murid gerakkan buah sendiri, bukan sekadar membaca. Pak Kuda menerangkan setiap konsep, memberi petunjuk bila tersekat dan membetulkan langkah yang salah dengan lembut.</p>
                 </div>
                 <div class="lp-chat" aria-hidden="true">
                     <p class="me">Kenapa langkah ini tak boleh?</p>
-                    <p class="pk"><span class="lp-av"><i class="pc wN"></i></span>Raja awak akan kena sah. Cuba lindungi dia dulu!</p>
-                    <p class="pk ok"><span class="lp-av"><i class="pc wN"></i></span>Bagus! Itu langkah terbaik. +3 bintang</p>
+                    <p class="pk"><span class="lp-av"><i class="pc pk"></i></span>Raja awak akan kena sah. Cuba lindungi dia dulu!</p>
+                    <p class="pk ok"><span class="lp-av"><i class="pc pk"></i></span>Bagus! Itu langkah terbaik. +3 bintang</p>
                 </div>
             </article>
 
@@ -343,7 +343,7 @@ new #[Layout('layouts::chessflow')] #[Title('Belajar catur dalam Bahasa Melayu')
     {{-- CTA --}}
     <section class="lp-cta">
         <div class="lp-cta-in">
-            <span class="lp-cta-piece" aria-hidden="true"><i class="pc wN"></i></span>
+            <span class="lp-cta-piece" aria-hidden="true"><i class="pc pk"></i></span>
             <h2>Papan sudah tersedia. Giliran awak.</h2>
             <p>Murid masuk dengan nama pengguna dan PIN. Ibu bapa dan guru boleh daftar dalam seminit.</p>
             <div class="lp-actions">

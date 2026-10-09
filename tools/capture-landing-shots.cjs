@@ -31,7 +31,9 @@ if (!user || !pin) {
 
     await page.goto(`${base}/pelajaran/${lesson}`);
     await page.waitForSelector('[data-chessflow] .sq, [data-chessflow] cg-board, [data-chessflow] .board', { timeout: 10000 }).catch(() => {});
-    await page.waitForTimeout(1200);
+    // Shoot the fork moment: wait for the demo's attack arrows, then for the move and arrow animations to finish.
+    await page.waitForSelector('[data-chessflow] .arrows line', { timeout: 10000 }).catch(() => {});
+    await page.waitForTimeout(700);
     await page.screenshot({ path: path.join(out, 'pelajaran.jpg'), type: 'jpeg', quality: 80 });
 
     await browser.close();

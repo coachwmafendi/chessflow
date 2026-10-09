@@ -84,7 +84,7 @@ export class LessonRunner {
                 ? '<p class="exam-note">Ujian: setiap soalan ada <b>satu peluang</b>. Lulus jika betul sekurang-kurangnya 70%.</p>'
                 : '') +
             '<h3 class="step-title"></h3>' +
-            '<div class="coach"><div class="avatar sm"><i class="pc wN"></i></div><div class="bubble"><span class="who">Pak Kuda</span><p class="say"></p></div></div>' +
+            '<div class="coach"><div class="avatar sm"><i class="pc pk"></i></div><div class="bubble"><span class="who">Pak Kuda</span><p class="say"></p></div></div>' +
             '<div class="task"><small>Tugasan</small><div class="row"><span class="task-text"></span><span class="counter"></span></div><div class="opts"></div></div>' +
             '<div class="status" role="status" aria-live="polite"></div>' +
             '<div class="actions"><span class="acts"></span><span class="spacer"></span><button type="button" class="cta next-btn" disabled>Teruskan</button></div>' +

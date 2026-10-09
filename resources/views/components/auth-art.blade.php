@@ -1,5 +1,5 @@
 @props(['heading' => 'Belajar catur langkah demi langkah', 'text' => 'Bersama Pak Kuda: kenal buah, taktik, strategi dan endgame. Kutip bintang, kumpul XP dan dapatkan sijil setiap tahap.'])
-{{-- Left column of the login/register pages: ChessFlow illustration (pieces: rhosgfx, CC0). --}}
+{{-- Left column of the login/register pages: ChessFlow illustration (Pak Kuda: rhosgfx, CC0; pieces: cburnett, BSD). --}}
 <div class="relative hidden h-full flex-col overflow-hidden p-10 text-white lg:flex" style="background: linear-gradient(160deg, #0B8577 0%, #075E54 100%)">
     {{-- faint chessboard pattern --}}
     <div class="pointer-events-none absolute inset-0 opacity-[0.07]"
@@ -7,7 +7,7 @@
 
     <a href="{{ route('home') }}" class="relative z-20 flex items-center gap-2 text-lg font-semibold">
         <span class="flex size-10 items-center justify-center rounded-xl bg-white/15">
-            <img src="/images/pieces/wN.svg" alt="" class="size-8">
+            <img src="/images/pak-kuda.svg" alt="" class="size-8">
         </span>
         ChessFlow
     </a>
@@ -15,7 +15,7 @@
     <div class="relative z-10 flex flex-1 items-center justify-center">
         <div class="relative size-72">
             <div class="absolute inset-0 rounded-full bg-white/10 ring-1 ring-white/20"></div>
-            <img src="/images/pieces/wN.svg" alt="Pak Kuda" class="absolute inset-6 size-60 drop-shadow-2xl">
+            <img src="/images/pak-kuda.svg" alt="Pak Kuda" class="absolute inset-6 size-60 drop-shadow-2xl">
             <img src="/images/pieces/bK.svg" alt="" class="absolute -top-6 -right-10 size-24 rotate-12 drop-shadow-xl">
             <img src="/images/pieces/wQ.svg" alt="" class="absolute -bottom-4 -left-12 size-24 -rotate-12 drop-shadow-xl">
             <img src="/images/pieces/bP.svg" alt="" class="absolute top-10 -left-14 size-14 -rotate-6 opacity-90">

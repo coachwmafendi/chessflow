@@ -50,7 +50,7 @@ new #[Layout('layouts::chessflow')] #[Title('Peta')] class extends Component {
 
 <div>
     <section class="hero">
-        <div class="avatar"><i class="pc wN"></i></div>
+        <div class="avatar"><i class="pc pk"></i></div>
         <div>
             <h1>{{ $doneCount ? 'Selamat kembali!' : 'Jom main catur!' }}</h1>
             <p>Saya Pak Kuda. Kita belajar catur langkah demi langkah: kenal buah, belajar taktik, kutip bintang dan kumpul XP.</p>

@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Builds the favicons and the social share image from the ChessFlow mark (rhosgfx knight, CC0).
+// Builds the favicons and the social share image from the ChessFlow mark (Pak Kuda: rhosgfx knight, CC0, the .pc.pk rule).
 // Run after `npm run build` (the share image embeds the built Baloo 2 / Lexend fonts):
 //   node tools/make-brand-assets.cjs
 const { chromium } = require('@playwright/test');
@@ -20,7 +20,7 @@ function pieceSvg(code) {
 
 /** The header logo mark: white knight on a rounded teal square. radius 0 = full-bleed (iOS rounds it itself). */
 function markSvg(radius) {
-    const knight = pieceSvg('wN').replace('<svg ', '<svg x="7" y="5" width="50" height="50" ');
+    const knight = pieceSvg('pk').replace(/<svg /, '<svg x="7" y="5" width="50" height="50" ');
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="${radius}" fill="${ACCENT}"/>${knight}</svg>\n`;
 }
 

@@ -22,7 +22,8 @@ new #[Layout('layouts::chessflow')] #[Title('Tentang')] class extends Component 
     <ul>
         <li><b>Stockfish</b> (enjin catur untuk permainan dan petunjuk) — lesen GNU GPL v3. Kami guna <a href="https://github.com/nmrugg/stockfish.js">Stockfish.js 10</a>, versi WebAssembly; kod sumber Stockfish di <a href="https://github.com/official-stockfish/Stockfish">github.com/official-stockfish/Stockfish</a>. Fail enjin dihantar tanpa diubah di <a href="/stockfish/stockfish.js">/stockfish/</a>.</li>
         <li><b>chess.js</b> (peraturan catur) — lesen BSD-2-Clause, oleh Jeff Hlywa. <a href="https://github.com/jhlywa/chess.js">github.com/jhlywa/chess.js</a></li>
-        <li><b>Gambar buah catur</b> — set "rhosgfx" oleh RhosGFX, didedikasikan ke domain awam (CC0 1.0). Diambil dari <a href="https://github.com/lichess-org/lila/tree/master/public/piece/rhosgfx">repo Lichess</a>; warna buah hitam kami ubah kepada kelabu gelap.</li>
+        <li><b>Buah catur di papan</b> — set "cburnett" oleh Colin M.L. Burnett, versi asal dari <a href="https://commons.wikimedia.org/wiki/File:Chess_klt45.svg">Wikimedia Commons</a>, digunakan di bawah lesen BSD 3-klausa (<a href="/images/pieces/LICENSE.txt">teks lesen</a>).</li>
+        <li><b>Pak Kuda</b> (logo ChessFlow) — kuda putih daripada set "rhosgfx" oleh RhosGFX, didedikasikan ke domain awam (CC0 1.0). Diambil dari <a href="https://github.com/lichess-org/lila/tree/master/public/piece/rhosgfx">repo Lichess</a>.</li>
         <li><b>Fon</b> Baloo 2 dan Lexend — lesen SIL Open Font License 1.1, dihantar melalui Bunny Fonts.</li>
         <li>Dibina dengan Laravel, Livewire dan Filament (lesen MIT).</li>
     </ul>

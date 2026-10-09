@@ -213,9 +213,11 @@ export function createBoard(root: HTMLElement, orient: 'w' | 'b' = 'w'): BoardAp
                     const dy = y2 - y1;
                     const L = Math.hypot(dx, dy);
                     const k = (L - 0.38) / L;
+                    // Start a little off-centre so the line does not show through the piece it starts from.
+                    const s0 = Math.min(0.3, L / 3) / L;
                     el = document.createElementNS(SVG_NS, 'line');
-                    el.setAttribute('x1', String(x1));
-                    el.setAttribute('y1', String(y1));
+                    el.setAttribute('x1', String(x1 + dx * s0));
+                    el.setAttribute('y1', String(y1 + dy * s0));
                     el.setAttribute('x2', String(x1 + dx * k));
                     el.setAttribute('y2', String(y1 + dy * k));
                 }
