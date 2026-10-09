@@ -1,5 +1,6 @@
 <?php
 
+use App\Actions\AwardBadges;
 use App\Actions\CompleteReview;
 use App\Models\ReviewItem;
 use App\Support\ProgressGuard;
@@ -48,6 +49,7 @@ new #[Layout('layouts::chessflow')] #[Title('Latih semula')] class extends Compo
             'xp' => $r['xp'],
             'passed' => $r['correct'],
             'review' => ['correct' => $r['correct'], 'mastered' => $r['mastered'], 'remaining' => $r['remaining']],
+            'badges' => app(AwardBadges::class)->handle($user->fresh()),
             'totalXp' => $user->fresh()->xp,
             'mapUrl' => route('peta'),
             'next' => $r['remaining'] > 0 ? ['url' => route('latih'), 'title' => 'latihan seterusnya'] : null,

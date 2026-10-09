@@ -1,9 +1,11 @@
 <?php
 
+use App\Actions\AwardBadges;
 use App\Enums\GameResult;
 use App\Models\Lesson;
 use App\Models\Level;
 use App\Support\AssignmentReport;
+use App\Support\Badges;
 use App\Support\Chessflow;
 use App\Support\Curriculum;
 use Livewire\Attributes\Layout;
@@ -14,6 +16,15 @@ new #[Layout('layouts::chessflow')] #[Title('Peta')] class extends Component {
     public function with(Curriculum $curriculum): array
     {
         $user = auth()->user();
+
+        // Catch up on badges (e.g. progress made before badges existed), then celebrate the unseen ones once.
+        app(AwardBadges::class)->handle($user, markSeen: false);
+        $catalogue = Badges::all();
+        $unseen = $user->badges()->whereNull('seen_at')->get();
+        $newBadges = $unseen->map(fn ($b) => $catalogue[$b->badge] ?? null)->filter()->values();
+        if ($unseen->isNotEmpty()) {
+            $user->badges()->whereNull('seen_at')->update(['seen_at' => now()]);
+        }
         $lessons = $curriculum->lessons();
         $completed = $curriculum->completedIds($user);
         $progress = $user->lessonProgress()->get()->keyBy('lesson_id');
@@ -41,6 +52,9 @@ new #[Layout('layouts::chessflow')] #[Title('Peta')] class extends Component {
             'streak' => $user->currentStreak(),
             'wins' => $user->games()->where('result', GameResult::Win)->count(),
             'assignments' => app(AssignmentReport::class)->forStudent($user),
+            'newBadges' => $newBadges,
+            'badgeCount' => $user->badges()->count(),
+            'badgeTotal' => count($catalogue),
             'reviewDue' => $user->reviewItems()->due()->count(),
             'reviewTotal' => $user->reviewItems()->count(),
         ];
@@ -69,6 +83,18 @@ new #[Layout('layouts::chessflow')] #[Title('Peta')] class extends Component {
             </div>
         </div>
     </section>
+
+    @if ($newBadges->isNotEmpty())
+        <section class="badge-toast" role="status">
+            <b>{{ $newBadges->count() === 1 ? 'Lencana baru!' : $newBadges->count().' lencana baru!' }}</b>
+            <div class="badge-toast-list">
+                @foreach ($newBadges as $b)
+                    <x-chessflow.badge :badge="$b" :earned="true" class="mini" />
+                @endforeach
+            </div>
+            <a class="ghost" href="{{ route('lencana') }}">Lihat semua lencana</a>
+        </section>
+    @endif
 
     @if ($assignments->isNotEmpty())
         <section class="tasks" aria-labelledby="tasks-h">
@@ -112,6 +138,11 @@ new #[Layout('layouts::chessflow')] #[Title('Peta')] class extends Component {
                 <span class="qnum">{{ $reviewDue }}<small>hari ini</small></span>
             </a>
         @endif
+        <a class="qcard" href="{{ route('lencana') }}">
+            <span class="qico badge-qico"><x-chessflow.medal /></span>
+            <span><b>Lencana</b><small>Kumpul lencana dengan belajar dan bermain</small></span>
+            <span class="qnum">{{ $badgeCount }}<small>/{{ $badgeTotal }}</small></span>
+        </a>
         <a class="qcard" href="{{ route('main') }}">
             <span class="qico"><i class="pc bK"></i></span>
             <span><b>Main lawan Pak Kuda</b><small>Permainan penuh: mudah, sederhana atau sukar</small></span>

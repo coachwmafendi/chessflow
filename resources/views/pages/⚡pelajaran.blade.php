@@ -1,5 +1,6 @@
 <?php
 
+use App\Actions\AwardBadges;
 use App\Actions\CompleteLesson;
 use App\Actions\ScheduleReview;
 use App\Actions\SubmitExam;
@@ -62,6 +63,7 @@ new #[Layout('layouts::chessflow')] class extends Component {
         }
 
         $this->dispatch('lesson-result', ...$result + [
+            'badges' => app(AwardBadges::class)->handle($user->fresh()),
             'totalXp' => $user->fresh()->xp,
             'totalStars' => $user->totalStars(),
             'mapUrl' => route('peta'),

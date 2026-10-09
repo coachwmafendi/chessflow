@@ -1,3 +1,4 @@
+import type { NewBadge } from './core/badges';
 // Step/Lesson shapes mirror data/lessons.json (see MIGRATION_PLAN.md §6).
 // A square spec is either plain algebraic ("e4") or a line spec ("file:e" / "rank:4").
 export type SquareSpec = string;
@@ -170,6 +171,8 @@ export interface ServerLessonResult {
     message?: string;
     // "Latih semula" outcome: right/wrong, retired after the last box, steps still due today.
     review?: { correct: boolean; mastered: boolean; remaining: number };
+    // Badges earned by this result (decided on the server).
+    badges?: NewBadge[];
 }
 
 // Context handed to each step-type runner by LessonRunner.

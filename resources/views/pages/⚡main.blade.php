@@ -1,5 +1,6 @@
 <?php
 
+use App\Actions\AwardBadges;
 use App\Actions\RecordGame;
 use App\Enums\GameResult;
 use App\Support\ProgressGuard;
@@ -24,7 +25,7 @@ new #[Layout('layouts::chessflow')] #[Title('Main lawan Pak Kuda')] class extend
 
         $r = app(RecordGame::class)->handle($user, $userColor, $level, $gameResult, $pgn, $moveCount);
 
-        $this->dispatch('game-result', xp: $r['xp'], wins: $r['wins'], totalXp: $user->fresh()->xp);
+        $this->dispatch('game-result', xp: $r['xp'], wins: $r['wins'], totalXp: $user->fresh()->xp, badges: app(AwardBadges::class)->handle($user->fresh()));
     }
 }; ?>
 

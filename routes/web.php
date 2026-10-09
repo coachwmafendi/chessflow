@@ -17,6 +17,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::livewire('pelajaran/{lesson:slug}', 'pages::pelajaran')->name('pelajaran');
     Route::livewire('harian', 'pages::harian')->name('harian');
     Route::livewire('latih', 'pages::latih')->name('latih');
+    Route::livewire('lencana', 'pages::lencana')->name('lencana');
     Route::livewire('main', 'pages::main')->name('main');
     Route::livewire('sertai', 'pages::sertai')->name('sertai');
 

@@ -7,6 +7,7 @@ import { bot } from '../engine/simple-bot';
 import { sharedEngine, type StockfishEngine } from '../engine/stockfish';
 import { judgeDrawOffer } from './draw';
 import { analyseGame, type Mistake } from './analysis';
+import { newBadgesHtml, type NewBadge } from '../core/badges';
 
 export type GameOutcome = 'win' | 'loss' | 'draw' | 'resign';
 
@@ -90,11 +91,13 @@ export class GameRunner {
     }
 
     /** Server reply to a reported game (Livewire `game-result`). */
-    showResult(r: { xp: number; totalXp?: number }): void {
+    showResult(r: { xp: number; totalXp?: number; badges?: NewBadge[] }): void {
         if (r.xp > 0) {
             const s = this.$('.status');
             s.textContent = s.textContent + ' +' + r.xp + ' XP';
         }
+        this.root.querySelector('.new-badges')?.remove();
+        this.$('.status').insertAdjacentHTML('afterend', newBadgesHtml(r.badges));
         if (typeof r.totalXp === 'number') {
             document.querySelectorAll('[data-stat="xp"]').forEach((el) => (el.textContent = String(r.totalXp)));
         }
@@ -190,6 +193,7 @@ export class GameRunner {
         this.reported = false;
         this.drawRefusedAt = null;
         this.hideAnalysis();
+        this.root.querySelector('.new-badges')?.remove();
         this.status(
             'Awak main ' +
                 (this.user === 'w' ? 'Putih' : 'Hitam') +

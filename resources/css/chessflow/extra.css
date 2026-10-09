@@ -110,3 +110,42 @@
 .assign-form .grow{flex:1;min-width:200px}
 .assign-form select,.assign-form input{padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink);font:inherit}
 .assign-msg{width:100%;margin:0}
+/* achievement badges (components/chessflow/badge, /lencana, map toast) */
+.badges-intro{color:var(--muted);margin:0 0 16px;max-width:60ch}
+.badge-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}
+.badge{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:18px 12px}
+.badge b{font-family:var(--display);font-size:18px;line-height:1.15}
+.badge small{color:var(--muted);font-size:13px;line-height:1.35}
+.badge-medal{width:72px;height:72px;border-radius:50%;display:grid;place-items:center;background:var(--sun);box-shadow:0 0 0 5px var(--sun-soft),0 4px 0 6px color-mix(in srgb,var(--sun) 45%,transparent);margin-bottom:6px;color:#3A2A00}
+.badge-medal i.pc{width:50px;height:50px;display:block}
+.badge-medal .star-ico{width:40px;height:40px;background:#fff}
+.badge-medal svg{width:40px;height:40px;fill:#fff}
+.badge-glyph{font-family:var(--display);font-weight:800;font-size:28px;color:#fff;line-height:1}
+.badge.locked .badge-medal{background:var(--line);box-shadow:0 0 0 5px var(--bg)}
+.badge.locked .badge-medal > *{opacity:.45;filter:grayscale(1)}
+.badge.locked b{color:var(--muted)}
+.badge-date{font-size:12px;font-weight:600;color:var(--accent)}
+.badge-progress{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;width:100%;justify-content:center}
+.badge-progress .meter{width:90px}
+.badge.mini{flex-direction:row;text-align:left;padding:8px 12px;gap:10px;border-radius:14px}
+.badge.mini .badge-medal{width:40px;height:40px;margin:0;box-shadow:0 0 0 3px var(--sun-soft)}
+.badge.mini .badge-medal i.pc{width:30px;height:30px}
+.badge.mini .badge-medal svg,.badge.mini .badge-medal .star-ico{width:24px;height:24px}
+.badge.mini .badge-glyph{font-size:17px}
+.badge.mini b{font-size:15px}
+.badge.mini small{display:none}
+.badge-toast{margin-top:14px;display:flex;flex-wrap:wrap;align-items:center;gap:12px;background:var(--sun-soft);border:2px solid var(--sun);border-radius:20px;padding:14px 16px;animation:badge-pop .5s cubic-bezier(.3,1.5,.5,1)}
+.badge-toast > b{font-family:var(--display);font-size:22px}
+.badge-toast-list{display:flex;flex-wrap:wrap;gap:8px;flex:1}
+@keyframes badge-pop{from{transform:scale(.92);opacity:0}to{transform:scale(1);opacity:1}}
+@media (prefers-reduced-motion: reduce){.badge-toast{animation:none}}
+.qico.badge-qico{background:var(--sun-soft)} .qico.badge-qico svg{fill:var(--sun)}
+/* new badges inside the lesson / game result */
+.new-badges{display:flex;flex-direction:column;align-items:center;gap:8px;background:var(--sun-soft);border:2px solid var(--sun);border-radius:16px;padding:10px 14px;width:100%}
+.new-badges > b{font-family:var(--display);font-size:18px}
+.new-badges ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.new-badges li{display:flex;align-items:center;gap:8px;font-weight:600}
+.new-badges .badge-medal{width:34px;height:34px;margin:0;box-shadow:none}
+.new-badges .badge-medal i.pc{width:26px;height:26px}
+.new-badges .badge-medal svg,.new-badges .badge-medal .star-ico{width:20px;height:20px}
+.new-badges .badge-glyph{font-size:14px}

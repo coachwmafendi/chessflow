@@ -1,4 +1,5 @@
 import type { BoardApi, Lesson, LessonResult, ServerLessonResult, StepContext } from '../types';
+import { newBadgesHtml } from '../core/badges';
 import { createBoard } from '../core/board';
 import { SFX } from '../core/sound';
 import { runStep } from '../steps';
@@ -273,6 +274,8 @@ export class LessonRunner {
 
         if (r.xp > 0) card.insertAdjacentHTML('beforeend', '<div class="xp">+' + r.xp + ' XP</div>');
         else if (this.lesson.daily && !r.message) card.insertAdjacentHTML('beforeend', '<p>XP teka-teki hari ini sudah dikutip.</p>');
+        card.querySelector('.new-badges')?.remove();
+        card.insertAdjacentHTML('beforeend', newBadgesHtml(r.badges));
 
         const links: string[] = [];
         if (r.certificateUrl) links.push(link(r.certificateUrl, 'Lihat sijil', 'cta'));

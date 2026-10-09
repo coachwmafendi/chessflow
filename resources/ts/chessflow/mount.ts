@@ -4,6 +4,7 @@ import { destroySharedEngine } from './engine/stockfish';
 import { isSoundOn, setSoundOn, SFX } from './core/sound';
 import { THEME_KEY, THEME_LABEL, applyTheme, getTheme, nextTheme, setTheme } from './core/theme';
 import type { Lesson, ServerLessonResult } from './types';
+import type { NewBadge } from './core/badges';
 
 declare global {
     interface Window {
@@ -77,7 +78,7 @@ window.addEventListener('lesson-result', (e) => {
 });
 
 window.addEventListener('game-result', (e) => {
-    const detail = (e as CustomEvent<{ xp: number; totalXp?: number }>).detail;
+    const detail = (e as CustomEvent<{ xp: number; totalXp?: number; badges?: NewBadge[] }>).detail;
     islands.forEach((island) => {
         if (island instanceof GameRunner) island.showResult(detail);
     });

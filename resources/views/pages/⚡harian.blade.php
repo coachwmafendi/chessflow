@@ -1,5 +1,6 @@
 <?php
 
+use App\Actions\AwardBadges;
 use App\Actions\CompleteDaily;
 use App\Actions\ScheduleReview;
 use App\Actions\PickDailyPuzzle;
@@ -44,6 +45,7 @@ new #[Layout('layouts::chessflow')] #[Title('Teka-teki Harian')] class extends C
             'xp' => $r['xp'],
             'streak' => $r['streak'],
             'passed' => true,
+            'badges' => app(AwardBadges::class)->handle($user->fresh()),
             'totalXp' => $user->fresh()->xp,
             'mapUrl' => route('peta'),
             'next' => null,
