@@ -15,7 +15,6 @@
         "@laravel/passkeys": "^0.2.0",
         "@tailwindcss/vite": "^4.1.11",
         "chess.js": "^1.4.0",
-        "concurrently": "^10.0.3",
         "laravel-vite-plugin": "^3.1",
         "tailwindcss": "^4.0.7",
         "vite": "^8.0.0",
@@ -31,8 +30,14 @@
         "@axe-core/playwright": "^4.13.0",
         "@playwright/test": "^1.64.0",
         "@types/node": "^26.6.4",
+        "concurrently": "^10.0.6",
         "jsdom": "^29.1.1",
         "typescript": "^5.9.3",
         "vitest": "^4.1.11"
+    },
+    "overrides": {
+        "oxfmt": {
+            "tinypool": "2.1.2"
+        }
     }
 }
