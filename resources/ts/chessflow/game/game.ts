@@ -187,6 +187,7 @@ export class GameRunner {
         this.board = createBoard(this.$('.gbw'), this.user);
         this.board.setFen(this.g.fen());
         this.board.on((i) => this.onTap(i));
+        this.board.draggable((i) => !this.over && !this.busy && this.g.turn() === this.user && this.g.get(nm(i) as Square)?.color === this.user);
         this.over = false;
         this.busy = false;
         this.sel = null;
@@ -313,8 +314,25 @@ export class GameRunner {
         if (!this.sel) return;
         const legal = this.g.moves({ square: this.sel, verbose: true }).filter((m) => m.to === s);
         if (!legal.length) return;
-        this.apply({ from: this.sel, to: s, promotion: legal[0].promotion ? 'q' : undefined });
+        const from = this.sel;
         this.sel = null;
+        if (legal[0].promotion) {
+            this.busy = true;
+            const id = this.gameId;
+            void this.board.choosePromotion(this.user).then((piece) => {
+                if (id !== this.gameId) return;
+                this.busy = false;
+                if (this.over) return; // resigned while choosing
+                if (piece) this.playerMove(from, s, piece);
+                else this.board.mark({ sel: null, dots: [] });
+            });
+            return;
+        }
+        this.playerMove(from, s);
+    }
+
+    private playerMove(from: Square, to: Square, promotion?: string): void {
+        this.apply({ from, to, promotion });
         SFX.move();
         this.status('', '');
         if (!this.end()) this.botMove();

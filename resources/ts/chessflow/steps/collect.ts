@@ -29,6 +29,7 @@ export function collect(st: CollectStep, c: StepContext): void {
         fin = false;
         draw();
         c.status('', '');
+        b.draggable((i) => !fin && i === k);
         b.on((i) => {
             if (fin) return;
             const list = b.all().map((p) => ({ c: p.c, t: p.t, sq: p.sq }));

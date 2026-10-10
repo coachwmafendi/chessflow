@@ -81,12 +81,25 @@ export function puzzle(st: PuzzleStep, c: StepContext): void {
         const legal = g.moves({ square: sel, verbose: true }).filter((m) => m.to === square);
         if (!legal.length) return;
 
-        let promotion: string | undefined;
+        const from = legal[0].from;
         if (legal[0].promotion) {
-            const expected = st.line && st.line[ply];
-            promotion = expected && expected.length === 5 ? expected[4] : 'q';
+            // The player picks the piece; the puzzle line decides whether it was the right one.
+            busy = true;
+            void b.choosePromotion(user).then((piece) => {
+                busy = false;
+                if (piece) attempt(from, square, i, piece);
+                else {
+                    sel = null;
+                    b.mark({ sel: null, dots: [] });
+                }
+            });
+            return;
         }
-        const res = g.move({ from: legal[0].from, to: square, promotion });
+        attempt(from, square, i);
+    });
+
+    function attempt(from: Square, square: Square, i: number, promotion?: string): void {
+        const res = g.move({ from, to: square, promotion });
         b.applyMove(res);
         b.mark({ sel: null, dots: [], ring: [] });
         b.arrows([]);
@@ -153,5 +166,7 @@ export function puzzle(st: PuzzleStep, c: StepContext): void {
                 if (wrong >= 2) hint();
             }, 950);
         }
-    });
+    }
+
+    b.draggable((i) => !busy && g.turn() === user && g.get(nm(i) as Square)?.color === user);
 }

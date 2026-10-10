@@ -118,4 +118,75 @@ describe('Board', () => {
         b.setFen('4k3/8/8/8/8/8/8/R3K3 w - - 0 1');
         expect(root.querySelectorAll('.sq.last, .sq.check').length).toBe(0);
     });
+    // jsdom has no layout: give the grid an 800x800 box at (0,0), so each square is 100px.
+    const sized = (b: ReturnType<typeof createBoard>) => {
+        const grid = root.querySelector('.grid') as HTMLElement;
+        grid.getBoundingClientRect = () => ({ left: 0, top: 0, width: 800, height: 800, right: 800, bottom: 800, x: 0, y: 0, toJSON: () => ({}) }) as DOMRect;
+        return { b, grid };
+    };
+    const pointer = (el: Element, type: string, x: number, y: number) => {
+        const e = new MouseEvent(type, { bubbles: true, clientX: x, clientY: y, button: 0 });
+        Object.defineProperty(e, 'pointerId', { value: 1 });
+        el.dispatchEvent(e);
+    };
+    // Centre of a square for White's orientation: file a..h → x, rank 8..1 → y.
+    const at = (name: string): [number, number] => [(name.charCodeAt(0) - 97) * 100 + 50, (8 - Number(name[1])) * 100 + 50];
+
+    it('reports a drag from A to B as a tap on A then a tap on B', () => {
+        const { b, grid } = sized(createBoard(root));
+        b.set([{ c: 'w', t: 'N', sq: sq('g1') }]);
+        const taps: number[] = [];
+        b.on((i) => taps.push(i));
+        b.draggable(() => true);
+
+        const sqEl = root.querySelector(`[data-sq="${sq('g1')}"]`) as HTMLElement;
+        pointer(sqEl, 'pointerdown', ...at('g1'));
+        pointer(grid, 'pointermove', ...at('g2'));
+        pointer(grid, 'pointermove', ...at('f3'));
+        expect(root.querySelector('.piece.dragging')).not.toBeNull();
+        expect(cls('f3').contains('drag-over')).toBe(true);
+        pointer(grid, 'pointerup', ...at('f3'));
+
+        expect(taps).toEqual([sq('g1'), sq('f3')]);
+        expect(root.querySelector('.piece.dragging')).toBeNull();
+    });
+
+    it('leaves taps alone and only drags when enabled for that piece', () => {
+        const { b, grid } = sized(createBoard(root));
+        b.set([{ c: 'w', t: 'N', sq: sq('g1') }, { c: 'b', t: 'P', sq: sq('e5') }]);
+        const taps: number[] = [];
+        b.on((i) => taps.push(i));
+
+        const g1 = root.querySelector(`[data-sq="${sq('g1')}"]`) as HTMLElement;
+        pointer(g1, 'pointerdown', ...at('g1'));
+        pointer(grid, 'pointermove', ...at('f3'));
+        pointer(grid, 'pointerup', ...at('f3'));
+        expect(taps).toEqual([]); // dragging is off by default
+
+        b.draggable((i) => i === sq('g1'));
+        const e5 = root.querySelector(`[data-sq="${sq('e5')}"]`) as HTMLElement;
+        pointer(e5, 'pointerdown', ...at('e5'));
+        pointer(grid, 'pointermove', ...at('e4'));
+        pointer(grid, 'pointerup', ...at('e4'));
+        expect(taps).toEqual([]); // not a draggable piece
+
+        pointer(g1, 'pointerdown', ...at('g1'));
+        pointer(g1, 'pointerup', ...at('g1')); // no movement: stays a tap (the click event)
+        expect(taps).toEqual([]);
+    });
+
+    it('asks which piece to promote to, and can be cancelled', async () => {
+        const b = createBoard(root);
+        const first = b.choosePromotion('w');
+        const opts = [...root.querySelectorAll<HTMLElement>('.promo [data-p]')];
+        expect(opts.map((o) => o.textContent)).toEqual(['Menteri', 'Tir', 'Gajah', 'Kuda']);
+        expect(root.querySelector('.promo .pc.wN')).not.toBeNull();
+        opts[3].click();
+        await expect(first).resolves.toBe('n');
+        expect(root.querySelector('.promo')).toBeNull();
+
+        const second = b.choosePromotion('b');
+        document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+        await expect(second).resolves.toBeNull();
+    });
 });

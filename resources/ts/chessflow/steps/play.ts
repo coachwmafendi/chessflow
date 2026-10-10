@@ -13,6 +13,7 @@ export function play(st: PlayStep, c: StepContext): void {
     let n = 0;
     let over = false;
     let sel: Square | null = null;
+    let picking = false;
 
     const cnt = () => c.counter('Langkah: ' + n + '/' + st.maxMoves);
     const fail = (msg: string) => {
@@ -24,7 +25,7 @@ export function play(st: PlayStep, c: StepContext): void {
     const userPawns = () => g.board().flat().filter((x) => x && x.color === user && x.type === 'p').length;
 
     function onTap(i: number): void {
-        if (over || g.turn() !== user) return;
+        if (over || picking || g.turn() !== user) return;
         const square = nm(i) as Square;
         const p = g.get(square);
         if (p && p.color === user) {
@@ -36,7 +37,22 @@ export function play(st: PlayStep, c: StepContext): void {
         const legal = g.moves({ square: sel, verbose: true }).filter((m) => m.to === square);
         if (!legal.length) return;
 
-        const res = g.move({ from: sel, to: square, promotion: legal[0].promotion ? 'q' : undefined });
+        const from = sel;
+        if (legal[0].promotion) {
+            picking = true;
+            void b.choosePromotion(user).then((p) => {
+                picking = false;
+                if (p) move(from, square, p);
+                else b.mark({ sel: null, dots: [] });
+            });
+            sel = null;
+            return;
+        }
+        move(from, square);
+    }
+
+    function move(from: Square, square: Square, promotion?: string): void {
+        const res = g.move({ from, to: square, promotion });
         b.applyMove(res);
         b.mark({ sel: null, dots: [] });
         sel = null;
@@ -86,6 +102,7 @@ export function play(st: PlayStep, c: StepContext): void {
         cnt();
         c.status('', '');
         b.on(onTap);
+        b.draggable((i) => !over && !picking && g.turn() === user && g.get(nm(i) as Square)?.color === user);
     };
 
     c.actions([{ label: 'Cuba lagi', fn: reset }]);

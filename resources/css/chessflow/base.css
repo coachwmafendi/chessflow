@@ -178,3 +178,17 @@ kbd{font-family:var(--body);font-weight:600;background:var(--accent-soft);paddin
 .ghost.danger:hover{border-color:var(--coral);background:var(--coral-soft)}
 .qico.resign-ico{background:var(--coral-soft)}
 .qico.resign-ico svg{fill:none;color:var(--coral)}
+/* drag and drop + promotion picker (core/board.ts) */
+.board.can-drag .grid{touch-action:none}
+.board.is-dragging,.board.is-dragging .sq{cursor:grabbing}
+.piece.dragging{transition:none!important;z-index:5;scale:1.15;filter:drop-shadow(0 10px 8px rgba(0,0,0,.35))}
+.sq.drag-over{box-shadow:inset 0 0 0 4px color-mix(in srgb,var(--ink) 35%,transparent)}
+.promo{position:absolute;inset:0;z-index:10;display:grid;place-items:center;background:color-mix(in srgb,var(--ink) 40%,transparent)}
+.promo-card{background:var(--surface);border-radius:18px;padding:14px;display:flex;flex-direction:column;align-items:center;gap:10px;box-shadow:0 20px 40px -12px rgba(0,0,0,.45)}
+.promo-card b{font-family:var(--display);font-size:20px}
+.promo-opts{display:flex;gap:8px}
+.promo-opts button{display:flex;flex-direction:column;align-items:center;gap:2px;background:var(--bg);border:2px solid var(--line);border-radius:14px;padding:8px 6px 6px;width:76px;font-size:13px;font-weight:600}
+.promo-opts button:hover,.promo-opts button:focus-visible{border-color:var(--accent);background:var(--accent-soft)}
+.promo-opts i.pc{width:56px;height:56px;display:block}
+.promo-cancel{background:none;border:0;color:var(--muted);font-size:14px;text-decoration:underline}
+@media (max-width:420px){.promo-opts button{width:62px}.promo-opts i.pc{width:44px;height:44px}}

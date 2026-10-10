@@ -229,4 +229,11 @@ export interface BoardApi {
     flash(i: number): void;
     arrows(list: (ArrowSpec | ArrowDrawSpec)[]): void;
     on(fn: (sq: number) => void): void;
+    /**
+     * Let the player drag pieces for which `canDrag(square)` is true; null turns dragging off.
+     * A drag from A to B is reported to on() as a tap on A then a tap on B, so steps keep their tap logic.
+     */
+    draggable(canDrag: ((sq: number) => boolean) | null): void;
+    /** Ask which piece a pawn becomes; resolves null if the player backs out. */
+    choosePromotion(color: 'w' | 'b'): Promise<'q' | 'r' | 'b' | 'n' | null>;
 }

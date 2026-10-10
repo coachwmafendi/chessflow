@@ -1,4 +1,5 @@
 import type { ArrowDrawSpec, ArrowSpec, BoardApi, MarkPatch, Piece } from '../types';
+import { PNAME } from './names';
 import { expandSq, fenList, nm, sq } from './squares';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
@@ -61,6 +62,82 @@ export function createBoard(root: HTMLElement, orient: 'w' | 'b' = 'w'): BoardAp
         const b = (e.target as HTMLElement).closest('.sq') as HTMLElement | null;
         if (b && handler) handler(+(b.dataset.sq as string));
     });
+
+    // ---- drag and drop (pointer events: mouse, pen and touch) ----
+    let canDrag: ((sq: number) => boolean) | null = null;
+    let drag: { from: number; piece: TrackedPiece; x: number; y: number; id: number; moving: boolean } | null = null;
+    let over = -1;
+
+    const squareAt = (clientX: number, clientY: number): number => {
+        const r = grid.getBoundingClientRect();
+        const col = Math.floor(((clientX - r.left) / r.width) * 8);
+        const row = Math.floor(((clientY - r.top) / r.height) * 8);
+        if (col < 0 || col > 7 || row < 0 || row > 7) return -1;
+        return o === 'w' ? (7 - row) * 8 + col : row * 8 + (7 - col);
+    };
+    const follow = (el: HTMLElement, clientX: number, clientY: number) => {
+        const r = grid.getBoundingClientRect();
+        const x = ((clientX - r.left) / r.width) * 8 - 0.5;
+        const y = ((clientY - r.top) / r.height) * 8 - 0.5;
+        el.style.transform = 'translate(' + x * 100 + '%,' + y * 100 + '%)';
+    };
+    const setOver = (i: number) => {
+        if (over === i) return;
+        if (over >= 0) els[over]?.classList.remove('drag-over');
+        over = i;
+        if (i >= 0) els[i]?.classList.add('drag-over');
+    };
+    const endDrag = () => {
+        if (!drag) return;
+        drag.piece.el.classList.remove('dragging');
+        setOver(-1);
+        wrap.classList.remove('is-dragging');
+        drag = null;
+    };
+
+    grid.addEventListener('pointerdown', (e) => {
+        if (!canDrag || e.button !== 0 || drag) return;
+        const b = (e.target as HTMLElement).closest('.sq') as HTMLElement | null;
+        if (!b) return;
+        const from = +(b.dataset.sq as string);
+        const piece = api.at(from);
+        if (!piece || !canDrag(from)) return;
+        // No pointer capture yet: a plain tap must still reach the square as a click.
+        drag = { from, piece, x: e.clientX, y: e.clientY, id: e.pointerId, moving: false };
+    });
+    grid.addEventListener('pointermove', (e) => {
+        if (!drag || e.pointerId !== drag.id) return;
+        if (!drag.moving) {
+            // A few pixels of slack so a tap stays a tap.
+            if (Math.hypot(e.clientX - drag.x, e.clientY - drag.y) < 6) return;
+            drag.moving = true;
+            grid.setPointerCapture?.(e.pointerId);
+            drag.piece.el.classList.add('dragging');
+            wrap.classList.add('is-dragging');
+            handler?.(drag.from); // same as tapping the piece: the step selects it and shows its moves
+        }
+        follow(drag.piece.el, e.clientX, e.clientY);
+        setOver(squareAt(e.clientX, e.clientY));
+    });
+    const drop = (e: PointerEvent, cancelled: boolean) => {
+        if (!drag || e.pointerId !== drag.id) return;
+        const { from, piece, moving } = drag;
+        endDrag();
+        if (!moving) return; // a plain tap: the click event handles it
+        const to = cancelled ? -1 : squareAt(e.clientX, e.clientY);
+        if (to >= 0 && to !== from) {
+            // Land where it was dropped, then let the step decide; an illegal move slides back.
+            piece.el.style.transition = 'none';
+            place(piece.el, to);
+            void piece.el.offsetWidth;
+            piece.el.style.transition = '';
+            handler?.(to);
+        }
+        // Not moved by the step: slide back, unless it is waiting for the promotion choice on the target.
+        if (pieces.get(piece.id)?.sq === from && !wrap.querySelector('.promo')) place(piece.el, from);
+    };
+    grid.addEventListener('pointerup', (e) => drop(e, false));
+    grid.addEventListener('pointercancel', (e) => drop(e, true));
 
     const place = (el: HTMLElement, i: number) => {
         const [x, y] = pos(i);
@@ -230,6 +307,45 @@ export function createBoard(root: HTMLElement, orient: 'w' | 'b' = 'w'): BoardAp
         },
         on(fn) {
             handler = fn;
+        },
+        draggable(fn) {
+            canDrag = fn;
+            wrap.classList.toggle('can-drag', fn !== null);
+            if (!fn) endDrag();
+        },
+        choosePromotion(color) {
+            wrap.querySelector('.promo')?.remove();
+            return new Promise((resolve) => {
+                const box = document.createElement('div');
+                box.className = 'promo';
+                box.setAttribute('role', 'dialog');
+                box.setAttribute('aria-label', 'Pilih buah untuk promosi');
+                box.innerHTML =
+                    '<div class="promo-card"><b>Bidak jadi apa?</b><div class="promo-opts">' +
+                    (['Q', 'R', 'B', 'N'] as const)
+                        .map((t) => '<button type="button" data-p="' + t.toLowerCase() + '"><i class="pc ' + color + t + '"></i><span>' + PNAME[t] + '</span></button>')
+                        .join('') +
+                    '</div><button type="button" class="promo-cancel">Batal</button></div>';
+                const done = (choice: 'q' | 'r' | 'b' | 'n' | null) => {
+                    document.removeEventListener('keydown', onKey);
+                    box.remove();
+                    // Cancelled: a pawn dropped on the last rank goes back where it really is.
+                    if (!choice) pieces.forEach((p) => place(p.el, p.sq));
+                    resolve(choice);
+                };
+                const onKey = (e: KeyboardEvent) => {
+                    if (e.key === 'Escape') done(null);
+                };
+                box.addEventListener('click', (e) => {
+                    const t = e.target as HTMLElement;
+                    const opt = t.closest<HTMLElement>('[data-p]');
+                    if (opt) done(opt.dataset.p as 'q' | 'r' | 'b' | 'n');
+                    else if (t === box || t.closest('.promo-cancel')) done(null);
+                });
+                document.addEventListener('keydown', onKey);
+                wrap.appendChild(box);
+                box.querySelector<HTMLElement>('[data-p="q"]')?.focus();
+            });
         },
     };
     return api;
