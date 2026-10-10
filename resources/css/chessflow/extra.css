@@ -149,3 +149,11 @@
 .new-badges .badge-medal i.pc{width:26px;height:26px}
 .new-badges .badge-medal svg,.new-badges .badge-medal .star-ico{width:20px;height:20px}
 .new-badges .badge-glyph{font-size:14px}
+/* legal pages and consent notes */
+.legal .legal-meta{color:var(--muted);font-size:14px}
+.legal h3{font-size:18px;margin-block:14px 6px}
+.legal hr{border:0;border-top:1px dashed var(--line);margin-block:32px}
+.legal section[lang="en"] p{font-size:15px}
+.consent{width:100%;font-size:13px;color:var(--muted);margin:2px 0 0}
+.consent a{color:var(--accent)}
+.legal-address{font-style:normal;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 14px;line-height:1.5;max-width:420px}

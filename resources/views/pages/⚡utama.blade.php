@@ -61,6 +61,7 @@ new #[Layout('layouts::chessflow')] #[Title('Belajar catur dalam Bahasa Melayu')
                 <a class="lp-btn" href="{{ route('login') }}">Guru atau ibu bapa</a>
             </div>
             <ul class="lp-trust">
+                <li><i class="lp-tick" aria-hidden="true"></i>Percuma untuk tempoh terhad</li>
                 <li><i class="lp-tick" aria-hidden="true"></i>Murid tidak perlu e-mel</li>
                 <li><i class="lp-tick" aria-hidden="true"></i>Terus dalam pelayar web</li>
                 <li><i class="lp-tick" aria-hidden="true"></i>100% Bahasa Melayu</li>
@@ -297,9 +298,10 @@ new #[Layout('layouts::chessflow')] #[Title('Belajar catur dalam Bahasa Melayu')
         <div class="lp-privacy-in">
             <div>
                 <small>Privasi kanak-kanak</small>
-                <h2>Data minimum. Tiada e-mel. Tiada iklan.</h2>
+                <h2>Data minimum. Tiada e-mel murid. Tiada iklan.</h2>
+                <p class="lp-fine">Tiada iklan untuk tempoh terhad.</p>
                 <p>Kami hanya simpan apa yang perlu untuk pembelajaran. Kemajuan murid hanya dilihat oleh murid itu, guru kelasnya dan ibu bapa yang dipautkan.</p>
-                <a class="lp-link" href="{{ route('tentang') }}#privasi">Baca dasar privasi →</a>
+                <a class="lp-link" href="{{ route('privasi') }}">Baca dasar privasi (PDPA 2010) →</a>
             </div>
             <ul>
                 <li><b>Tanpa e-mel</b><span>Murid masuk dengan nama pengguna dan PIN.</span></li>
@@ -317,6 +319,10 @@ new #[Layout('layouts::chessflow')] #[Title('Belajar catur dalam Bahasa Melayu')
             <p>Tak jumpa jawapan? E-mel kami di <a href="mailto:{{ $email }}">{{ $email }}</a>.</p>
         </header>
         <div class="lp-faq">
+            <details>
+                <summary>Berapa kos?</summary>
+                <p>ChessFlow <b>percuma untuk tempoh terhad</b>. Jika kami memperkenalkan bayaran, ibu bapa dan guru akan dimaklumkan terlebih dahulu, dan tiada caj tanpa persetujuan anda. Lihat <a href="{{ route('terma') }}#harga">Terma Penggunaan</a>.</p>
+            </details>
             <details>
                 <summary>Siapa yang sesuai guna ChessFlow?</summary>
                 <p>Kanak-kanak sekolah rendah dan sesiapa sahaja yang baru belajar catur. Tahap 1 bermula dari kenal papan, jadi tiada pengalaman diperlukan.</p>
@@ -373,7 +379,8 @@ new #[Layout('layouts::chessflow')] #[Title('Belajar catur dalam Bahasa Melayu')
                 <li><a href="#laluan">Laluan pembelajaran</a></li>
                 <li><a href="#ciri">Ciri-ciri</a></li>
                 <li><a href="{{ route('tentang') }}">Tentang ChessFlow</a></li>
-                <li><a href="{{ route('tentang') }}#privasi">Privasi</a></li>
+                <li><a href="{{ route('privasi') }}">Dasar privasi</a></li>
+                <li><a href="{{ route('terma') }}">Terma penggunaan</a></li>
                 <li><a href="{{ route('tentang') }}#lesen">Perisian dan lesen</a></li>
             </ul>
         </div>
@@ -394,6 +401,6 @@ new #[Layout('layouts::chessflow')] #[Title('Belajar catur dalam Bahasa Melayu')
             </form>
             @error('certCode') <p class="lp-err">{{ $message }}</p> @enderror
         </div>
-        <p class="lp-legal">© {{ now()->year }} ChessFlow · Belajar catur dalam Bahasa Melayu untuk kanak-kanak dan pemula</p>
+        <p class="lp-legal">© {{ now()->year }} ChessFlow · WM AFENDI ENTERPRISE · Belajar catur dalam Bahasa Melayu untuk kanak-kanak dan pemula</p>
     </section>
 </div>

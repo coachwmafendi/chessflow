@@ -1,6 +1,7 @@
 <?php
 
 use App\Concerns\ProfileValidationRules;
+use App\Support\UserDataExport;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Flux\Flux;
 use Illuminate\Support\Facades\Auth;
@@ -62,6 +63,12 @@ new #[Title('Tetapan profil')] class extends Component {
         Session::flash('status', 'verification-link-sent');
     }
 
+    /** A copy of everything held about this account, as JSON (PDPA access / portability). */
+    public function downloadMyData(UserDataExport $export)
+    {
+        return $export->download(Auth::user());
+    }
+
     #[Computed]
     public function hasUnverifiedEmail(): bool
     {
@@ -116,6 +123,12 @@ new #[Title('Tetapan profil')] class extends Component {
 
             </div>
         </form>
+
+        <section class="mt-10 space-y-3">
+            <flux:heading>Data peribadi anda</flux:heading>
+            <flux:subheading>Muat turun salinan semua data akaun ini dalam format JSON, seperti dalam <flux:link :href="route('privasi')">Dasar Privasi</flux:link>.</flux:subheading>
+            <flux:button wire:click="downloadMyData" icon="arrow-down-tray" data-test="download-my-data">Muat turun data saya</flux:button>
+        </section>
 
         @if ($this->showDeleteUser)
             <livewire:pages::settings.delete-user-form />

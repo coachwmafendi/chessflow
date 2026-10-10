@@ -76,8 +76,8 @@
             </main>
 
             <footer class="foot">
-                <span>ChessFlow · Belajar catur dalam Bahasa Melayu untuk kanak-kanak dan pemula</span>
-                <span class="foot-r"><a href="{{ route('tentang') }}">Tentang, privasi dan lesen</a></span>
+                <span>© {{ now()->year }} ChessFlow · WM AFENDI ENTERPRISE · Belajar catur dalam Bahasa Melayu untuk kanak-kanak dan pemula</span>
+                <span class="foot-r"><a href="{{ route('tentang') }}">Tentang</a><a href="{{ route('privasi') }}">Privasi</a><a href="{{ route('terma') }}">Terma</a></span>
             </footer>
         </div>
     </body>

@@ -222,3 +222,19 @@ it('applies the saved colour theme before paint and offers a theme toggle', func
         ->assertSee("localStorage.getItem('flux.appearance')", false)
         ->assertSee('data-theme-toggle', false);
 });
+
+it('publishes the privacy notice in Malay and English, and the terms', function () {
+    $this->get(route('privasi'))
+        ->assertOk()
+        ->assertSee('Akta Perlindungan Data Peribadi 2010')
+        ->assertSee('Privacy Notice (English)')
+        ->assertSee('mailto:wmafendi@gmail.com', false);
+
+    $this->get(route('terma'))->assertOk()->assertSee('percuma dan tanpa iklan untuk tempoh terhad', false)->assertSee('WM AFENDI ENTERPRISE');
+    $this->get('/sitemap.xml')->assertSee('<loc>'.route('privasi').'</loc>', false);
+});
+
+it('tells people about the terms and privacy where accounts are made, and the price on the landing page', function () {
+    $this->get(route('register'))->assertSee(route('privasi'), false)->assertSee(route('terma'), false);
+    $this->get(route('home'))->assertSee('Percuma untuk tempoh terhad')->assertSee('Berapa kos?');
+});

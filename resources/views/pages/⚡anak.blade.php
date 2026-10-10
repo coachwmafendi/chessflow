@@ -1,11 +1,13 @@
 <?php
 
 use App\Actions\CreateStudents;
+use App\Actions\DeleteStudent;
 use App\Actions\ResetStudentPin;
 use App\Enums\Role;
 use App\Models\User;
 use App\Support\Curriculum;
 use App\Support\ProgressReport;
+use App\Support\UserDataExport;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
@@ -22,6 +24,8 @@ new #[Layout('layouts::chessflow')] #[Title('Anak saya')] class extends Componen
     public string $pin = '';
 
     public array $credentials = [];
+
+    public ?string $notice = null;
 
     public function createChild(CreateStudents $create): void
     {
@@ -66,11 +70,35 @@ new #[Layout('layouts::chessflow')] #[Title('Anak saya')] class extends Componen
         auth()->user()->students()->detach($childId);
     }
 
+    /** A copy of everything held about the child, as JSON (PDPA access / portability). */
+    public function exportChild(int $childId, UserDataExport $export)
+    {
+        return $export->download(auth()->user()->students()->findOrFail($childId));
+    }
+
+    /** Parents may delete their child's account and all its data (PDPA). */
+    public function deleteChild(int $childId, DeleteStudent $delete): void
+    {
+        $child = auth()->user()->students()->findOrFail($childId);
+        $delete->handle(auth()->user(), $child);
+        $this->credentials = [];
+        $this->notice = 'Akaun '.$child->name.' dan semua datanya telah dipadam.';
+    }
+
+    /** Typed confirmation (wire:confirm.prompt): deleting cannot be undone. */
+    private function deleteConfirm(User $student): string
+    {
+        return e('Padam akaun '.$student->name.' selama-lamanya? Semua kemajuan, sijil, lencana dan permainan akan hilang dan tidak boleh dipulihkan. Taip PADAM untuk sahkan.').'|PADAM';
+    }
+
     public function actionsHtml(User $child): string
     {
         return '<button class="ghost" type="button" wire:click="resetPin('.$child->id.')">PIN baru</button> '
             .'<button class="ghost" type="button" wire:click="unlink('.$child->id.')" wire:confirm="'
-            .e('Buang pautan dengan '.$child->name.'? Akaun anak tidak dipadam.').'">Buang pautan</button>';
+            .e('Buang pautan dengan '.$child->name.'? Akaun anak tidak dipadam.').'">Buang pautan</button> '
+            .'<button class="ghost" type="button" wire:click="exportChild('.$child->id.')">Muat turun data</button> '
+            .'<button class="ghost danger" type="button" wire:click="deleteChild('.$child->id.')" wire:confirm.prompt="'
+            .$this->deleteConfirm($child).'">Padam akaun</button>';
     }
 
     public function with(): array
@@ -86,6 +114,10 @@ new #[Layout('layouts::chessflow')] #[Title('Anak saya')] class extends Componen
 
 <div>
     <div class="page-head"><h1>Anak saya</h1></div>
+
+    @if ($notice)
+        <p class="status good" wire:key="notice">{{ $notice }}</p>
+    @endif
 
     @if ($credentials)
         <section class="panel-card" wire:key="creds">
@@ -113,6 +145,7 @@ new #[Layout('layouts::chessflow')] #[Title('Anak saya')] class extends Componen
             <input type="text" wire:model="childName" placeholder="Nama panggilan anak" aria-label="Nama anak" maxlength="60">
             <button class="cta" type="submit">Cipta</button>
             @error('childName') <p class="err">{{ $message }}</p> @enderror
+            <p class="consent">Dengan mencipta akaun, anda mengesahkan anda ibu bapa atau penjaga kanak-kanak ini dan bersetuju dengan <a href="{{ route('privasi') }}">Dasar Privasi</a>. Hanya nama panggilan diperlukan.</p>
         </form>
     </section>
 

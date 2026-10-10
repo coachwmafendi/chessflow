@@ -54,6 +54,10 @@
                 viewable
             />
 
+            <p class="text-sm text-zinc-600 dark:text-zinc-400">
+                Dengan mendaftar, anda bersetuju dengan <flux:link :href="route('terma')">Terma Penggunaan</flux:link> dan <flux:link :href="route('privasi')">Dasar Privasi</flux:link> ChessFlow (Akta Perlindungan Data Peribadi 2010).
+            </p>
+
             <div class="flex items-center justify-end">
                 <flux:button type="submit" variant="primary" class="w-full" data-test="register-user-button">
                     {{ __('Create account') }}

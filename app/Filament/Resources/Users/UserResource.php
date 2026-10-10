@@ -5,7 +5,9 @@ namespace App\Filament\Resources\Users;
 use App\Enums\Role;
 use App\Filament\Resources\Users\Pages\ManageUsers;
 use App\Models\User;
+use App\Support\UserDataExport;
 use BackedEnum;
+use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
@@ -73,6 +75,9 @@ class UserResource extends Resource
             ])
             ->recordActions([
                 EditAction::make(),
+                // For PDPA access requests sent by email.
+                Action::make('exportData')->label('Eksport data')->icon(Heroicon::OutlinedArrowDownTray)->color('gray')
+                    ->action(fn (User $record) => app(UserDataExport::class)->download($record)),
                 DeleteAction::make()->hidden(fn (User $record) => $record->is(auth()->user())),
             ]);
     }

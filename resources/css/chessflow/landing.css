@@ -272,3 +272,4 @@ body:has(.lp) { overflow-x: clip; }
 /* the landing has its own links section, so the layout footer is dropped here */
 .app:has(.lp) > .foot { display: none; }
 .lp-legal { grid-column: 1 / -1; margin-top: 16px !important; padding-top: 16px; border-top: 1px dashed var(--line); font-size: 13px; color: var(--muted); }
+.lp-privacy .lp-fine{margin:6px 0 0;font-size:13px;opacity:.8}
