@@ -6,6 +6,7 @@
     "32 pelajaran": "32 lessons",
     ":count/:total dikumpul": ":count/:total collected",
     ":done/:total pelajaran": ":done/:total lessons",
+    ":have/:max bintang": ":have/:max stars",
     ":lesson, terkunci": ":lesson, locked",
     ":n langkah · :xp XP": ":n steps · :xp XP",
     ":n latihan untuk hari ini": ":n practice items for today",

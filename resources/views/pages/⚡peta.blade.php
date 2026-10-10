@@ -66,7 +66,8 @@ new #[Layout('layouts::chessflow')] #[Title('Peta')] class extends Component {
     $zi = 0;
 @endphp
 
-<div>
+{{-- data-map-store: where this student's open/closed levels are remembered on the device (core/map-levels.ts). --}}
+<div data-map-store="chessflow-map:{{ auth()->id() }}">
     <section class="hero">
         <div class="avatar"><i class="pc pk"></i></div>
         <div>
@@ -158,12 +159,34 @@ new #[Layout('layouts::chessflow')] #[Title('Peta')] class extends Component {
             $levelStops = $stops->get($level->id, collect());
         @endphp
         @continue($levelStops->isEmpty())
-        <section class="tahap">
-            <div class="tahap-head">
+        @php
+            // Smart default: finished and not-yet-reached levels fold away, the level being worked on stays open.
+            // Staff see every lesson unlocked, so nothing is "locked" for them and every level opens.
+            $doneN = $levelStops->where('done', true)->count();
+            $allDone = $doneN === $levelStops->count();
+            $allLocked = $levelStops->every(fn (array $s) => $s['locked']);
+            $state = $allDone ? 'done' : ($allLocked ? 'locked' : 'current');
+            $starStops = $levelStops->reject(fn (array $s) => $s['lesson']->isExam());
+            $starsHave = $starStops->sum('stars');
+            $starsMax = $starStops->count() * 3;
+            $preview = $starStops->first()['lesson'] ?? null;
+        @endphp
+        <details class="tahap tahap-{{ $state }}" data-level="{{ $level->number }}" @if ($state === 'current') open @endif>
+            <summary class="tahap-head">
                 <small>{{ __('Tahap :n', ['n' => $level->number]) }}</small>
                 <h2>{{ $level->name }}</h2>
-                <span>{{ $level->note }} · {{ $levelStops->where('done', true)->count() }}/{{ $levelStops->count() }}</span>
-            </div>
+                <span>{{ $level->note }} · {{ $doneN }}/{{ $levelStops->count() }}</span>
+                <span class="tahap-chip">
+                    @if ($state === 'done')
+                        <span class="tahap-badge done">{{ __('Siap') }}</span>
+                        @if ($starsMax)<span class="tahap-stars"><i class="star-ico" aria-hidden="true"></i>{{ __(':have/:max bintang', ['have' => $starsHave, 'max' => $starsMax]) }}</span>@endif
+                    @elseif ($state === 'locked')
+                        @if ($preview)<i class="pc {{ $preview->icon }} tahap-preview" aria-hidden="true"></i>@endif
+                        <span class="tahap-badge locked"><x-chessflow.lock />{{ __('Terkunci') }}</span>
+                    @endif
+                    <span class="tahap-toggle" aria-hidden="true"></span>
+                </span>
+            </summary>
             <div class="path">
                 @foreach ($levelStops as $s)
                     @php
@@ -196,6 +219,6 @@ new #[Layout('layouts::chessflow')] #[Title('Peta')] class extends Component {
                     </div>
                 @endforeach
             </div>
-        </section>
+        </details>
     @endforeach
 </div>

@@ -4,6 +4,7 @@ import { destroySharedEngine } from './engine/stockfish';
 import { isSoundOn, setSoundOn, SFX } from './core/sound';
 import { THEME_KEY, THEME_LABEL, applyTheme, getTheme, nextTheme, setTheme } from './core/theme';
 import { ICONS } from './core/toolbar-icons';
+import { initMapLevels } from './core/map-levels';
 import type { Lesson, ServerLessonResult } from './types';
 import type { NewBadge } from './core/badges';
 import { t } from './i18n';
@@ -114,10 +115,12 @@ document.addEventListener('click', (e) => {
 mountAll();
 syncSoundButtons();
 syncThemeButtons();
+initMapLevels();
 document.addEventListener('livewire:navigated', () => {
     applyTheme(getTheme());
     mountAll();
     syncSoundButtons();
     syncThemeButtons();
+    initMapLevels();
 });
 document.addEventListener('livewire:navigating', unmountAll);

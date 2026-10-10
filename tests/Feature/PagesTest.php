@@ -2,6 +2,7 @@
 
 use App\Models\Certificate;
 use App\Models\Lesson;
+use App\Models\LessonProgress;
 use App\Models\User;
 use Database\Seeders\LessonSeeder;
 use Livewire\Livewire;
@@ -252,4 +253,25 @@ it('introduces each piece with its English name in the lessons', function () {
     foreach (['kuda' => 'Knight', 'gajah' => 'Bishop', 'tir' => 'Rook', 'bidak' => 'Pawn'] as $slug => $english) {
         expect(Lesson::where('slug', $slug)->firstOrFail()->steps[0]['say'])->toContain('<i>'.$english.'</i>');
     }
+});
+
+it('folds finished and locked levels on the map and keeps the current one open', function () {
+    $levelOne = Lesson::where('slug', 'papan')->firstOrFail()->level_id;
+    Lesson::where('level_id', $levelOne)->get()->each(function (Lesson $l) {
+        LessonProgress::create(['user_id' => $this->student->id, 'lesson_id' => $l->id, 'best_stars' => 3, 'last_stars' => 3, 'mistakes' => 0, 'attempts' => 1, 'completed_at' => now()]);
+    });
+
+    $html = $this->actingAs($this->student)->get(route('peta'))->assertOk()->getContent();
+
+    expect($html)->toMatch('/<details class="tahap tahap-done" data-level="1"\s*>/')   // finished: folded
+        ->toMatch('/<details class="tahap tahap-current" data-level="2"\s+open\s*>/')      // being worked on: open
+        ->toMatch('/<details class="tahap tahap-locked" data-level="3"\s*>/')           // not reached: folded
+        ->toContain('data-map-store="chessflow-map:'.$this->student->id.'"');
+});
+
+it('opens every level for staff, who have every lesson unlocked', function () {
+    $teacher = User::factory()->teacher()->create();
+    $html = $this->actingAs($teacher)->get(route('peta'))->getContent();
+
+    expect(substr_count($html, 'class="tahap tahap-current"'))->toBe(5);
 });

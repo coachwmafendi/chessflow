@@ -178,3 +178,22 @@
 .tb-ico{width:20px;height:20px;display:block}
 .icon-btn[data-tip]::after{content:attr(data-tip);position:absolute;top:calc(100% + 8px);right:0;z-index:30;white-space:nowrap;background:var(--ink);color:var(--bg);font-size:12px;font-weight:600;padding:5px 9px;border-radius:8px;pointer-events:none;opacity:0;transform:translateY(-3px);transition:opacity .15s,transform .15s}
 .icon-btn[data-tip]:hover::after,.icon-btn[data-tip]:focus-visible::after{opacity:1;transform:none}
+/* collapsible map levels (pages/⚡peta, core/map-levels.ts) */
+details.tahap > summary.tahap-head{list-style:none;cursor:pointer;border-radius:12px;padding-inline:6px;margin-inline:-6px}
+details.tahap > summary.tahap-head::-webkit-details-marker{display:none}
+details.tahap > summary.tahap-head:hover{background:color-mix(in srgb,var(--accent-soft) 60%,transparent)}
+details.tahap > summary.tahap-head:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+.tahap-chip{margin-left:auto;display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600}
+.tahap-badge{display:inline-flex;align-items:center;gap:4px;border-radius:99px;padding:3px 10px}
+.tahap-badge.done{background:var(--good-soft);color:var(--good)}
+.tahap-badge.locked{background:var(--bg);color:var(--muted);border:1px solid var(--line)}
+.tahap-badge.locked svg{width:13px;height:13px;fill:currentColor}
+.tahap-stars{display:inline-flex;align-items:center;gap:4px;color:var(--ink)}
+.tahap-stars .star-ico{width:16px;height:16px}
+.tahap-preview{width:28px;height:28px;display:block;opacity:.6;filter:grayscale(1)}
+.tahap-toggle{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:var(--surface);border:1px solid var(--line)}
+.tahap-toggle::before{content:"";width:8px;height:8px;border-right:2px solid var(--ink);border-bottom:2px solid var(--ink);transform:translateY(-2px) rotate(45deg);transition:transform .2s}
+details.tahap[open] .tahap-toggle::before{transform:translateY(2px) rotate(-135deg)}
+details.tahap:not([open]){margin-top:14px}
+details.tahap:not([open]) > summary.tahap-head{border-bottom-style:solid}
+@media (max-width:520px){.tahap-chip{margin-left:0;width:100%;justify-content:space-between}}
