@@ -18,6 +18,28 @@ describe('oppHasMate', () => {
     });
 });
 
+describe('evaluatePuzzleAcceptance — promotion piece', () => {
+    const st = { type: 'puzzle', title: 'Promosi!', fen: '8/1P2k3/8/8/8/8/8/4K3 w - - 0 1', line: ['b7b8q'] } as PuzzleStep;
+    const play = (promotion: string) => {
+        const g = new Chess(st.fen);
+        const m = g.move({ from: 'b7', to: 'b8', promotion });
+        return evaluatePuzzleAcceptance(st, 0, m, g);
+    };
+
+    it('accepts the piece the line asks for', () => expect(play('q')).toBe(true));
+    it('rejects another piece on the right square', () => {
+        expect(play('n')).toBe(false);
+        expect(play('r')).toBe(false);
+    });
+    it('reads a four-letter promoting line move as a queen', () => {
+        const short = { ...st, line: ['b7b8'] } as PuzzleStep;
+        const g = new Chess(st.fen);
+        expect(evaluatePuzzleAcceptance(short, 0, g.move({ from: 'b7', to: 'b8', promotion: 'q' }), g)).toBe(true);
+        const h = new Chess(st.fen);
+        expect(evaluatePuzzleAcceptance(short, 0, h.move({ from: 'b7', to: 'b8', promotion: 'b' }), h)).toBe(false);
+    });
+});
+
 describe('evaluatePuzzleAcceptance — line', () => {
     it('accepts the exact uci move at the current ply', () => {
         const g = new Chess();

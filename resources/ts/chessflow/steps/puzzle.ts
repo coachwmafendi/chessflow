@@ -26,7 +26,9 @@ export function oppHasMate(g: Chess): boolean {
 export function evaluatePuzzleAcceptance(st: PuzzleStep, ply: number, result: Move, game: Chess): boolean {
     if (st.line) {
         const expected = st.line[ply];
-        if (result.from + result.to === expected.slice(0, 4)) return true;
+        // The promotion piece counts too (a 4-letter line move that promotes means a queen).
+        const want = expected.length === 4 && result.promotion ? expected + 'q' : expected;
+        if (result.from + result.to + (result.promotion ?? '') === want) return true;
         if (st.alts && st.alts[ply] && st.alts[ply].includes(result.san)) return true;
         return ply === 0 && !!st.acceptSan && st.acceptSan.includes(result.san);
     }
@@ -151,10 +153,13 @@ export function puzzle(st: PuzzleStep, c: StepContext): void {
             c.mistake();
             SFX.bad();
             b.flash(i);
+            const rightSquareWrongPiece = !!res.promotion && !!st.line && st.line[ply]?.slice(0, 4) === res.from + res.to;
             c.status(
                 g.isStalemate()
                     ? 'Stalemate! Itu seri, bukan menang. Raja lawan mesti ada langkah atau kena sah mati.'
-                    : st.wrongMsg || 'Belum betul. Cuba lagi.',
+                    : rightSquareWrongPiece
+                      ? 'Hampir! Petak betul, tapi pilih buah lain untuk promosi.'
+                      : st.wrongMsg || 'Belum betul. Cuba lagi.',
                 'bad',
             );
             busy = true;

@@ -43,10 +43,13 @@ jobs:
       - name: Run CI Checks
         run: composer ci:check
 
-      # Click-through of every lesson in /dev/playground. Uses the Google Chrome
-      # preinstalled on the runner (playwright.config.ts: channel 'chrome'); assets
-      # come from the `npm run build` done by composer setup.
+      # Click-through of every lesson in /dev/playground, plus the feature specs
+      # (tests/e2e/features.spec.ts) that log in as accounts made by
+      # chessflow:e2e-fixtures, which needs the lessons in the database. Uses the
+      # Google Chrome preinstalled on the runner (playwright.config.ts: channel
+      # 'chrome'); assets come from the `npm run build` done by composer setup.
       - name: E2E (Playwright)
         run: |
           php artisan config:clear
+          php artisan chessflow:import-lessons
           npm run test:e2e

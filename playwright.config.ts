@@ -4,6 +4,8 @@ const PORT = 8123;
 
 export default defineConfig({
     testDir: 'tests/e2e',
+    // Fresh test accounts (student + teacher) for the feature specs.
+    globalSetup: './tests/e2e/global-setup.ts',
     timeout: 30_000,
     fullyParallel: true,
     reporter: 'list',
