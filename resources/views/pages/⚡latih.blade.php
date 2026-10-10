@@ -38,7 +38,7 @@ new #[Layout('layouts::chessflow')] #[Title('Latih semula')] class extends Compo
 
         $tooFast = now()->getTimestamp() - $this->startedAt < (int) config('chessflow.limits.min_seconds_per_step');
         if (! $item || $tooFast || ! ProgressGuard::allow($user, 'review')) {
-            $this->dispatch('lesson-result', xp: 0, passed: false, message: ProgressGuard::TOO_FAST, mapUrl: route('peta'));
+            $this->dispatch('lesson-result', xp: 0, passed: false, message: ProgressGuard::tooFastMessage(), mapUrl: route('peta'));
 
             return;
         }
@@ -71,10 +71,10 @@ new #[Layout('layouts::chessflow')] #[Title('Latih semula')] class extends Compo
             'id' => 'latih',
             'review' => true,
             'tahap' => $item->lesson->level->number,
-            'title' => 'Latih semula',
+            'title' => __('Latih semula'),
             'icon' => $item->lesson->icon,
             'steps' => [array_merge($step, [
-                'say' => 'Dari pelajaran <b>'.e($item->lesson->title).'</b>. Awak tersilap di sini sebelum ini, jom cuba lagi!<br>'.($step['say'] ?? ''),
+                'say' => __('Dari pelajaran :lesson. Awak tersilap di sini sebelum ini, jom cuba lagi!', ['lesson' => '<b>'.e($item->lesson->title).'</b>']).'<br>'.($step['say'] ?? ''),
             ])],
         ];
     }
@@ -86,15 +86,15 @@ new #[Layout('layouts::chessflow')] #[Title('Latih semula')] class extends Compo
 }; ?>
 
 <div>
-    <p class="no-print" style="margin-block: 8px 0"><a class="ghost" href="{{ route('peta') }}">← Peta</a></p>
+    <p class="no-print" style="margin-block: 8px 0"><a class="ghost" href="{{ route('peta') }}">{{ __('← Peta') }}</a></p>
     @if ($payload = $this->payload())
-        <p class="review-left">{{ $due }} latihan untuk hari ini</p>
+        <p class="review-left">{{ __(':n latihan untuk hari ini', ['n' => $due]) }}</p>
         <div wire:ignore data-chessflow="lesson" data-lesson="{{ json_encode($payload) }}"></div>
     @else
         <section class="panel-card review-empty">
-            <h1>Tiada latihan hari ini</h1>
-            <p>Bila awak tersilap dalam pelajaran atau teka-teki, Pak Kuda simpan soalan itu dan bawa semula ke sini pada hari yang sesuai. Teruskan belajar!</p>
-            <a class="cta" href="{{ route('peta') }}">Ke peta</a>
+            <h1>{{ __('Tiada latihan hari ini') }}</h1>
+            <p>{{ __('Bila awak tersilap dalam pelajaran atau teka-teki, Pak Kuda simpan soalan itu dan bawa semula ke sini pada hari yang sesuai. Teruskan belajar!') }}</p>
+            <a class="cta" href="{{ route('peta') }}">{{ __('Ke peta') }}</a>
         </section>
     @endif
 </div>

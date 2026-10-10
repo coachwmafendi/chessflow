@@ -29,7 +29,7 @@ new #[Layout('layouts::chessflow')] #[Title('Teka-teki Harian')] class extends C
     {
         $user = auth()->user();
         if (! ProgressGuard::allow($user, 'daily')) {
-            $this->dispatch('lesson-result', xp: 0, passed: false, message: ProgressGuard::TOO_FAST, mapUrl: route('peta'));
+            $this->dispatch('lesson-result', xp: 0, passed: false, message: ProgressGuard::tooFastMessage(), mapUrl: route('peta'));
 
             return;
         }
@@ -59,17 +59,17 @@ new #[Layout('layouts::chessflow')] #[Title('Teka-teki Harian')] class extends C
     {
         $puzzle = DailyPuzzle::with('lesson.level')->findOrFail($this->puzzleId);
         $step = $puzzle->lesson->steps[$puzzle->step_index];
-        $date = Chessflow::now()->locale('ms')->translatedFormat('j F');
+        $date = Chessflow::now()->locale(app()->getLocale())->translatedFormat('j F');
 
         return [
             'id' => 'harian',
             'daily' => true,
             'tahap' => $puzzle->lesson->level->number,
-            'title' => 'Teka-teki Harian',
+            'title' => __('Teka-teki Harian'),
             'icon' => 'wN',
             'steps' => [array_merge($step, [
-                'title' => 'Teka-teki '.$date,
-                'say' => 'Teka-teki baharu setiap hari. Selesaikan untuk kekalkan streak!<br>'.($step['say'] ?? ''),
+                'title' => __('Teka-teki :date', ['date' => $date]),
+                'say' => __('Teka-teki baharu setiap hari. Selesaikan untuk kekalkan streak!').'<br>'.($step['say'] ?? ''),
             ])],
         ];
     }
@@ -86,9 +86,9 @@ new #[Layout('layouts::chessflow')] #[Title('Teka-teki Harian')] class extends C
 }; ?>
 
 <div>
-    <p class="no-print" style="margin-block: 8px 0"><a class="ghost" href="{{ route('peta') }}">← Peta</a></p>
+    <p class="no-print" style="margin-block: 8px 0"><a class="ghost" href="{{ route('peta') }}">{{ __('← Peta') }}</a></p>
     @if ($doneToday)
-        <p class="status good">Teka-teki hari ini sudah selesai ({{ $streak }} hari berturut-turut). Awak boleh cuba lagi, tetapi XP hanya sekali sehari.</p>
+        <p class="status good">{{ __('Teka-teki hari ini sudah selesai (:n hari berturut-turut). Awak boleh cuba lagi, tetapi XP hanya sekali sehari.', ['n' => $streak]) }}</p>
     @endif
     <div wire:ignore data-chessflow="lesson" data-lesson="{{ json_encode($this->payload()) }}"></div>
 </div>

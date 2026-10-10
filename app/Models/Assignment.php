@@ -39,10 +39,10 @@ class Assignment extends Model
             return null;
         }
         if ($this->due_on->toDateString() === Chessflow::today()) {
-            return 'Hari ini';
+            return __('Hari ini');
         }
 
-        return 'Sebelum '.$this->due_on->copy()->settings(['locale' => 'ms'])->translatedFormat('D, j M');
+        return __('Sebelum :date', ['date' => $this->due_on->copy()->settings(['locale' => app()->getLocale()])->translatedFormat('D, j M')]);
     }
 
     /**

@@ -11,10 +11,10 @@
             @default <i class="pc {{ $badge['icon'] }}"></i>
         @endswitch
     </span>
-    <b>{{ $badge['name'] }}</b>
-    <small>{{ $badge['description'] }}</small>
+    <b>{{ __($badge['name']) }}</b>
+    <small>{{ __($badge['description']) }}</small>
     @if ($earned && $date)
-        <span class="badge-date">Dapat {{ $date->locale('ms')->translatedFormat('j M Y') }}</span>
+        <span class="badge-date">{{ __('Dapat :date', ['date' => $date->locale(app()->getLocale())->translatedFormat('j M Y')]) }}</span>
     @elseif (! $earned && $progress)
         <span class="badge-progress">
             <span class="meter"><span style="width: {{ round($progress['have'] / $progress['need'] * 100) }}%"></span></span>

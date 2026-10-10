@@ -28,7 +28,7 @@ class AwardBadges
                 ['awarded_at' => now(), 'seen_at' => $markSeen ? now() : null],
             );
             if ($created->wasRecentlyCreated) {
-                $new[] = ['key' => $key, 'name' => $badge['name'], 'description' => $badge['description'], 'icon' => $badge['icon']];
+                $new[] = ['key' => $key, 'name' => __($badge['name']), 'description' => __($badge['description']), 'icon' => $badge['icon']];
             }
         }
 

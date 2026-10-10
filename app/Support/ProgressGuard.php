@@ -10,6 +10,12 @@ class ProgressGuard
 {
     public const TOO_FAST = 'Perlahan sikit! Keputusan ini tidak direkodkan. Cuba lagi sebentar.';
 
+    /** TOO_FAST in the current UI language. */
+    public static function tooFastMessage(): string
+    {
+        return __('Perlahan sikit! Keputusan ini tidak direkodkan. Cuba lagi sebentar.');
+    }
+
     public static function allow(User $user, string $action): bool
     {
         $max = (int) config("chessflow.limits.{$action}_per_minute");
