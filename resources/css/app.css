@@ -80,3 +80,18 @@ select:focus[data-flux-control] {
 /* \[:where(&)\]:size-4 {
     @apply size-4;
 } */
+
+/* WCAG AA contrast (checked with axe in tests/e2e/a11y.spec.ts). Unlayered, so it wins over Flux's utility classes:
+   white text on danger buttons, and the sidebar group headings. */
+[data-flux-button].bg-red-500 {
+    background-color: var(--color-red-700);
+}
+[data-flux-button].bg-red-500:hover {
+    background-color: var(--color-red-800);
+}
+[data-flux-sidebar-group] > .text-zinc-400 {
+    color: var(--color-zinc-600);
+}
+.dark [data-flux-sidebar-group] > .text-zinc-400 {
+    color: var(--color-zinc-400);
+}

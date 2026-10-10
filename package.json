@@ -28,6 +28,7 @@
         "lightningcss-linux-x64-gnu": "^1.29.1"
     },
     "devDependencies": {
+        "@axe-core/playwright": "^4.13.0",
         "@playwright/test": "^1.64.0",
         "@types/node": "^26.6.4",
         "jsdom": "^29.1.1",

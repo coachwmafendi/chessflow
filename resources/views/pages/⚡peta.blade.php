@@ -78,7 +78,7 @@ new #[Layout('layouts::chessflow')] #[Title('Peta')] class extends Component {
                 @else
                     <span class="pill">Semua pelajaran selesai!</span>
                 @endif
-                <div class="meter" aria-label="Kemajuan"><span style="width: {{ $total ? round($doneCount / $total * 100) : 0 }}%"></span></div>
+                <div class="meter" role="progressbar" aria-label="Kemajuan pelajaran" aria-valuemin="0" aria-valuemax="{{ $total }}" aria-valuenow="{{ $doneCount }}"><span style="width: {{ $total ? round($doneCount / $total * 100) : 0 }}%"></span></div>
                 <small class="meter-lbl">{{ $doneCount }}/{{ $total }} pelajaran</small>
             </div>
         </div>

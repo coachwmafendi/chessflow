@@ -16,7 +16,7 @@
     @if ($earned && $date)
         <span class="badge-date">Dapat {{ $date->locale('ms')->translatedFormat('j M Y') }}</span>
     @elseif (! $earned && $progress)
-        <span class="badge-progress" aria-label="{{ $progress['have'] }} daripada {{ $progress['need'] }}">
+        <span class="badge-progress">
             <span class="meter"><span style="width: {{ round($progress['have'] / $progress['need'] * 100) }}%"></span></span>
             <span>{{ $progress['have'] }}/{{ $progress['need'] }}</span>
         </span>

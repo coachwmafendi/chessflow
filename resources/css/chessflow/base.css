@@ -1,8 +1,9 @@
 /* Layout: playful learning map (zigzag path of lesson stops) → lesson screen with a board on the left and Pak Kuda's coaching panel on the right */
 :root{
+  /* accent and coral are dark enough for small text on every light surface (WCAG AA 4.5:1) */
   --bg:#EEF3F7; --surface:#FFFFFF; --ink:#18263A; --muted:#58677D; --line:#D6E0E8;
-  --accent:#0B8577; --accent-ink:#FFFFFF; --accent-soft:#D6EFEB;
-  --sun:#F6A91B; --sun-soft:#FFF1D2; --coral:#E5484D; --coral-soft:#FDE3E2; --good:#1D9A57; --good-soft:#DDF4E6;
+  --accent:#087466; --accent-ink:#FFFFFF; --accent-soft:#D6EFEB;
+  --sun:#F6A91B; --sun-soft:#FFF1D2; --coral:#C42F36; --coral-soft:#FDE3E2; --good:#1D9A57; --good-soft:#DDF4E6;
   --sq-light:#F2E7D0; --sq-dark:#7FA89F; --frame:#28463F;
   --display:"Baloo 2", "Trebuchet MS", system-ui, sans-serif;
   --body:"Lexend", "Segoe UI", system-ui, sans-serif;
@@ -104,7 +105,7 @@ h1,h2,h3{font-family:var(--display);line-height:1.1;margin:0;text-wrap:balance}
 .bubble p{margin:6px 0 0}
 .step-title{font-size:30px;font-weight:800}
 .task{background:var(--sun-soft);border-radius:var(--r);padding:14px 16px;display:flex;flex-direction:column;gap:6px}
-.task small{font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:600;color:color-mix(in srgb,var(--sun) 55%,var(--ink))}
+.task small{font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:600;color:color-mix(in srgb,var(--sun) 40%,var(--ink))}
 .task .row{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
 .counter{font-weight:600;font-variant-numeric:tabular-nums;background:var(--surface);border-radius:99px;padding:3px 12px;font-size:14px}
 .counter:empty{display:none}

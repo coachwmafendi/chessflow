@@ -72,7 +72,7 @@
 .mistake b{font-family:var(--display);font-size:17px}
 .mistake .tag{align-self:flex-start;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;border-radius:99px;padding:2px 8px}
 .mistake .tag.besar{background:var(--coral-soft);color:var(--coral)}
-.mistake .tag.kecil{background:var(--sun-soft);color:color-mix(in srgb,var(--sun) 55%,var(--ink))}
+.mistake .tag.kecil{background:var(--sun-soft);color:color-mix(in srgb,var(--sun) 40%,var(--ink))}
 /* teacher assignments: map (student) and class page (teacher) */
 .tasks{margin-top:14px}
 .tasks h2{font-size:22px;margin-bottom:8px}
@@ -157,3 +157,4 @@
 .consent{width:100%;font-size:13px;color:var(--muted);margin:2px 0 0}
 .consent a{color:var(--accent)}
 .legal-address{font-style:normal;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 14px;line-height:1.5;max-width:420px}
+.badge.locked .badge-medal > .badge-glyph{opacity:1;filter:none;color:var(--muted)}
