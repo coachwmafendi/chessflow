@@ -5,6 +5,7 @@ import { isSoundOn, setSoundOn, SFX } from './core/sound';
 import { THEME_KEY, THEME_LABEL, applyTheme, getTheme, nextTheme, setTheme } from './core/theme';
 import type { Lesson, ServerLessonResult } from './types';
 import type { NewBadge } from './core/badges';
+import { t } from './i18n';
 
 declare global {
     interface Window {
@@ -57,15 +58,15 @@ function mountAll(): void {
 function syncSoundButtons(): void {
     document.querySelectorAll<HTMLElement>('[data-sound-toggle]').forEach((b) => {
         b.setAttribute('aria-pressed', String(isSoundOn()));
-        b.textContent = 'Bunyi: ' + (isSoundOn() ? 'Hidup' : 'Tutup');
+        b.textContent = isSoundOn() ? t('Bunyi: Hidup') : t('Bunyi: Tutup');
     });
 }
 
 function syncThemeButtons(): void {
-    const t = getTheme();
+    const theme = getTheme();
     document.querySelectorAll<HTMLElement>('[data-theme-toggle]').forEach((b) => {
-        b.textContent = 'Tema: ' + THEME_LABEL[t];
-        b.setAttribute('aria-label', 'Tema warna: ' + THEME_LABEL[t] + '. Tekan untuk tukar.');
+        b.textContent = t('Tema: :name', { name: t(THEME_LABEL[theme]) });
+        b.setAttribute('aria-label', t('Tema warna: :name. Tekan untuk tukar.', { name: t(THEME_LABEL[theme]) }));
     });
 }
 

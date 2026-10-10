@@ -36,4 +36,23 @@ describe('t()', () => {
         }
         expect(missing).toEqual([]);
     });
+
+    it('has English for strings translated at render time (action labels, piece names, levels, themes)', () => {
+        const sources: [string, RegExp][] = [
+            ['resources/ts/chessflow/steps', /label: '([^']+)'/g],
+            ['resources/ts/chessflow/core/names.ts', /[KQRBNP]: '([^']+)'/g],
+            ['resources/ts/chessflow/game/game.ts', /\{ n: '([^']+)'/g],
+            ['resources/ts/chessflow/core/theme.ts', /(?:system|light|dark): '([^']+)'/g],
+        ];
+        const missing: string[] = [];
+        for (const [path, re] of sources) {
+            const files = path.endsWith('.ts') ? [path] : sourceFiles(path);
+            for (const file of files) {
+                for (const m of readFileSync(file, 'utf8').matchAll(re)) {
+                    if (!(m[1] in dictionaries.en)) missing.push(`${file}: ${m[1]}`);
+                }
+            }
+        }
+        expect(missing).toEqual([]);
+    });
 });

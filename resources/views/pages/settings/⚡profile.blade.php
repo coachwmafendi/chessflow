@@ -125,9 +125,9 @@ new #[Title('Tetapan profil')] class extends Component {
         </form>
 
         <section class="mt-10 space-y-3">
-            <flux:heading>Data peribadi anda</flux:heading>
-            <flux:subheading>Muat turun salinan semua data akaun ini dalam format JSON, seperti dalam <flux:link :href="route('privasi')">Dasar Privasi</flux:link>.</flux:subheading>
-            <flux:button wire:click="downloadMyData" icon="arrow-down-tray" data-test="download-my-data">Muat turun data saya</flux:button>
+            <flux:heading>{{ __('Data peribadi anda') }}</flux:heading>
+            <flux:subheading>{{ __('Muat turun salinan semua data akaun ini dalam format JSON, seperti dalam') }} <flux:link :href="route('privasi')">{{ __('Dasar Privasi') }}</flux:link>.</flux:subheading>
+            <flux:button wire:click="downloadMyData" icon="arrow-down-tray" data-test="download-my-data">{{ __('Muat turun data saya') }}</flux:button>
         </section>
 
         @if ($this->showDeleteUser)

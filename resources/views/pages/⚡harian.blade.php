@@ -58,7 +58,7 @@ new #[Layout('layouts::chessflow')] #[Title('Teka-teki Harian')] class extends C
     public function payload(): array
     {
         $puzzle = DailyPuzzle::with('lesson.level')->findOrFail($this->puzzleId);
-        $step = $puzzle->lesson->steps[$puzzle->step_index];
+        $step = $puzzle->lesson->localizedStep($puzzle->step_index) ?? [];
         $date = Chessflow::now()->locale(app()->getLocale())->translatedFormat('j F');
 
         return [

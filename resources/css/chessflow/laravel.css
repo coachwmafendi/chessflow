@@ -51,3 +51,8 @@ a.cta, a.ghost { display: inline-flex; align-items: center; justify-content: cen
 .join-link { text-align: right; margin-block: 8px; font-size: 14px; }
 .join-link a { color: var(--accent); font-weight: 600; text-decoration: none; }
 .join-link a:hover { text-decoration: underline; }
+
+/* Privacy notice: both languages stay on the page (PDPA s.7(3)); English readers get English first. */
+.legal-en-first { display: flex; flex-direction: column; }
+.legal-en-first > #english { order: -1; margin-bottom: 24px; }
+.legal-en-first > #english + * { margin-top: 0; }

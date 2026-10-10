@@ -206,6 +206,11 @@ Semua langkah ada medan biasa: `type`, `title`, `say` (HTML ringkas), `task`, se
 
 Pelajaran: `id`→`slug`, `tahap`→`level`, `title`, `icon`, `exam` (bool), `tip`, `steps[]`. Dalam mod ujian, kesilapan pertama menandakan soalan itu salah dan butang Teruskan dibuka.
 
+**Terjemahan (pilihan).** Teks sumber ialah Bahasa Melayu. Terjemahan diletak bersebelahan di bawah kod bahasa:
+- Tahap: `"en": {"name", "note"}`. Pelajaran: `"en": {"title", "tip"}`.
+- Langkah: `"en": {...}` dengan medan teks sahaja: `title`, `say`, `task`, `wrong`, `wrongMsg`, `win`, `done`, `mid`, `mids[]`, `ok`, `counter`, `wrongMap`, `options[] {t, why}`, `seq[] {ask, ok, wrong}`, `demoNotes {status}`.
+- Medan yang tiada terjemahan kekal BM; senarai digabung ikut kedudukan. `validate-lessons` menolak medan logik catur (fen, line, accept, …) dalam blok terjemahan. Pemegang tempat seperti `{sq}` mesti dikekalkan.
+
 ---
 
 ## 7. Fasa kerja
@@ -319,3 +324,4 @@ Setiap fasa ada **matlamat**, **siap bila** dan **arahan untuk CC**. Mulakan set
 2. `npm run validate:lessons`: menyemak FEN, langkah dan jawapan.
 3. Untuk teka-teki taktik atau endgame, sahkan dengan `node tools/stockfish-analyse.cjs "<FEN>" 20 6`.
 4. `php artisan chessflow:import-lessons` → cuba di `/dev/playground` → terbitkan.
+5. Terjemahan English (pilihan): tambah blok `"en"` seperti §6, jalankan semula langkah 2 dan 4, kemudian semak dengan butang **EN** di header.

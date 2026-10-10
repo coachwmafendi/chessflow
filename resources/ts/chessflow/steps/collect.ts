@@ -2,6 +2,7 @@ import type { BoardApi, CollectStep, StepContext } from '../types';
 import { gen, pcs, sq, tourOpt } from '../core/squares';
 import { SFX } from '../core/sound';
 import { base } from './base';
+import { t } from '../i18n';
 
 export function collect(st: CollectStep, c: StepContext): void {
     const list0 = pcs(st.pcs);
@@ -18,7 +19,7 @@ export function collect(st: CollectStep, c: StepContext): void {
     const draw = () => {
         const list = b.all().map((p) => ({ c: p.c, t: p.t, sq: p.sq }));
         b.mark({ sel: k, dots: fin ? [] : gen(list, k), stars: [...left] });
-        c.counter('Langkah: ' + moves + ' · Bintang: ' + (stars.length - left.size) + '/' + stars.length);
+        c.counter(t('Langkah: :moves · Bintang: :got/:total', { moves, got: stars.length - left.size, total: stars.length }));
     };
 
     const reset = () => {
@@ -49,12 +50,11 @@ export function collect(st: CollectStep, c: StepContext): void {
                 if (extra > 3) c.mistake(2);
                 else if (extra > 0) c.mistake(1);
                 c.status(
-                    'Misi selesai dalam ' +
-                        moves +
-                        ' langkah! ' +
+                    t('Misi selesai dalam :n langkah!', { n: moves }) +
+                        ' ' +
                         (extra <= 0
-                            ? 'Itu jumlah paling sedikit. Hebat!'
-                            : 'Paling sedikit ialah ' + opt + ' langkah. Tekan "Mula semula" kalau nak cuba lagi.'),
+                            ? t('Itu jumlah paling sedikit. Hebat!')
+                            : t('Paling sedikit ialah :n langkah. Tekan "Mula semula" kalau nak cuba lagi.', { n: opt })),
                     'good',
                 );
                 SFX.win();

@@ -65,7 +65,7 @@ new #[Layout('layouts::chessflow')] #[Title('Latih semula')] class extends Compo
         if (! $item || ! isset($item->lesson->steps[$item->step_index])) {
             return null;
         }
-        $step = $item->lesson->steps[$item->step_index];
+        $step = $item->lesson->localizedStep($item->step_index) ?? [];
 
         return [
             'id' => 'latih',

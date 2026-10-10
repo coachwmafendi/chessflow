@@ -1,4 +1,5 @@
 import type { Chess } from 'chess.js';
+import { t } from '../i18n';
 
 /** Plies (half-moves) before Pak Kuda will consider a draw: 20 moves each. */
 export const DRAW_MIN_PLIES = 40;
@@ -32,17 +33,17 @@ export function materialBalance(g: Chess): number {
 export function judgeDrawOffer(g: Chess, user: 'w' | 'b', lastRefusedAt: number | null): DrawVerdict {
     const plies = g.history().length;
     if (plies < DRAW_MIN_PLIES) {
-        return { accept: false, reason: 'early', message: 'Terlalu awal untuk seri. Pak Kuda mahu main sekurang-kurangnya 20 langkah dulu.' };
+        return { accept: false, reason: 'early', message: t('Terlalu awal untuk seri. Pak Kuda mahu main sekurang-kurangnya 20 langkah dulu.') };
     }
     if (lastRefusedAt !== null && plies - lastRefusedAt < DRAW_COOLDOWN_PLIES) {
-        return { accept: false, reason: 'cooldown', message: 'Awak baru minta seri. Main 10 langkah lagi sebelum minta semula.' };
+        return { accept: false, reason: 'cooldown', message: t('Awak baru minta seri. Main 10 langkah lagi sebelum minta semula.') };
     }
     const botAhead = (user === 'w' ? -1 : 1) * materialBalance(g);
     if (botAhead >= 2) {
-        return { accept: false, reason: 'material', message: 'Pak Kuda tolak seri: dia ada lebih buah (' + botAhead + ' mata). Cuba pertahankan dan cari peluang!' };
+        return { accept: false, reason: 'material', message: t('Pak Kuda tolak seri: dia ada lebih buah (:n mata). Cuba pertahankan dan cari peluang!', { n: botAhead }) };
     }
     if (botAhead <= -2) {
-        return { accept: true, reason: 'player-ahead', message: 'Pak Kuda terima seri dengan gembira. Awak sebenarnya ada lebih buah, mungkin boleh menang!' };
+        return { accept: true, reason: 'player-ahead', message: t('Pak Kuda terima seri dengan gembira. Awak sebenarnya ada lebih buah, mungkin boleh menang!') };
     }
-    return { accept: true, reason: 'equal', message: 'Pak Kuda setuju. Kedudukan seimbang, permainan seri.' };
+    return { accept: true, reason: 'equal', message: t('Pak Kuda setuju. Kedudukan seimbang, permainan seri.') };
 }

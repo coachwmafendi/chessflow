@@ -6,6 +6,7 @@ export type Theme = 'system' | 'light' | 'dark';
 
 export const THEME_KEY = 'flux.appearance';
 
+// Malay source labels; translate with t() where shown.
 export const THEME_LABEL: Record<Theme, string> = { system: 'Sistem', light: 'Cerah', dark: 'Gelap' };
 
 const ORDER: Theme[] = ['system', 'light', 'dark'];

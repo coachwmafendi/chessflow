@@ -1,6 +1,7 @@
 import type { ArrowDrawSpec, ArrowSpec, BoardApi, MarkPatch, Piece } from '../types';
 import { PNAME } from './names';
 import { expandSq, fenList, nm, sq } from './squares';
+import { t } from '../i18n';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
@@ -14,7 +15,7 @@ export function createBoard(root: HTMLElement, orient: 'w' | 'b' = 'w'): BoardAp
     wrap.className = 'board';
     const grid = document.createElement('div');
     grid.className = 'grid';
-    grid.setAttribute('aria-label', 'Papan catur');
+    grid.setAttribute('aria-label', t('Papan catur'));
 
     const pos = (i: number): [number, number] => {
         const f = i % 8;
@@ -32,7 +33,7 @@ export function createBoard(root: HTMLElement, orient: 'w' | 'b' = 'w'): BoardAp
             b.type = 'button';
             b.className = 'sq ' + ((f + r) % 2 ? 'light' : 'dark');
             b.dataset.sq = String(i);
-            b.setAttribute('aria-label', 'Petak ' + nm(i));
+            b.setAttribute('aria-label', t('Petak :sq', { sq: nm(i) }));
             if (col === 0) b.insertAdjacentHTML('beforeend', '<span class="cr">' + (r + 1) + '</span>');
             if (row === 7) b.insertAdjacentHTML('beforeend', '<span class="cf">' + 'abcdefgh'[f] + '</span>');
             grid.appendChild(b);
@@ -319,13 +320,13 @@ export function createBoard(root: HTMLElement, orient: 'w' | 'b' = 'w'): BoardAp
                 const box = document.createElement('div');
                 box.className = 'promo';
                 box.setAttribute('role', 'dialog');
-                box.setAttribute('aria-label', 'Pilih buah untuk promosi');
+                box.setAttribute('aria-label', t('Pilih buah untuk promosi'));
                 box.innerHTML =
-                    '<div class="promo-card"><b>Bidak jadi apa?</b><div class="promo-opts">' +
+                    '<div class="promo-card"><b>' + t('Bidak jadi apa?') + '</b><div class="promo-opts">' +
                     (['Q', 'R', 'B', 'N'] as const)
                         .map((t) => '<button type="button" data-p="' + t.toLowerCase() + '"><i class="pc ' + color + t + '"></i><span>' + PNAME[t] + '</span></button>')
                         .join('') +
-                    '</div><button type="button" class="promo-cancel">Batal</button></div>';
+                    '</div><button type="button" class="promo-cancel">' + t('Batal') + '</button></div>';
                 const done = (choice: 'q' | 'r' | 'b' | 'n' | null) => {
                     document.removeEventListener('keydown', onKey);
                     box.remove();

@@ -12,7 +12,7 @@ new #[Layout('layouts::chessflow')] #[Title('Dasar Privasi')] class extends Comp
 
 {{-- Notice under the Personal Data Protection Act 2010 (Act 709). Section 7(3) asks for the notice in both
      Bahasa Melayu and English, hence the English version below. Keep both in sync with what the app stores. --}}
-<div class="prose-page legal">
+<div class="prose-page legal{{ app()->getLocale() === 'en' ? ' legal-en-first' : '' }}">
     <h1>Dasar Privasi</h1>
     <p class="legal-meta">Berkuat kuasa: {{ self::EFFECTIVE }} · <a href="#english">English version</a></p>
 
@@ -95,5 +95,5 @@ new #[Layout('layouts::chessflow')] #[Title('Dasar Privasi')] class extends Comp
         <p><b>Changes.</b> If this notice changes materially, we will show the new date above and inform adult account holders.</p>
     </section>
 
-    <p class="legal-meta"><a href="{{ route('terma') }}">Terma Penggunaan</a> · <a href="{{ route('tentang') }}">Tentang ChessFlow</a></p>
+    <p class="legal-meta"><a href="{{ route('terma') }}">{{ __('Terma Penggunaan') }}</a> · <a href="{{ route('tentang') }}">{{ __('Tentang ChessFlow') }}</a></p>
 </div>

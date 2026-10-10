@@ -19,14 +19,14 @@ async function loginStudent(page: Page): Promise<void> {
     await page.goto('/masuk-murid');
     await page.fill('#username', fx().student.username);
     await page.fill('#pin', fx().student.pin);
-    await Promise.all([page.waitForURL('**/peta'), page.click('button[type=submit]')]);
+    await Promise.all([page.waitForURL('**/peta'), page.click('form:has(#pin) button[type=submit]')]);
 }
 
 async function loginTeacher(page: Page): Promise<void> {
     await page.goto('/login');
     await page.fill('input[type=email]', fx().teacher.email);
     await page.fill('input[type=password]', fx().teacher.password);
-    await Promise.all([page.waitForURL((u) => !u.pathname.endsWith('/login')), page.click('button[type=submit]')]);
+    await Promise.all([page.waitForURL((u) => !u.pathname.endsWith('/login')), page.click('form:has(input[type=password]) button[type=submit]')]);
 }
 
 const sqIndex = (s: string) => s.charCodeAt(0) - 97 + (Number(s[1]) - 1) * 8;

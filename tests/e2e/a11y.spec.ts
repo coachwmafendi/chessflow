@@ -11,14 +11,14 @@ async function loginViewer(page: Page): Promise<void> {
     await page.goto('/masuk-murid');
     await page.fill('#username', fx().viewer.username);
     await page.fill('#pin', fx().viewer.pin);
-    await Promise.all([page.waitForURL('**/peta'), page.click('button[type=submit]')]);
+    await Promise.all([page.waitForURL('**/peta'), page.click('form:has(#pin) button[type=submit]')]);
 }
 
 async function loginTeacher(page: Page): Promise<void> {
     await page.goto('/login');
     await page.fill('input[type=email]', fx().teacher.email);
     await page.fill('input[type=password]', fx().teacher.password);
-    await Promise.all([page.waitForURL((u) => !u.pathname.endsWith('/login')), page.click('button[type=submit]')]);
+    await Promise.all([page.waitForURL((u) => !u.pathname.endsWith('/login')), page.click('form:has(input[type=password]) button[type=submit]')]);
 }
 
 async function audit(page: Page, path: string): Promise<string[]> {

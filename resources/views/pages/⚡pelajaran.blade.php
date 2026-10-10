@@ -88,7 +88,7 @@ new #[Layout('layouts::chessflow')] class extends Component {
             'icon' => $this->lesson->icon,
             'exam' => $this->lesson->isExam(),
             'tip' => $this->lesson->tip,
-            'steps' => $this->lesson->steps,
+            'steps' => $this->lesson->localizedSteps(),
         ];
     }
 }; ?>
