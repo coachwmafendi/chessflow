@@ -5,6 +5,7 @@ import { PNAME } from '../core/names';
 import { SFX } from '../core/sound';
 import { bot } from '../engine/simple-bot';
 import { base } from './base';
+import { t } from '../i18n';
 
 export function play(st: PlayStep, c: StepContext): void {
     let g: Chess;
@@ -15,12 +16,12 @@ export function play(st: PlayStep, c: StepContext): void {
     let sel: Square | null = null;
     let picking = false;
 
-    const cnt = () => c.counter('Langkah: ' + n + '/' + st.maxMoves);
+    const cnt = () => c.counter(t('Langkah: :n/:max', { n, max: st.maxMoves }));
     const fail = (msg: string) => {
         over = true;
         c.mistake();
         SFX.bad();
-        c.status(msg + ' Tekan "Cuba lagi".', 'bad');
+        c.status(msg + ' ' + t('Tekan "Cuba lagi".'), 'bad');
     };
     const userPawns = () => g.board().flat().filter((x) => x && x.color === user && x.type === 'p').length;
 
@@ -73,9 +74,9 @@ export function play(st: PlayStep, c: StepContext): void {
             c.done();
             return;
         }
-        if (g.isStalemate()) return fail('Stalemate! Raja hitam tiada langkah tapi tidak kena sah. Itu seri.');
-        if (g.isDraw()) return fail('Permainan seri.');
-        if (n >= st.maxMoves) return fail('Sudah ' + st.maxMoves + ' langkah.');
+        if (g.isStalemate()) return fail(t('Stalemate! Raja hitam tiada langkah tapi tidak kena sah. Itu seri.'));
+        if (g.isDraw()) return fail(t('Permainan seri.'));
+        if (n >= st.maxMoves) return fail(t('Sudah :n langkah.', { n: st.maxMoves }));
 
         c.later(() => {
             const m = bot(g, st.bot, user);
@@ -83,12 +84,12 @@ export function play(st: PlayStep, c: StepContext): void {
             const r = g.move(m);
             b.applyMove(r);
             c.later(() => b.quiet(g.fen()), 420);
-            if (st.goal === 'promote' && !userPawns()) return fail('Raja hitam tangkap bidak awak!');
+            if (st.goal === 'promote' && !userPawns()) return fail(t('Raja hitam tangkap bidak awak!'));
             if (st.goal === 'mate' && r.captured && r.captured !== 'p') {
-                return fail('Alamak, ' + PNAME[r.captured.toUpperCase()] + ' awak dimakan! Jauhkan buah daripada Raja lawan.');
+                return fail(t('Alamak, :piece awak dimakan! Jauhkan buah daripada Raja lawan.', { piece: PNAME[r.captured.toUpperCase()] }));
             }
-            if (st.goal === 'captureQ' && n >= st.maxMoves) return fail('Menteri hitam terlepas.');
-            c.status(g.isCheck() ? 'Sah!' : '', 'info');
+            if (st.goal === 'captureQ' && n >= st.maxMoves) return fail(t('Menteri hitam terlepas.'));
+            c.status(g.isCheck() ? t('Sah!') : '', 'info');
         }, 550);
     }
 

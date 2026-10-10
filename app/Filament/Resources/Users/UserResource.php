@@ -28,9 +28,15 @@ class UserResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    protected static ?string $modelLabel = 'pengguna';
+    public static function getModelLabel(): string
+    {
+        return __('pengguna');
+    }
 
-    protected static ?string $pluralModelLabel = 'pengguna';
+    public static function getPluralModelLabel(): string
+    {
+        return __('pengguna');
+    }
 
     /**
      * @return array<string, string>
@@ -38,10 +44,10 @@ class UserResource extends Resource
     public static function roleOptions(): array
     {
         return [
-            Role::Murid->value => 'Murid',
-            Role::IbuBapa->value => 'Ibu bapa',
-            Role::Guru->value => 'Guru',
-            Role::Admin->value => 'Admin',
+            Role::Murid->value => __('roles.murid'),
+            Role::IbuBapa->value => __('roles.ibubapa'),
+            Role::Guru->value => __('roles.guru'),
+            Role::Admin->value => __('roles.admin'),
         ];
     }
 
@@ -49,8 +55,8 @@ class UserResource extends Resource
     {
         return $schema
             ->components([
-                TextInput::make('name')->label('Nama')->required()->maxLength(60),
-                Select::make('role')->label('Peranan')->options(self::roleOptions())->required()
+                TextInput::make('name')->label(__('Nama'))->required()->maxLength(60),
+                Select::make('role')->label(__('Peranan'))->options(self::roleOptions())->required()
                     // Students have no email/password login, so they stay students.
                     ->disabled(fn (?User $record) => $record?->email === null),
             ]);
@@ -62,21 +68,21 @@ class UserResource extends Resource
             ->recordTitleAttribute('name')
             ->defaultSort('created_at', 'desc')
             ->columns([
-                TextColumn::make('name')->label('Nama')->searchable(),
-                TextColumn::make('username')->label('Nama pengguna')->searchable()->placeholder('—'),
-                TextColumn::make('email')->label('E-mel')->searchable()->placeholder('—'),
-                TextColumn::make('role')->label('Peranan')->badge()
+                TextColumn::make('name')->label(__('Nama'))->searchable(),
+                TextColumn::make('username')->label(__('Nama pengguna'))->searchable()->placeholder('—'),
+                TextColumn::make('email')->label(__('E-mel'))->searchable()->placeholder('—'),
+                TextColumn::make('role')->label(__('Peranan'))->badge()
                     ->formatStateUsing(fn (Role $state) => self::roleOptions()[$state->value]),
-                TextColumn::make('xp')->label('XP')->sortable(),
-                TextColumn::make('created_at')->label('Dicipta')->date()->sortable(),
+                TextColumn::make('xp')->label(__('XP'))->sortable(),
+                TextColumn::make('created_at')->label(__('Dicipta'))->date()->sortable(),
             ])
             ->filters([
-                SelectFilter::make('role')->label('Peranan')->options(self::roleOptions()),
+                SelectFilter::make('role')->label(__('Peranan'))->options(self::roleOptions()),
             ])
             ->recordActions([
                 EditAction::make(),
                 // For PDPA access requests sent by email.
-                Action::make('exportData')->label('Eksport data')->icon(Heroicon::OutlinedArrowDownTray)->color('gray')
+                Action::make('exportData')->label(__('Eksport data'))->icon(Heroicon::OutlinedArrowDownTray)->color('gray')
                     ->action(fn (User $record) => app(UserDataExport::class)->download($record)),
                 DeleteAction::make()->hidden(fn (User $record) => $record->is(auth()->user())),
             ]);

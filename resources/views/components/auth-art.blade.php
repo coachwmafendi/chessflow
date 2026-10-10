@@ -1,4 +1,8 @@
-@props(['heading' => 'Belajar catur langkah demi langkah', 'text' => 'Bersama Pak Kuda: kenal buah, taktik, strategi dan endgame. Kutip bintang, kumpul XP dan dapatkan sijil setiap tahap.'])
+@props(['heading' => null, 'text' => null])
+@php
+    $heading = __($heading ?? 'Belajar catur langkah demi langkah');
+    $text = $text ?? __('Bersama Pak Kuda: kenal buah, taktik, strategi dan endgame. Kutip bintang, kumpul XP dan dapatkan sijil setiap tahap.');
+@endphp
 {{-- Left column of the login/register pages: ChessFlow illustration (Pak Kuda: rhosgfx, CC0; pieces: cburnett, BSD). --}}
 <div class="relative hidden h-full flex-col overflow-hidden p-10 text-white lg:flex" style="background: linear-gradient(160deg, #0B8577 0%, #075E54 100%)">
     {{-- faint chessboard pattern --}}
@@ -27,9 +31,9 @@
         <h2 class="text-3xl font-bold leading-tight">{{ $heading }}</h2>
         <p class="max-w-md text-white/85">{{ $text }}</p>
         <div class="flex flex-wrap gap-2 pt-1 text-sm">
-            <span class="rounded-full bg-white/15 px-3 py-1">32 pelajaran</span>
-            <span class="rounded-full bg-white/15 px-3 py-1">Teka-teki harian</span>
-            <span class="rounded-full bg-white/15 px-3 py-1">Sijil setiap tahap</span>
+            <span class="rounded-full bg-white/15 px-3 py-1">{{ __('32 pelajaran') }}</span>
+            <span class="rounded-full bg-white/15 px-3 py-1">{{ __('Teka-teki harian') }}</span>
+            <span class="rounded-full bg-white/15 px-3 py-1">{{ __('Sijil setiap tahap') }}</span>
         </div>
     </div>
 </div>

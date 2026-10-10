@@ -1,3 +1,4 @@
+import { t } from '../i18n';
 // "Lencana baru!" block shown in the lesson/daily/review result card and under the game status.
 // Badges are decided on the server (App\Support\Badges); this only draws the ones it sends back.
 
@@ -28,7 +29,7 @@ export function newBadgesHtml(list: NewBadge[] | undefined): string {
     if (!list?.length) return '';
     return (
         '<div class="new-badges" role="status"><b>' +
-        (list.length === 1 ? 'Lencana baru!' : list.length + ' lencana baru!') +
+        (list.length === 1 ? t('Lencana baru!') : t(':n lencana baru!', { n: list.length })) +
         '</b><ul>' +
         list
             .map((b) => '<li title="' + esc(b.description) + '"><span class="badge-medal" aria-hidden="true">' + icon(b.icon) + '</span>' + esc(b.name) + '</li>')

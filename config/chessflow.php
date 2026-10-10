@@ -1,6 +1,12 @@
 <?php
 
 return [
+    // UI languages; the first is the default. Lesson content falls back to Malay.
+    'locales' => [
+        'ms' => 'Bahasa Melayu',
+        'en' => 'English',
+    ],
+
     // Streaks, daily puzzles and "today" are always computed in this zone.
     'timezone' => 'Asia/Kuala_Lumpur',
 

@@ -57,8 +57,8 @@
         </div>
 
         <div class="text-sm text-center text-zinc-600 dark:text-zinc-400">
-            <span>Murid?</span>
-            <flux:link :href="route('murid.login')">Masuk dengan nama pengguna dan PIN</flux:link>
+            <span>{{ __('Murid?') }}</span>
+            <flux:link :href="route('murid.login')">{{ __('Masuk dengan nama pengguna dan PIN') }}</flux:link>
         </div>
     </div>
 </x-layouts::auth.split>

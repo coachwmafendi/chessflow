@@ -29,7 +29,7 @@ new #[Layout('layouts::chessflow')] #[Title('Anak saya')] class extends Componen
 
     public function createChild(CreateStudents $create): void
     {
-        $this->validate(['childName' => 'required|string|max:60'], [], ['childName' => 'nama anak']);
+        $this->validate(['childName' => 'required|string|max:60'], [], ['childName' => __('nama anak')]);
         $this->credentials = $create->handle(auth()->user(), [$this->childName]);
         $this->childName = '';
     }
@@ -40,18 +40,18 @@ new #[Layout('layouts::chessflow')] #[Title('Anak saya')] class extends Componen
         $this->validate([
             'username' => 'required|string|max:30',
             'pin' => 'required|digits_between:4,6',
-        ], [], ['username' => 'nama pengguna', 'pin' => 'PIN']);
+        ], [], ['username' => __('nama pengguna'), 'pin' => 'PIN']);
 
         $key = 'link-child:'.auth()->id();
         if (RateLimiter::tooManyAttempts($key, 5)) {
-            throw ValidationException::withMessages(['username' => 'Terlalu banyak cubaan. Cuba lagi dalam '.RateLimiter::availableIn($key).' saat.']);
+            throw ValidationException::withMessages(['username' => __('Terlalu banyak cubaan. Cuba lagi dalam :seconds saat.', ['seconds' => RateLimiter::availableIn($key)])]);
         }
 
         $child = User::where('username', Str::lower($this->username))->where('role', Role::Murid)->first();
         if (! $child || ! $child->pin || ! Hash::check($this->pin, $child->pin)) {
             RateLimiter::hit($key);
             $this->reset('pin');
-            throw ValidationException::withMessages(['username' => 'Nama pengguna atau PIN salah.']);
+            throw ValidationException::withMessages(['username' => __('Nama pengguna atau PIN salah.')]);
         }
 
         RateLimiter::clear($key);
@@ -82,23 +82,23 @@ new #[Layout('layouts::chessflow')] #[Title('Anak saya')] class extends Componen
         $child = auth()->user()->students()->findOrFail($childId);
         $delete->handle(auth()->user(), $child);
         $this->credentials = [];
-        $this->notice = 'Akaun '.$child->name.' dan semua datanya telah dipadam.';
+        $this->notice = __('Akaun :name dan semua datanya telah dipadam.', ['name' => $child->name]);
     }
 
     /** Typed confirmation (wire:confirm.prompt): deleting cannot be undone. */
     private function deleteConfirm(User $student): string
     {
-        return e('Padam akaun '.$student->name.' selama-lamanya? Semua kemajuan, sijil, lencana dan permainan akan hilang dan tidak boleh dipulihkan. Taip PADAM untuk sahkan.').'|PADAM';
+        return e(__('Padam akaun :name selama-lamanya? Semua kemajuan, sijil, lencana dan permainan akan hilang dan tidak boleh dipulihkan. Taip :word untuk sahkan.', ['name' => $student->name, 'word' => __('PADAM')])).'|'.e(__('PADAM'));
     }
 
     public function actionsHtml(User $child): string
     {
-        return '<button class="ghost" type="button" wire:click="resetPin('.$child->id.')">PIN baru</button> '
+        return '<button class="ghost" type="button" wire:click="resetPin('.$child->id.')">'.e(__('PIN baru')).'</button> '
             .'<button class="ghost" type="button" wire:click="unlink('.$child->id.')" wire:confirm="'
-            .e('Buang pautan dengan '.$child->name.'? Akaun anak tidak dipadam.').'">Buang pautan</button> '
-            .'<button class="ghost" type="button" wire:click="exportChild('.$child->id.')">Muat turun data</button> '
+            .e(__('Buang pautan dengan :name? Akaun anak tidak dipadam.', ['name' => $child->name])).'">'.e(__('Buang pautan')).'</button> '
+            .'<button class="ghost" type="button" wire:click="exportChild('.$child->id.')">'.e(__('Muat turun data')).'</button> '
             .'<button class="ghost danger" type="button" wire:click="deleteChild('.$child->id.')" wire:confirm.prompt="'
-            .$this->deleteConfirm($child).'">Padam akaun</button>';
+            .$this->deleteConfirm($child).'">'.e(__('Padam akaun')).'</button>';
     }
 
     public function with(): array
@@ -113,7 +113,7 @@ new #[Layout('layouts::chessflow')] #[Title('Anak saya')] class extends Componen
 }; ?>
 
 <div>
-    <div class="page-head"><h1>Anak saya</h1></div>
+    <div class="page-head"><h1>{{ __('Anak saya') }}</h1></div>
 
     @if ($notice)
         <p class="status good" wire:key="notice">{{ $notice }}</p>
@@ -121,41 +121,41 @@ new #[Layout('layouts::chessflow')] #[Title('Anak saya')] class extends Componen
 
     @if ($credentials)
         <section class="panel-card" wire:key="creds">
-            <h2>Akaun anak</h2>
-            <p>Simpan maklumat ini. PIN tidak akan dipaparkan lagi.</p>
+            <h2>{{ __('Akaun anak') }}</h2>
+            <p>{{ __('Simpan maklumat ini. PIN tidak akan dipaparkan lagi.') }}</p>
             <table class="creds">
-                <thead><tr><th>Nama</th><th>Nama pengguna</th><th>PIN</th></tr></thead>
+                <thead><tr><th>{{ __('Nama') }}</th><th>{{ __('Nama pengguna') }}</th><th>PIN</th></tr></thead>
                 <tbody>
                     @foreach ($credentials as $c)
                         <tr><td>{{ $c['name'] }}</td><td>{{ $c['username'] }}</td><td>{{ $c['pin'] }}</td></tr>
                     @endforeach
                 </tbody>
             </table>
-            <p style="margin-top: 8px">Anak masuk di <b>{{ route('murid.login') }}</b>
-                <button class="ghost" type="button" wire:click="$set('credentials', [])">Tutup</button></p>
+            <p style="margin-top: 8px">{!! __('Anak masuk di :url', ['url' => '<b>'.e(route('murid.login')).'</b>']) !!}
+                <button class="ghost" type="button" wire:click="$set('credentials', [])">{{ __('Tutup') }}</button></p>
         </section>
     @endif
 
     <x-chessflow.progress-table :rows="$rows" :lessons="$lessons" :actions="fn ($c) => $this->actionsHtml($c)" />
 
     <section class="panel-card">
-        <h2>Cipta akaun anak</h2>
-        <p>Tiada e-mel diperlukan. Kami jana nama pengguna dan PIN.</p>
+        <h2>{{ __('Cipta akaun anak') }}</h2>
+        <p>{{ __('Tiada e-mel diperlukan. Kami jana nama pengguna dan PIN.') }}</p>
         <form wire:submit="createChild">
-            <input type="text" wire:model="childName" placeholder="Nama panggilan anak" aria-label="Nama anak" maxlength="60">
-            <button class="cta" type="submit">Cipta</button>
+            <input type="text" wire:model="childName" placeholder="{{ __('Nama panggilan anak') }}" aria-label="{{ __('Nama anak') }}" maxlength="60">
+            <button class="cta" type="submit">{{ __('Cipta') }}</button>
             @error('childName') <p class="err">{{ $message }}</p> @enderror
-            <p class="consent">Dengan mencipta akaun, anda mengesahkan anda ibu bapa atau penjaga kanak-kanak ini dan bersetuju dengan <a href="{{ route('privasi') }}">Dasar Privasi</a>. Hanya nama panggilan diperlukan.</p>
+            <p class="consent">{!! __('Dengan mencipta akaun, anda mengesahkan anda ibu bapa atau penjaga kanak-kanak ini dan bersetuju dengan :policy. Hanya nama panggilan diperlukan.', ['policy' => '<a href="'.route('privasi').'">'.e(__('Dasar Privasi')).'</a>']) !!}</p>
         </form>
     </section>
 
     <section class="panel-card">
-        <h2>Pautkan anak yang sudah ada akaun</h2>
-        <p>Contohnya akaun yang dicipta oleh guru. Masukkan nama pengguna dan PIN anak.</p>
+        <h2>{{ __('Pautkan anak yang sudah ada akaun') }}</h2>
+        <p>{{ __('Contohnya akaun yang dicipta oleh guru. Masukkan nama pengguna dan PIN anak.') }}</p>
         <form wire:submit="linkChild">
-            <input type="text" wire:model="username" placeholder="Nama pengguna" aria-label="Nama pengguna anak" autocapitalize="none">
-            <input type="password" wire:model="pin" placeholder="PIN" aria-label="PIN anak" inputmode="numeric" maxlength="6">
-            <button class="cta" type="submit">Pautkan</button>
+            <input type="text" wire:model="username" placeholder="{{ __('Nama pengguna') }}" aria-label="{{ __('Nama pengguna anak') }}" autocapitalize="none">
+            <input type="password" wire:model="pin" placeholder="PIN" aria-label="{{ __('PIN anak') }}" inputmode="numeric" maxlength="6">
+            <button class="cta" type="submit">{{ __('Pautkan') }}</button>
             @error('username') <p class="err">{{ $message }}</p> @enderror
             @error('pin') <p class="err">{{ $message }}</p> @enderror
         </form>

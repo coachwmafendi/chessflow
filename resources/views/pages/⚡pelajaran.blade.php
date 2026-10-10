@@ -38,7 +38,7 @@ new #[Layout('layouts::chessflow')] class extends Component {
 
         $minSeconds = count($this->lesson->steps) * (int) config('chessflow.limits.min_seconds_per_step');
         if (now()->getTimestamp() - $this->startedAt < $minSeconds || ! ProgressGuard::allow($user, 'lessons')) {
-            $this->dispatch('lesson-result', xp: 0, passed: false, message: ProgressGuard::TOO_FAST, mapUrl: route('peta'));
+            $this->dispatch('lesson-result', xp: 0, passed: false, message: ProgressGuard::tooFastMessage(), mapUrl: route('peta'));
 
             return;
         }
@@ -88,12 +88,12 @@ new #[Layout('layouts::chessflow')] class extends Component {
             'icon' => $this->lesson->icon,
             'exam' => $this->lesson->isExam(),
             'tip' => $this->lesson->tip,
-            'steps' => $this->lesson->steps,
+            'steps' => $this->lesson->localizedSteps(),
         ];
     }
 }; ?>
 
 <div>
-    <p class="no-print" style="margin-block: 8px 0"><a class="ghost" href="{{ route('peta') }}">← Peta</a></p>
+    <p class="no-print" style="margin-block: 8px 0"><a class="ghost" href="{{ route('peta') }}">{{ __('← Peta') }}</a></p>
     <div wire:ignore data-chessflow="lesson" data-lesson="{{ json_encode($this->payload()) }}"></div>
 </div>

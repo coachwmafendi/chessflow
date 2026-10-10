@@ -38,5 +38,30 @@ for (const l of lessons) l.steps.forEach((st, i) => {
   if (st.type === 'quiz' && !st.options.some((o) => o.ok)) E(l, i, 'quiz has no correct option');
   if (st.type === 'tap') st.seq.forEach((it) => it.sq.forEach((s) => { if (!/^[a-h][1-8]$/.test(s)) E(l, i, 'bad square ' + s); }));
 });
+// Translations (e.g. "en": {...}) may only replace text, never chess logic.
+const LOCALES = ['en'];
+const STEP_TEXT = new Set(['title', 'say', 'task', 'wrong', 'wrongMsg', 'win', 'done', 'mid', 'mids', 'ok', 'counter', 'wrongMap', 'options', 'seq', 'demoNotes']);
+const ITEM_TEXT = { options: new Set(['t', 'why']), seq: new Set(['ask', 'ok', 'wrong']) };
+for (const l of lessons) {
+  for (const code of LOCALES) {
+    const tl = l[code];
+    if (tl !== undefined) {
+      for (const k of Object.keys(tl)) if (!['title', 'tip'].includes(k)) E(l, '-', `${code}.${k} is not a translatable lesson field`);
+    }
+    l.steps.forEach((st, i) => {
+      const tr = st[code];
+      if (tr === undefined) return;
+      if (typeof tr !== 'object' || Array.isArray(tr)) { E(l, i, `${code} must be an object`); return; }
+      for (const k of Object.keys(tr)) {
+        if (!STEP_TEXT.has(k)) { E(l, i, `${code}.${k} is not a text field (translations cannot change chess logic)`); continue; }
+        if (ITEM_TEXT[k]) {
+          if (!Array.isArray(tr[k]) || !Array.isArray(st[k]) || tr[k].length > st[k].length) { E(l, i, `${code}.${k} must be a list no longer than ${k}`); continue; }
+          tr[k].forEach((item, j) => item && Object.keys(item).forEach((ik) => { if (!ITEM_TEXT[k].has(ik)) E(l, i, `${code}.${k}[${j}].${ik} is not a text field`); }));
+        }
+        if (k === 'mids' && (!Array.isArray(tr.mids) || !Array.isArray(st.mids) || tr.mids.length > st.mids.length)) E(l, i, `${code}.mids must be a list no longer than mids`);
+      }
+    });
+  }
+}
 console.log(`${lessons.length} lessons, ${lessons.reduce((a, l) => a + l.steps.length, 0)} steps, ${errs} errors`);
 process.exit(errs ? 1 : 0);

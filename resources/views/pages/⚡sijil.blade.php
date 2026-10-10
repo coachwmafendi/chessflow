@@ -35,27 +35,27 @@ new #[Layout('layouts::chessflow')] #[Title('Sijil')] class extends Component {
 
 <div class="cert-page">
     <div class="cert">
-        <small>Sijil ChessFlow</small>
-        <h2>Tahap {{ $certificate->level->number }}: {{ $certificate->level->name }}</h2>
-        <p>Dengan ini disahkan bahawa</p>
+        <small>{{ __('Sijil ChessFlow') }}</small>
+        <h2>{{ __('Tahap :n: :name', ['n' => $certificate->level->number, 'name' => $certificate->level->name]) }}</h2>
+        <p>{{ __('Dengan ini disahkan bahawa') }}</p>
         <p class="cert-name">{{ $certificate->display_name }}</p>
-        <p>telah lulus Ujian Tahap {{ $certificate->level->number }} dengan markah <b>{{ $certificate->score }}/{{ $certificate->total }}</b>.</p>
-        <small class="cert-date">{{ $certificate->issued_at->locale('ms')->translatedFormat('j F Y') }} · Pak Kuda</small>
+        <p>{!! __('telah lulus Ujian Tahap :n dengan markah :score.', ['n' => $certificate->level->number, 'score' => '<b>'.$certificate->score.'/'.$certificate->total.'</b>']) !!}</p>
+        <small class="cert-date">{{ $certificate->issued_at->locale(app()->getLocale())->translatedFormat('j F Y') }} · Pak Kuda</small>
     </div>
 
-    <p class="verify">Sijil sah. Kod pengesahan: <b>{{ $certificate->code }}</b><br>{{ route('sijil', $certificate->code) }}</p>
+    <p class="verify">{!! __('Sijil sah. Kod pengesahan: :code', ['code' => '<b>'.e($certificate->code).'</b>']) !!}<br>{{ route('sijil', $certificate->code) }}</p>
 
     <div class="no-print">
         @if ($this->isOwner())
             <form wire:submit="saveName">
-                <input class="cert-name" type="text" wire:model="displayName" maxlength="40" aria-label="Nama pada sijil" placeholder="Tulis nama awak">
-                <button class="cta" type="submit">Simpan nama</button>
+                <input class="cert-name" type="text" wire:model="displayName" maxlength="40" aria-label="{{ __('Nama pada sijil') }}" placeholder="{{ __('Tulis nama awak') }}">
+                <button class="cta" type="submit">{{ __('Simpan nama') }}</button>
             </form>
             @error('displayName') <p class="status bad">{{ $message }}</p> @enderror
         @endif
         <div class="actions" style="justify-content: center; margin-top: 12px">
-            <button class="ghost" type="button" onclick="window.print()">Cetak</button>
-            @auth <a class="ghost" href="{{ route('peta') }}">Ke peta</a> @endauth
+            <button class="ghost" type="button" onclick="window.print()">{{ __('Cetak') }}</button>
+            @auth <a class="ghost" href="{{ route('peta') }}">{{ __('Ke peta') }}</a> @endauth
         </div>
     </div>
 </div>

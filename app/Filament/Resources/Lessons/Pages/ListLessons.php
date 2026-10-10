@@ -16,16 +16,16 @@ class ListLessons extends ListRecords
     {
         return [
             Action::make('import')
-                ->label('Import dari lessons.json')
+                ->label(__('Import dari lessons.json'))
                 ->icon('heroicon-o-arrow-down-tray')
                 ->requiresConfirmation()
-                ->modalDescription('Kandungan (tajuk, langkah, tip) dikemas kini daripada data/lessons.json selepas disemak oleh validate-lessons. Kedudukan dan status terbit di sini tidak berubah.')
+                ->modalDescription(__('Kandungan (tajuk, langkah, tip) dikemas kini daripada data/lessons.json selepas disemak oleh validate-lessons. Kedudukan dan status terbit di sini tidak berubah.'))
                 ->action(function () {
                     $ok = Artisan::call('chessflow:import-lessons') === 0;
                     $output = trim(Artisan::output());
 
                     Notification::make()
-                        ->title($ok ? 'Import selesai' : 'Import gagal')
+                        ->title($ok ? __('Import selesai') : __('Import gagal'))
                         ->body($output)
                         ->status($ok ? 'success' : 'danger')
                         ->send();

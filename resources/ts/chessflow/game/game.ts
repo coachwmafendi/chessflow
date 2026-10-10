@@ -8,6 +8,7 @@ import { sharedEngine, type StockfishEngine } from '../engine/stockfish';
 import { judgeDrawOffer } from './draw';
 import { analyseGame, type Mistake } from './analysis';
 import { newBadgesHtml, type NewBadge } from '../core/badges';
+import { t } from '../i18n';
 
 export type GameOutcome = 'win' | 'loss' | 'draw' | 'resign';
 
@@ -118,17 +119,21 @@ export class GameRunner {
 
     private render(): void {
         this.root.innerHTML =
-            '<div class="lesson-bar"><h2>Main lawan Pak Kuda</h2></div>' +
+            '<div class="lesson-bar"><h2>' + t('Main lawan Pak Kuda') + '</h2></div>' +
             '<div class="lesson"><div class="board-wrap"><div class="gbw"></div><p class="turn"></p></div><div class="panel">' +
-            '<div class="setup"><div class="seg" role="group" aria-label="Warna"><span class="seg-l">Warna</span><button type="button" data-c="w">Putih</button><button type="button" data-c="b">Hitam</button><button type="button" data-c="r">Rawak</button></div>' +
-            '<div class="seg" role="group" aria-label="Tahap"><span class="seg-l">Tahap</span>' +
-            LEVELS.map((l, i) => '<button type="button" data-l="' + i + '">' + l.n + '</button>').join('') +
-            '</div><button class="cta" type="button" data-act="new">Permainan baru</button></div>' +
+            '<div class="setup"><div class="seg" role="group" aria-label="' + t('Warna') + '"><span class="seg-l">' + t('Warna') + '</span><button type="button" data-c="w">' + t('Putih') + '</button><button type="button" data-c="b">' + t('Hitam') + '</button><button type="button" data-c="r">' + t('Rawak') + '</button></div>' +
+            '<div class="seg" role="group" aria-label="' + t('Tahap') + '"><span class="seg-l">' + t('Tahap') + '</span>' +
+            LEVELS.map((l, i) => '<button type="button" data-l="' + i + '">' + t(l.n) + '</button>').join('') +
+            '</div><button class="cta" type="button" data-act="new">' + t('Permainan baru') + '</button></div>' +
             '<div class="status" role="status" aria-live="polite"></div>' +
-            '<div class="moves"><small>Langkah</small><ol></ol>' +
-            '<p class="notation-key">K Raja · Q Menteri · R Tir · B Gajah · N Kuda · x makan · + sah · # sah mati · <a href="/istilah">Istilah</a></p></div>' +
+            '<div class="moves"><small>' + t('Langkah') + '</small><ol></ol>' +
+            '<p class="notation-key">' +
+            t('K Raja · Q Menteri · R Tir · B Gajah · N Kuda · x makan · + sah · # sah mati') +
+            ' · <a href="/istilah">' +
+            t('Istilah') +
+            '</a></p></div>' +
             '<div class="analysis" aria-live="polite" hidden></div>' +
-            '<div class="actions"><button class="ghost" type="button" data-act="undo">Undur</button><button class="ghost" type="button" data-act="hint">Petunjuk</button><span class="spacer"></span><span class="actions-end"><button class="ghost" type="button" data-act="draw">' + ICON_DRAW + 'Minta seri</button><button class="ghost" type="button" data-act="resign">' + ICON_RESIGN + 'Mengaku kalah</button></span></div>' +
+            '<div class="actions"><button class="ghost" type="button" data-act="undo">' + t('Undur') + '</button><button class="ghost" type="button" data-act="hint">' + t('Petunjuk') + '</button><span class="spacer"></span><span class="actions-end"><button class="ghost" type="button" data-act="draw">' + ICON_DRAW + t('Minta seri') + '</button><button class="ghost" type="button" data-act="resign">' + ICON_RESIGN + t('Mengaku kalah') + '</button></span></div>' +
             '</div></div>';
 
         this.root.querySelectorAll<HTMLElement>('[data-c]').forEach(
@@ -158,10 +163,10 @@ export class GameRunner {
         this.root.querySelectorAll<HTMLElement>('[data-l]').forEach((b) => b.setAttribute('aria-pressed', String(Number(b.dataset.l) === this.level)));
     }
 
-    private status(t: string, k: 'good' | 'bad' | 'info' | '' = ''): void {
+    private status(text: string, k: 'good' | 'bad' | 'info' | '' = ''): void {
         const s = this.$('.status');
         s.className = 'status' + (k ? ' ' + k : '');
-        s.textContent = t;
+        s.textContent = text;
     }
 
     private showMoves(): void {
@@ -171,7 +176,7 @@ export class GameRunner {
         const ol = this.$('.moves ol');
         ol.innerHTML = out;
         ol.scrollTop = ol.scrollHeight;
-        this.$('.turn').textContent = this.over ? '' : this.g.turn() === this.user ? 'Giliran awak' : 'Pak Kuda sedang berfikir…';
+        this.$('.turn').textContent = this.over ? '' : this.g.turn() === this.user ? t('Giliran awak') : t('Pak Kuda sedang berfikir…');
     }
 
     private start(): void {
@@ -197,12 +202,8 @@ export class GameRunner {
         this.hideAnalysis();
         this.root.querySelector('.new-badges')?.remove();
         this.status(
-            'Awak main ' +
-                (this.user === 'w' ? 'Putih' : 'Hitam') +
-                ' · tahap ' +
-                LEVELS[this.level].n +
-                '.' +
-                (this.level > 0 && !this.engine.available ? ' (Enjin kuat tidak dapat dimuatkan, Pak Kuda guna otak sendiri.)' : ''),
+            t('Awak main :colour · tahap :level.', { colour: this.user === 'w' ? t('Putih') : t('Hitam'), level: t(LEVELS[this.level].n) }) +
+                (this.level > 0 && !this.engine.available ? ' ' + t('(Enjin kuat tidak dapat dimuatkan, Pak Kuda guna otak sendiri.)') : ''),
             'info',
         );
         this.showMoves();
@@ -227,23 +228,23 @@ export class GameRunner {
         this.over = true;
         if (g.isCheckmate()) {
             if (g.turn() !== this.user) {
-                this.status('Sah mati! Awak menang lawan Pak Kuda (' + LEVELS[this.level].n + ').', 'good');
+                this.status(t('Sah mati! Awak menang lawan Pak Kuda (:level).', { level: t(LEVELS[this.level].n) }), 'good');
                 SFX.win();
                 this.report('win');
             } else {
-                this.status('Sah mati. Pak Kuda menang kali ini. Cuba lagi!', 'bad');
+                this.status(t('Sah mati. Pak Kuda menang kali ini. Cuba lagi!'), 'bad');
                 SFX.bad();
                 this.report('loss');
             }
         } else {
             this.status(
                 g.isStalemate()
-                    ? 'Stalemate. Permainan seri.'
+                    ? t('Stalemate. Permainan seri.')
                     : g.isThreefoldRepetition()
-                      ? 'Ulangan tiga kali. Seri.'
+                      ? t('Ulangan tiga kali. Seri.')
                       : g.isInsufficientMaterial()
-                        ? 'Buah tak cukup untuk sah mati. Seri.'
-                        : 'Seri (peraturan 50 langkah).',
+                        ? t('Buah tak cukup untuk sah mati. Seri.')
+                        : t('Seri (peraturan 50 langkah).'),
                 'info',
             );
             this.report('draw');
@@ -280,7 +281,7 @@ export class GameRunner {
                     this.apply(choice);
                     SFX.move();
                     this.busy = false;
-                    if (!this.end()) this.status(this.g.inCheck() ? 'Sah! Selamatkan Raja awak.' : '', this.g.inCheck() ? 'bad' : '');
+                    if (!this.end()) this.status(this.g.inCheck() ? t('Sah! Selamatkan Raja awak.') : '', this.g.inCheck() ? 'bad' : '');
                     this.showMoves();
                 },
                 this.level === 0 ? 500 : 150,
@@ -349,21 +350,21 @@ export class GameRunner {
         this.board.arrows([]);
         this.sel = null;
         this.hideAnalysis();
-        this.status('Langkah diundur.', 'info');
+        this.status(t('Langkah diundur.'), 'info');
         this.showMoves();
     }
 
     private hint(): void {
         if (this.busy || this.over || this.g.turn() !== this.user) return;
         this.busy = true;
-        this.status('Pak Kuda sedang fikir petunjuk…', 'info');
+        this.status(t('Pak Kuda sedang fikir petunjuk…'), 'info');
         const id = this.gameId;
         const show = (mv: { from: string; to: string } | null) => {
             if (id !== this.gameId) return;
             this.busy = false;
-            if (!mv) return this.status('Tiada petunjuk.', 'info');
+            if (!mv) return this.status(t('Tiada petunjuk.'), 'info');
             this.board.arrows([{ from: sq(mv.from), to: sq(mv.to), kind: 'path' }]);
-            this.status('Cuba langkah anak panah ini.', 'info');
+            this.status(t('Cuba langkah anak panah ini.'), 'info');
         };
         const local = () => bot(this.g, 'defend', this.g.turn() === 'w' ? 'b' : 'w', 1);
         if (!this.engine.available) return show(local());
@@ -395,9 +396,9 @@ export class GameRunner {
         modal.innerHTML =
             '<div class="card" role="alertdialog" aria-modal="true" aria-labelledby="resign-t" aria-describedby="resign-d">' +
             '<span class="qico big resign-ico">' + ICON_RESIGN + '</span>' +
-            '<h2 id="resign-t">Mengaku kalah?</h2>' +
-            '<p id="resign-d">Permainan ini akan tamat dan dikira kalah. Tak apa, pemain hebat pun pernah kalah. Atau awak boleh teruskan dan cuba bertahan!</p>' +
-            '<div class="actions confirm-actions"><button class="ghost danger" type="button" data-r="yes">Ya, mengaku kalah</button><button class="cta" type="button" data-r="no">Teruskan main</button></div>' +
+            '<h2 id="resign-t">' + t('Mengaku kalah?') + '</h2>' +
+            '<p id="resign-d">' + t('Permainan ini akan tamat dan dikira kalah. Tak apa, pemain hebat pun pernah kalah. Atau awak boleh teruskan dan cuba bertahan!') + '</p>' +
+            '<div class="actions confirm-actions"><button class="ghost danger" type="button" data-r="yes">' + t('Ya, mengaku kalah') + '</button><button class="cta" type="button" data-r="no">' + t('Teruskan main') + '</button></div>' +
             '</div>';
         const yes = modal.querySelector('[data-r="yes"]') as HTMLButtonElement;
         const no = modal.querySelector('[data-r="no"]') as HTMLButtonElement;
@@ -432,7 +433,7 @@ export class GameRunner {
     private resign(): void {
         if (this.over) return;
         this.over = true;
-        this.status('Awak mengaku kalah. Tekan "Permainan baru" untuk cuba lagi.', 'bad');
+        this.status(t('Awak mengaku kalah. Tekan "Permainan baru" untuk cuba lagi.'), 'bad');
         this.report('resign');
         this.showMoves();
         this.offerAnalysis();
@@ -453,20 +454,23 @@ export class GameRunner {
         const box = this.$('.analysis');
         box.hidden = false;
         box.innerHTML =
-            '<button class="cta" type="button" data-act="analyse">Semak permainan dengan Pak Kuda</button>' +
-            '<small>Pak Kuda tunjuk langkah yang paling penting untuk dipelajari.</small>';
+            '<button class="cta" type="button" data-act="analyse">' +
+            t('Semak permainan dengan Pak Kuda') +
+            '</button><small>' +
+            t('Pak Kuda tunjuk langkah yang paling penting untuk dipelajari.') +
+            '</small>';
         (box.querySelector('[data-act="analyse"]') as HTMLElement).onclick = () => void this.runAnalysis();
     }
 
     private async runAnalysis(): Promise<void> {
         const box = this.$('.analysis');
         if (!this.engine.available) {
-            box.innerHTML = '<p class="analysis-note">Analisis perlukan enjin catur, tetapi enjin tidak dapat dimuatkan pada peranti ini.</p>';
+            box.innerHTML = '<p class="analysis-note">' + t('Analisis perlukan enjin catur, tetapi enjin tidak dapat dimuatkan pada peranti ini.') + '</p>';
             return;
         }
         const id = this.gameId;
         box.innerHTML =
-            '<p class="analysis-note">Pak Kuda sedang menyemak permainan… <b class="pct">0%</b></p><div class="meter analysis-meter"><span style="width:0%"></span></div>';
+            '<p class="analysis-note">' + t('Pak Kuda sedang menyemak permainan…') + ' <b class="pct">0%</b></p><div class="meter analysis-meter"><span style="width:0%"></span></div>';
         const bar = box.querySelector('.analysis-meter span') as HTMLElement;
         const pct = box.querySelector('.pct') as HTMLElement;
         const result = await analyseGame(
@@ -487,11 +491,11 @@ export class GameRunner {
     private showMistakes(list: Mistake[]): void {
         const box = this.$('.analysis');
         if (!list.length) {
-            box.innerHTML = '<p class="analysis-good">Tiada kesilapan besar dalam permainan ini. Syabas!</p>';
+            box.innerHTML = '<p class="analysis-good">' + t('Tiada kesilapan besar dalam permainan ini. Syabas!') + '</p>';
             return;
         }
         box.innerHTML =
-            '<small>Langkah untuk dipelajari</small><ol class="mistakes">' +
+            '<small>' + t('Langkah untuk dipelajari') + '</small><ol class="mistakes">' +
             list
                 .map(
                     (m, k) =>
@@ -500,18 +504,19 @@ export class GameRunner {
                         '" aria-pressed="false"><span class="tag ' +
                         m.severity +
                         '">' +
-                        (m.severity === 'besar' ? 'Kesilapan besar' : 'Silap kecil') +
-                        '</span><b>Langkah ' +
-                        m.moveNo +
-                        ': ' +
-                        m.san +
+                        (m.severity === 'besar' ? t('Kesilapan besar') : t('Silap kecil')) +
+                        '</span><b>' +
+                        t('Langkah :n: :san', { n: m.moveNo, san: m.san }) +
                         '</b><span>' +
                         m.text +
                         '</span></button></li>',
                 )
                 .join('') +
-            '</ol><p class="analysis-legend" hidden>Anak panah merah: langkah awak. Hijau: cadangan Pak Kuda.</p>' +
-            '<button class="ghost" type="button" data-act="final" hidden>Kembali ke kedudukan akhir</button>';
+            '</ol><p class="analysis-legend" hidden>' +
+            t('Anak panah merah: langkah awak. Hijau: cadangan Pak Kuda.') +
+            '</p><button class="ghost" type="button" data-act="final" hidden>' +
+            t('Kembali ke kedudukan akhir') +
+            '</button>';
         box.querySelectorAll<HTMLElement>('.mistake').forEach((b) => (b.onclick = () => this.showMistake(list, Number(b.dataset.k))));
         (box.querySelector('[data-act="final"]') as HTMLElement).onclick = () => this.showFinalPosition();
     }

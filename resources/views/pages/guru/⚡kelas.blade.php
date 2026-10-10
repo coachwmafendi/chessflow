@@ -43,7 +43,7 @@ new #[Layout('layouts::chessflow')] class extends Component {
     public function addStudents(CreateStudents $create): void
     {
         $this->authorize('manage', $this->classroom);
-        $this->validate(['names' => 'required|string|max:4000'], [], ['names' => 'senarai nama']);
+        $this->validate(['names' => 'required|string|max:4000'], [], ['names' => __('senarai nama')]);
 
         $lines = preg_split('/\R/', $this->names) ?: [];
         $this->credentials = $create->handle(auth()->user(), $lines, $this->classroom);
@@ -73,8 +73,8 @@ new #[Layout('layouts::chessflow')] class extends Component {
             'dueOn' => ['nullable', 'date_format:Y-m-d', 'after_or_equal:'.Chessflow::today()],
             'note' => ['nullable', 'string', 'max:200'],
         ], [
-            'dueOn.after_or_equal' => 'Tarikh akhir tidak boleh sebelum hari ini.',
-        ], ['lessonId' => 'pelajaran', 'dueOn' => 'tarikh akhir', 'note' => 'nota']);
+            'dueOn.after_or_equal' => __('Tarikh akhir tidak boleh sebelum hari ini.'),
+        ], ['lessonId' => __('pelajaran'), 'dueOn' => __('tarikh akhir'), 'note' => __('nota')]);
 
         $lesson = Lesson::where('is_published', true)->findOrFail($this->lessonId);
         $assignment = Assignment::updateOrCreate(
@@ -82,7 +82,9 @@ new #[Layout('layouts::chessflow')] class extends Component {
             ['due_on' => $this->dueOn ?: null, 'note' => trim($this->note) ?: null],
         );
 
-        $this->assignedMsg = ($assignment->wasRecentlyCreated ? 'Tugasan diberi: ' : 'Tugasan dikemas kini: ').$lesson->title.'.';
+        $this->assignedMsg = $assignment->wasRecentlyCreated
+            ? __('Tugasan diberi: :lesson.', ['lesson' => $lesson->title])
+            : __('Tugasan dikemas kini: :lesson.', ['lesson' => $lesson->title]);
         $this->reset('lessonId', 'dueOn', 'note');
     }
 
@@ -105,24 +107,24 @@ new #[Layout('layouts::chessflow')] class extends Component {
         }
         $delete->handle(auth()->user(), $student);
         $this->credentials = [];
-        $this->notice = 'Akaun '.$student->name.' dan semua datanya telah dipadam.';
+        $this->notice = __('Akaun :name dan semua datanya telah dipadam.', ['name' => $student->name]);
     }
 
     /** Typed confirmation (wire:confirm.prompt): deleting cannot be undone. */
     private function deleteConfirm(User $student): string
     {
-        return e('Padam akaun '.$student->name.' selama-lamanya? Semua kemajuan, sijil, lencana dan permainan akan hilang dan tidak boleh dipulihkan. Taip PADAM untuk sahkan.').'|PADAM';
+        return e(__('Padam akaun :name selama-lamanya? Semua kemajuan, sijil, lencana dan permainan akan hilang dan tidak boleh dipulihkan. Taip :word untuk sahkan.', ['name' => $student->name, 'word' => __('PADAM')])).'|'.e(__('PADAM'));
     }
 
     public function actionsHtml(User $student): string
     {
-        $html = '<button class="ghost" type="button" wire:click="resetPin('.$student->id.')">PIN baru</button> '
+        $html = '<button class="ghost" type="button" wire:click="resetPin('.$student->id.')">'.e(__('PIN baru')).'</button> '
             .'<button class="ghost" type="button" wire:click="remove('.$student->id.')" wire:confirm="'
-            .e('Keluarkan '.$student->name.' daripada kelas?').'">Keluarkan</button>';
+            .e(__('Keluarkan :name daripada kelas?', ['name' => $student->name])).'">'.e(__('Keluarkan')).'</button>';
 
         if (app(DeleteStudent::class)->deniedReason(auth()->user(), $student) === null) {
             $html .= ' <button class="ghost danger" type="button" wire:click="deleteStudent('.$student->id.')" wire:confirm.prompt="'
-                .$this->deleteConfirm($student).'">Padam akaun</button>';
+                .$this->deleteConfirm($student).'">'.e(__('Padam akaun')).'</button>';
         }
 
         return $html;
@@ -143,10 +145,10 @@ new #[Layout('layouts::chessflow')] class extends Component {
 }; ?>
 
 <div>
-    <p class="no-print" style="margin-block: 8px 0"><a class="ghost" href="{{ route('guru') }}">← Kelas saya</a></p>
+    <p class="no-print" style="margin-block: 8px 0"><a class="ghost" href="{{ route('guru') }}">{{ __('← Kelas saya') }}</a></p>
     <div class="page-head">
         <h1>{{ $classroom->name }}</h1>
-        <span>Kod sertai: <span class="code">{{ $classroom->join_code }}</span></span>
+        <span>{{ __('Kod sertai:') }} <span class="code">{{ $classroom->join_code }}</span></span>
     </div>
 
     @if ($notice)
@@ -155,26 +157,26 @@ new #[Layout('layouts::chessflow')] class extends Component {
 
     @if ($credentials)
         <section class="panel-card" wire:key="creds">
-            <h2>Akaun murid</h2>
-            <p>Salin atau cetak sekarang. PIN tidak akan dipaparkan lagi.</p>
+            <h2>{{ __('Akaun murid') }}</h2>
+            <p>{{ __('Salin atau cetak sekarang. PIN tidak akan dipaparkan lagi.') }}</p>
             <table class="creds">
-                <thead><tr><th>Nama</th><th>Nama pengguna</th><th>PIN</th></tr></thead>
+                <thead><tr><th>{{ __('Nama') }}</th><th>{{ __('Nama pengguna') }}</th><th>PIN</th></tr></thead>
                 <tbody>
                     @foreach ($credentials as $c)
                         <tr><td>{{ $c['name'] }}</td><td>{{ $c['username'] }}</td><td>{{ $c['pin'] }}</td></tr>
                     @endforeach
                 </tbody>
             </table>
-            <p class="no-print" style="margin-top: 8px">Murid masuk di <b>{{ route('murid.login') }}</b>
-                <button class="ghost" type="button" onclick="window.print()">Cetak</button>
-                <button class="ghost" type="button" wire:click="$set('credentials', [])">Tutup</button></p>
+            <p class="no-print" style="margin-top: 8px">{!! __('Murid masuk di :url', ['url' => '<b>'.e(route('murid.login')).'</b>']) !!}
+                <button class="ghost" type="button" onclick="window.print()">{{ __('Cetak') }}</button>
+                <button class="ghost" type="button" wire:click="$set('credentials', [])">{{ __('Tutup') }}</button></p>
         </section>
     @endif
 
     <section class="panel-card assign-panel">
-        <h2>Tugasan</h2>
+        <h2>{{ __('Tugasan') }}</h2>
         @if ($assignments->isEmpty())
-            <p class="muted">Beri pelajaran atau ujian kepada seluruh kelas. Pelajaran itu terus terbuka untuk semua murid kelas ini, walaupun mereka belum sampai di peta.</p>
+            <p class="muted">{{ __('Beri pelajaran atau ujian kepada seluruh kelas. Pelajaran itu terus terbuka untuk semua murid kelas ini, walaupun mereka belum sampai di peta.') }}</p>
         @else
             <ul class="assign-list">
                 @foreach ($assignments as $row)
@@ -188,20 +190,20 @@ new #[Layout('layouts::chessflow')] class extends Component {
                             <div>
                                 <b>{{ $a->lesson->title }}</b>
                                 <small>
-                                    {{ $a->dueLabel() ?? 'Tiada tarikh akhir' }}@if ($a->isOverdue() && ! $complete) · <span class="late">Lewat</span>@endif
+                                    {{ $a->dueLabel() ?? __('Tiada tarikh akhir') }}@if ($a->isOverdue() && ! $complete) · <span class="late">{{ __('Lewat') }}</span>@endif
                                     @if ($a->note) · {{ $a->note }}@endif
                                 </small>
                             </div>
-                            <span class="assign-count">{{ $row['done'] }}/{{ $row['total'] }}<small>siap</small></span>
+                            <span class="assign-count">{{ $row['done'] }}/{{ $row['total'] }}<small>{{ __('siap') }}</small></span>
                         </div>
                         <div class="meter" aria-hidden="true"><span style="width: {{ $row['total'] ? round($row['done'] / $row['total'] * 100) : 0 }}%"></span></div>
                         <div class="assign-foot">
                             @if ($row['pending']->isNotEmpty() && ! $complete)
-                                <details><summary>Belum siap ({{ $row['pending']->count() }})</summary><p>{{ $row['pending']->pluck('name')->implode(', ') }}</p></details>
+                                <details><summary>{{ __('Belum siap (:n)', ['n' => $row['pending']->count()]) }}</summary><p>{{ $row['pending']->pluck('name')->implode(', ') }}</p></details>
                             @elseif ($complete)
-                                <span class="good-text">Semua murid sudah siap.</span>
+                                <span class="good-text">{{ __('Semua murid sudah siap.') }}</span>
                             @endif
-                            <button class="ghost no-print" type="button" wire:click="unassign({{ $a->id }})" wire:confirm="{{ 'Padam tugasan '.$a->lesson->title.'? Kemajuan murid tidak dipadam.' }}">Padam</button>
+                            <button class="ghost no-print" type="button" wire:click="unassign({{ $a->id }})" wire:confirm="{{ __('Padam tugasan :lesson? Kemajuan murid tidak dipadam.', ['lesson' => $a->lesson->title]) }}">{{ __('Padam') }}</button>
                         </div>
                     </li>
                 @endforeach
@@ -209,11 +211,11 @@ new #[Layout('layouts::chessflow')] class extends Component {
         @endif
 
         <form wire:submit="assign" class="assign-form no-print">
-            <label><span>Pelajaran</span>
+            <label><span>{{ __('Pelajaran') }}</span>
                 <select wire:model="lessonId" required>
-                    <option value="">Pilih pelajaran…</option>
+                    <option value="">{{ __('Pilih pelajaran…') }}</option>
                     @foreach ($levels as $level)
-                        <optgroup label="Tahap {{ $level->number }}: {{ $level->name }}">
+                        <optgroup label="{{ __('Tahap :n: :name', ['n' => $level->number, 'name' => $level->name]) }}">
                             @foreach ($lessons->where('level_id', $level->id) as $l)
                                 <option value="{{ $l->id }}">{{ $l->title }}</option>
                             @endforeach
@@ -221,13 +223,13 @@ new #[Layout('layouts::chessflow')] class extends Component {
                     @endforeach
                 </select>
             </label>
-            <label><span>Tarikh akhir <small>(pilihan)</small></span>
+            <label><span>{{ __('Tarikh akhir') }} <small>{{ __('(pilihan)') }}</small></span>
                 <input type="date" wire:model="dueOn" min="{{ $today }}">
             </label>
-            <label class="grow"><span>Nota untuk murid <small>(pilihan)</small></span>
-                <input type="text" wire:model="note" maxlength="200" placeholder="Contoh: Siapkan sebelum kelab Jumaat">
+            <label class="grow"><span>{{ __('Nota untuk murid') }} <small>{{ __('(pilihan)') }}</small></span>
+                <input type="text" wire:model="note" maxlength="200" placeholder="{{ __('Contoh: Siapkan sebelum kelab Jumaat') }}">
             </label>
-            <button class="cta" type="submit">Beri tugasan</button>
+            <button class="cta" type="submit">{{ __('Beri tugasan') }}</button>
             @error('lessonId') <p class="err">{{ $message }}</p> @enderror
             @error('dueOn') <p class="err">{{ $message }}</p> @enderror
             @error('note') <p class="err">{{ $message }}</p> @enderror
@@ -238,13 +240,13 @@ new #[Layout('layouts::chessflow')] class extends Component {
     <x-chessflow.progress-table :rows="$rows" :lessons="$lessons" :actions="fn ($s) => $this->actionsHtml($s)" />
 
     <section class="panel-card no-print">
-        <h2>Tambah murid</h2>
-        <p>Satu nama setiap baris (maksimum {{ App\Actions\CreateStudents::MAX_PER_BATCH }}). Akaun tanpa e-mel dicipta dengan nama pengguna dan PIN. Murid yang sudah ada akaun boleh sertai dengan kod <b>{{ $classroom->join_code }}</b>.</p>
+        <h2>{{ __('Tambah murid') }}</h2>
+        <p>{!! __('Satu nama setiap baris (maksimum :max). Akaun tanpa e-mel dicipta dengan nama pengguna dan PIN. Murid yang sudah ada akaun boleh sertai dengan kod :code.', ['max' => App\Actions\CreateStudents::MAX_PER_BATCH, 'code' => '<b>'.e($classroom->join_code).'</b>']) !!}</p>
         <form wire:submit="addStudents">
-            <textarea wire:model="names" aria-label="Nama murid" placeholder="Aina&#10;Badrul&#10;Chong Wei"></textarea>
-            <button class="cta" type="submit">Cipta akaun</button>
+            <textarea wire:model="names" aria-label="{{ __('Nama murid') }}" placeholder="Aina&#10;Badrul&#10;Chong Wei"></textarea>
+            <button class="cta" type="submit">{{ __('Cipta akaun') }}</button>
             @error('names') <p class="err">{{ $message }}</p> @enderror
-            <p class="consent">Dengan mencipta akaun murid, anda mengesahkan anda berhak memberi kebenaran bagi pihak murid ini (contohnya dengan izin sekolah atau ibu bapa), mengikut <a href="{{ route('privasi') }}">Dasar Privasi</a>.</p>
+            <p class="consent">{!! __('Dengan mencipta akaun murid, anda mengesahkan anda berhak memberi kebenaran bagi pihak murid ini (contohnya dengan izin sekolah atau ibu bapa), mengikut :policy.', ['policy' => '<a href="'.route('privasi').'">'.e(__('Dasar Privasi')).'</a>']) !!}</p>
         </form>
     </section>
 </div>

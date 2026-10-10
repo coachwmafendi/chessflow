@@ -1,6 +1,7 @@
 import { Chess, type Move } from 'chess.js';
 import { PNAME } from '../core/names';
 import type { Evaluation } from '../engine/stockfish';
+import { t } from '../i18n';
 
 // Post-game review: score the position before and after each of the player's moves and
 // explain the biggest drops in words a child can follow. Pure (the engine is passed in) so it
@@ -55,22 +56,26 @@ const VALUE: Record<string, number> = { p: 1, n: 3, b: 3, r: 5, q: 9, k: 0 };
 /** One sentence on what went wrong, from the engine's best move before and best reply after. */
 export function explain(san: string, before: Evaluation, after: Evaluation, best: Move | null, reply: Move | null, loss: number): string {
     if (after.mate !== null && after.mate > 0 && reply) {
-        return 'Langkah ini beri Pak Kuda peluang sah mati' + (after.mate > 1 ? ' dalam ' + after.mate + ' langkah' : '') + ', bermula dengan ' + reply.san + '.';
+        return after.mate > 1
+            ? t('Langkah ini beri Pak Kuda peluang sah mati dalam :n langkah, bermula dengan :san.', { n: after.mate, san: reply.san })
+            : t('Langkah ini beri Pak Kuda peluang sah mati, bermula dengan :san.', { san: reply.san });
     }
     if (reply?.captured && reply.captured !== 'p') {
-        return 'Selepas ' + san + ', Pak Kuda boleh makan ' + name(reply.captured) + ' awak dengan ' + reply.san + '.';
+        return t('Selepas :move, Pak Kuda boleh makan :piece awak dengan :san.', { move: san, piece: name(reply.captured), san: reply.san });
     }
     if (before.mate !== null && before.mate > 0 && best) {
-        return 'Ada sah mati' + (before.mate > 1 ? ' dalam ' + before.mate + ' langkah' : '') + '! Cuba ' + best.san + '.';
+        return before.mate > 1
+            ? t('Ada sah mati dalam :n langkah! Cuba :san.', { n: before.mate, san: best.san })
+            : t('Ada sah mati! Cuba :san.', { san: best.san });
     }
     // A missed pawn does not explain a big drop; then the stronger move says more.
     if (best?.captured && (VALUE[best.captured] >= 3 || loss < BIG_CP)) {
-        return 'Awak terlepas peluang makan ' + name(best.captured) + ' dengan ' + best.san + '.';
+        return t('Awak terlepas peluang makan :piece dengan :san.', { piece: name(best.captured), san: best.san });
     }
     if (reply?.captured) {
-        return 'Selepas ' + san + ', Pak Kuda boleh makan bidak awak dengan ' + reply.san + '.';
+        return t('Selepas :move, Pak Kuda boleh makan bidak awak dengan :san.', { move: san, san: reply.san });
     }
-    return best ? 'Langkah yang lebih kuat ialah ' + best.san + '.' : 'Langkah ini melemahkan kedudukan awak.';
+    return best ? t('Langkah yang lebih kuat ialah :san.', { san: best.san }) : t('Langkah ini melemahkan kedudukan awak.');
 }
 
 /**

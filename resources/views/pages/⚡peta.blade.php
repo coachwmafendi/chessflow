@@ -70,35 +70,35 @@ new #[Layout('layouts::chessflow')] #[Title('Peta')] class extends Component {
     <section class="hero">
         <div class="avatar"><i class="pc pk"></i></div>
         <div>
-            <h1>{{ $doneCount ? 'Selamat kembali!' : 'Jom main catur!' }}</h1>
-            <p>Saya Pak Kuda. Kita belajar catur langkah demi langkah: kenal buah, belajar taktik, kutip bintang dan kumpul XP.</p>
+            <h1>{{ $doneCount ? __('Selamat kembali!') : __('Jom main catur!') }}</h1>
+            <p>{{ __('Saya Pak Kuda. Kita belajar catur langkah demi langkah: kenal buah, belajar taktik, kutip bintang dan kumpul XP.') }}</p>
             <div class="hero-row">
                 @if ($next)
-                    <a class="cta" href="{{ route('pelajaran', $next) }}">{{ $doneCount ? 'Sambung' : 'Mula' }}: {{ $next->title }}</a>
+                    <a class="cta" href="{{ route('pelajaran', $next) }}">{{ $doneCount ? __('Sambung: :lesson', ['lesson' => $next->title]) : __('Mula: :lesson', ['lesson' => $next->title]) }}</a>
                 @else
-                    <span class="pill">Semua pelajaran selesai!</span>
+                    <span class="pill">{{ __('Semua pelajaran selesai!') }}</span>
                 @endif
-                <div class="meter" role="progressbar" aria-label="Kemajuan pelajaran" aria-valuemin="0" aria-valuemax="{{ $total }}" aria-valuenow="{{ $doneCount }}"><span style="width: {{ $total ? round($doneCount / $total * 100) : 0 }}%"></span></div>
-                <small class="meter-lbl">{{ $doneCount }}/{{ $total }} pelajaran</small>
+                <div class="meter" role="progressbar" aria-label="{{ __('Kemajuan pelajaran') }}" aria-valuemin="0" aria-valuemax="{{ $total }}" aria-valuenow="{{ $doneCount }}"><span style="width: {{ $total ? round($doneCount / $total * 100) : 0 }}%"></span></div>
+                <small class="meter-lbl">{{ __(':done/:total pelajaran', ['done' => $doneCount, 'total' => $total]) }}</small>
             </div>
         </div>
     </section>
 
     @if ($newBadges->isNotEmpty())
         <section class="badge-toast" role="status">
-            <b>{{ $newBadges->count() === 1 ? 'Lencana baru!' : $newBadges->count().' lencana baru!' }}</b>
+            <b>{{ $newBadges->count() === 1 ? __('Lencana baru!') : __(':n lencana baru!', ['n' => $newBadges->count()]) }}</b>
             <div class="badge-toast-list">
                 @foreach ($newBadges as $b)
                     <x-chessflow.badge :badge="$b" :earned="true" class="mini" />
                 @endforeach
             </div>
-            <a class="ghost" href="{{ route('lencana') }}">Lihat semua lencana</a>
+            <a class="ghost" href="{{ route('lencana') }}">{{ __('Lihat semua lencana') }}</a>
         </section>
     @endif
 
     @if ($assignments->isNotEmpty())
         <section class="tasks" aria-labelledby="tasks-h">
-            <h2 id="tasks-h">Tugasan daripada guru</h2>
+            <h2 id="tasks-h">{{ __('Tugasan daripada guru') }}</h2>
             <ul>
                 @foreach ($assignments as $t)
                     @php $a = $t['assignment']; @endphp
@@ -111,11 +111,11 @@ new #[Layout('layouts::chessflow')] #[Title('Peta')] class extends Component {
                             </span>
                             <span class="task-state">
                                 @if ($t['done'])
-                                    Siap
+                                    {{ __('Siap') }}
                                 @elseif ($a->isOverdue())
-                                    Lewat
+                                    {{ __('Lewat') }}
                                 @else
-                                    {{ $a->dueLabel() ?? 'Buat sekarang' }}
+                                    {{ $a->dueLabel() ?? __('Buat sekarang') }}
                                 @endif
                             </span>
                         </a>
@@ -128,29 +128,29 @@ new #[Layout('layouts::chessflow')] #[Title('Peta')] class extends Component {
     <section class="quick">
         <a class="qcard{{ $dailyDone ? ' done' : '' }}" href="{{ route('harian') }}">
             <span class="qico flame"><x-chessflow.flame /></span>
-            <span><b>Teka-teki Hari Ini</b><small>{{ $dailyDone ? 'Selesai! Datang lagi esok.' : 'Satu teka-teki baharu setiap hari' }}</small></span>
-            <span class="qnum">{{ $streak }}<small>hari</small></span>
+            <span><b>{{ __('Teka-teki Hari Ini') }}</b><small>{{ $dailyDone ? __('Selesai! Datang lagi esok.') : __('Satu teka-teki baharu setiap hari') }}</small></span>
+            <span class="qnum">{{ $streak }}<small>{{ __('hari') }}</small></span>
         </a>
         @if ($reviewTotal > 0)
             <a class="qcard{{ $reviewDue ? '' : ' done' }}" href="{{ route('latih') }}">
                 <span class="qico review"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4a8 8 0 1 0 7.75 10h-2.1A6 6 0 1 1 12 6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35A7.97 7.97 0 0 0 12 4z"/></svg></span>
-                <span><b>Latih semula</b><small>{{ $reviewDue ? 'Soalan yang awak tersilap sebelum ini' : 'Tiada latihan hari ini. Bagus!' }}</small></span>
-                <span class="qnum">{{ $reviewDue }}<small>hari ini</small></span>
+                <span><b>{{ __('Latih semula') }}</b><small>{{ $reviewDue ? __('Soalan yang awak tersilap sebelum ini') : __('Tiada latihan hari ini. Bagus!') }}</small></span>
+                <span class="qnum">{{ $reviewDue }}<small>{{ __('hari ini') }}</small></span>
             </a>
         @endif
         <a class="qcard" href="{{ route('lencana') }}">
             <span class="qico badge-qico"><x-chessflow.medal /></span>
-            <span><b>Lencana</b><small>Kumpul lencana dengan belajar dan bermain</small></span>
+            <span><b>{{ __('Lencana') }}</b><small>{{ __('Kumpul lencana dengan belajar dan bermain') }}</small></span>
             <span class="qnum">{{ $badgeCount }}<small>/{{ $badgeTotal }}</small></span>
         </a>
         <a class="qcard" href="{{ route('main') }}">
             <span class="qico"><i class="pc bK"></i></span>
-            <span><b>Main lawan Pak Kuda</b><small>Permainan penuh: mudah, sederhana atau sukar</small></span>
-            <span class="qnum">{{ $wins }}<small>menang</small></span>
+            <span><b>{{ __('Main lawan Pak Kuda') }}</b><small>{{ __('Permainan penuh: mudah, sederhana atau sukar') }}</small></span>
+            <span class="qnum">{{ $wins }}<small>{{ __('menang') }}</small></span>
         </a>
     </section>
     @if (auth()->user()->isStudent())
-        <p class="join-link"><a href="{{ route('sertai') }}">Ada kod kelas daripada guru? Sertai kelas</a></p>
+        <p class="join-link"><a href="{{ route('sertai') }}">{{ __('Ada kod kelas daripada guru? Sertai kelas') }}</a></p>
     @endif
 
     @foreach ($levels as $level)
@@ -160,7 +160,7 @@ new #[Layout('layouts::chessflow')] #[Title('Peta')] class extends Component {
         @continue($levelStops->isEmpty())
         <section class="tahap">
             <div class="tahap-head">
-                <small>Tahap {{ $level->number }}</small>
+                <small>{{ __('Tahap :n', ['n' => $level->number]) }}</small>
                 <h2>{{ $level->name }}</h2>
                 <span>{{ $level->note }} · {{ $levelStops->where('done', true)->count() }}/{{ $levelStops->count() }}</span>
             </div>
@@ -174,7 +174,7 @@ new #[Layout('layouts::chessflow')] #[Title('Peta')] class extends Component {
                     @endphp
                     <div class="stop {{ $cls }}" style="--x: {{ $x }}px">
                         @if ($s['locked'])
-                            <button class="node" type="button" disabled aria-label="{{ $l->title }}, terkunci">
+                            <button class="node" type="button" disabled aria-label="{{ __(':lesson, terkunci', ['lesson' => $l->title]) }}">
                                 @if ($exam)<span class="medal"><x-chessflow.medal /></span>@else<i class="pc {{ $l->icon }}"></i>@endif
                                 <span class="lock"><x-chessflow.lock /></span>
                             </button>
@@ -186,11 +186,11 @@ new #[Layout('layouts::chessflow')] #[Title('Peta')] class extends Component {
                         <span class="lbl">{{ $l->title }}</span>
                         <span class="sub">
                             @if ($s['done'])
-                                @if ($exam) Lulus · {{ $s['score'] }} @else <x-chessflow.stars :n="$s['stars']" /> @endif
+                                @if ($exam) {{ __('Lulus · :score', ['score' => $s['score']]) }} @else <x-chessflow.stars :n="$s['stars']" /> @endif
                             @elseif ($s['locked'])
-                                Terkunci
+                                {{ __('Terkunci') }}
                             @else
-                                {{ $exam ? count($l->steps).' soalan · lulus 70%' : count($l->steps).' langkah · '.$l->xp.' XP' }}
+                                {{ $exam ? __(':n soalan · lulus 70%', ['n' => count($l->steps)]) : __(':n langkah · :xp XP', ['n' => count($l->steps), 'xp' => $l->xp]) }}
                             @endif
                         </span>
                     </div>

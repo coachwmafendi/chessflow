@@ -6,6 +6,7 @@ import { THEME_KEY, THEME_LABEL, applyTheme, getTheme, nextTheme, setTheme } fro
 import { ICONS } from './core/toolbar-icons';
 import type { Lesson, ServerLessonResult } from './types';
 import type { NewBadge } from './core/badges';
+import { t } from './i18n';
 
 declare global {
     interface Window {
@@ -60,17 +61,17 @@ function syncSoundButtons(): void {
     document.querySelectorAll<HTMLElement>('[data-sound-toggle]').forEach((b) => {
         b.setAttribute('aria-pressed', String(on));
         b.innerHTML = on ? ICONS.soundOn : ICONS.soundOff;
-        b.setAttribute('aria-label', 'Bunyi: ' + (on ? 'Hidup' : 'Tutup'));
-        b.dataset.tip = 'Bunyi: ' + (on ? 'Hidup' : 'Tutup') + ' · tekan untuk ' + (on ? 'tutup' : 'hidupkan');
+        b.setAttribute('aria-label', on ? t('Bunyi: Hidup') : t('Bunyi: Tutup'));
+        b.dataset.tip = on ? t('Bunyi: Hidup · tekan untuk tutup') : t('Bunyi: Tutup · tekan untuk hidupkan');
     });
 }
 
 function syncThemeButtons(): void {
-    const t = getTheme();
+    const theme = getTheme();
     document.querySelectorAll<HTMLElement>('[data-theme-toggle]').forEach((b) => {
-        b.innerHTML = ICONS[t];
-        b.setAttribute('aria-label', 'Tema: ' + THEME_LABEL[t]);
-        b.dataset.tip = 'Tema: ' + THEME_LABEL[t] + ' · tekan untuk tukar';
+        b.innerHTML = ICONS[theme];
+        b.setAttribute('aria-label', t('Tema: :name', { name: t(THEME_LABEL[theme]) }));
+        b.dataset.tip = t('Tema: :name · tekan untuk tukar', { name: t(THEME_LABEL[theme]) });
     });
 }
 

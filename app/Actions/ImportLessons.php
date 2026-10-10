@@ -5,6 +5,7 @@ namespace App\Actions;
 use App\Enums\LessonKind;
 use App\Models\Lesson;
 use App\Models\Level;
+use App\Support\Locale;
 use Illuminate\Support\Facades\DB;
 use JsonException;
 
@@ -30,7 +31,7 @@ class ImportLessons
             foreach ($data['levels'] as $i => $lv) {
                 $levels[$lv['n']] = Level::updateOrCreate(
                     ['number' => $lv['n']],
-                    ['name' => $lv['name'], 'note' => $lv['note'] ?? null, 'position' => $i + 1],
+                    ['name' => $lv['name'], 'note' => $lv['note'] ?? null, 'i18n' => self::translations($lv, ['name', 'note']), 'position' => $i + 1],
                 );
             }
 
@@ -53,6 +54,7 @@ class ImportLessons
                     // Same default as the prototype: exam 80 XP, otherwise 10 XP per step.
                     'xp' => (int) ($l['xp'] ?? ($exam ? 80 : count($steps) * 10)),
                     'tip' => isset($l['tip']) ? (string) $l['tip'] : null,
+                    'i18n' => self::translations($l, ['title', 'tip']),
                     'steps' => $steps,
                 ];
 
@@ -73,7 +75,7 @@ class ImportLessons
                     continue;
                 }
 
-                if ($lesson->isDirty(['title', 'icon', 'kind', 'tip', 'steps'])) {
+                if ($lesson->isDirty(['title', 'icon', 'kind', 'tip', 'i18n', 'steps'])) {
                     $lesson->content_version++;
                 }
                 $lesson->save();
@@ -85,5 +87,31 @@ class ImportLessons
 
             return $stats + ['orphaned' => $orphaned];
         });
+    }
+
+    /**
+     * Translations of the given fields, e.g. {"en": {"title": "…"}} for a lesson's `en` block.
+     *
+     * @param  array<string, mixed>  $row
+     * @param  list<string>  $fields
+     * @return array<string, array<string, string>>|null
+     */
+    private static function translations(array $row, array $fields): ?array
+    {
+        $out = [];
+        foreach (array_keys(Locale::available()) as $code) {
+            if (! isset($row[$code]) || ! is_array($row[$code])) {
+                continue;
+            }
+            $picked = array_filter(
+                array_intersect_key($row[$code], array_flip($fields)),
+                fn ($v) => is_string($v) && $v !== '',
+            );
+            if ($picked !== []) {
+                $out[$code] = $picked;
+            }
+        }
+
+        return $out === [] ? null : $out;
     }
 }

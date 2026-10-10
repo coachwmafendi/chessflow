@@ -3,6 +3,7 @@ import { newBadgesHtml } from '../core/badges';
 import { createBoard } from '../core/board';
 import { SFX } from '../core/sound';
 import { runStep } from '../steps';
+import { t } from '../i18n';
 
 const PASS_RATIO = 0.7;
 
@@ -82,13 +83,13 @@ export class LessonRunner {
             '<div class="lesson-bar"><h2 class="lesson-title"></h2><div class="prog"></div></div>' +
             '<div class="lesson"><div class="board-wrap"><div class="bw"></div><p class="turn"></p></div><div class="panel">' +
             (this.lesson.exam
-                ? '<p class="exam-note">Ujian: setiap soalan ada <b>satu peluang</b>. Lulus jika betul sekurang-kurangnya 70%.</p>'
+                ? '<p class="exam-note">' + t('Ujian: setiap soalan ada <b>satu peluang</b>. Lulus jika betul sekurang-kurangnya 70%.') + '</p>'
                 : '') +
             '<h3 class="step-title"></h3>' +
             '<div class="coach"><div class="avatar sm"><i class="pc pk"></i></div><div class="bubble"><span class="who">Pak Kuda</span><p class="say"></p></div></div>' +
-            '<div class="task"><small>Tugasan</small><div class="row"><span class="task-text"></span><span class="counter"></span></div><div class="opts"></div></div>' +
+            '<div class="task"><small>' + t('Tugasan') + '</small><div class="row"><span class="task-text"></span><span class="counter"></span></div><div class="opts"></div></div>' +
             '<div class="status" role="status" aria-live="polite"></div>' +
-            '<div class="actions"><span class="acts"></span><span class="spacer"></span><button type="button" class="cta next-btn" disabled>Teruskan</button></div>' +
+            '<div class="actions"><span class="acts"></span><span class="spacer"></span><button type="button" class="cta next-btn" disabled>' + t('Teruskan') + '</button></div>' +
             '</div></div><div class="modal" hidden></div>';
 
         const els: Els = {
@@ -119,7 +120,7 @@ export class LessonRunner {
     }
 
     private examNote(): string {
-        return this.lesson.exam && this.failed.has(this.step) ? ' Soalan ini dikira salah. Tekan Teruskan.' : '';
+        return this.lesson.exam && this.failed.has(this.step) ? ' ' + t('Soalan ini dikira salah. Tekan Teruskan.') : '';
     }
 
     private buildContext(): StepContext {
@@ -129,8 +130,8 @@ export class LessonRunner {
                 const st = this.lesson.steps[this.step];
                 this.els.turn.textContent = st.fen
                     ? st.fen.split(' ')[1] === 'w'
-                        ? 'Putih untuk bergerak'
-                        : 'Hitam untuk bergerak'
+                        ? t('Putih untuk bergerak')
+                        : t('Hitam untuk bergerak')
                     : '';
                 return this.board;
             },
@@ -166,7 +167,7 @@ export class LessonRunner {
                     const bt = document.createElement('button');
                     bt.type = 'button';
                     bt.className = 'ghost';
-                    bt.textContent = x.label;
+                    bt.textContent = t(x.label); // labels stay Malay source strings (compared above)
                     bt.onclick = x.fn;
                     this.els.acts.appendChild(bt);
                 });
@@ -197,7 +198,7 @@ export class LessonRunner {
         this.els.status.textContent = '';
         this.els.acts.innerHTML = '';
         this.els.next.disabled = true;
-        this.els.next.textContent = this.step === this.lesson.steps.length - 1 ? 'Selesai' : 'Teruskan';
+        this.els.next.textContent = this.step === this.lesson.steps.length - 1 ? t('Selesai') : t('Teruskan');
         runStep(st, this.buildContext());
     }
 
@@ -247,21 +248,21 @@ export class LessonRunner {
 
         if (this.lesson.daily && r.streak) {
             const h = card.querySelector('h2');
-            if (h) h.textContent = r.streak + ' hari berturut-turut!';
+            if (h) h.textContent = t(':n hari berturut-turut!', { n: r.streak });
         }
 
         if (this.lesson.review && r.review) {
             const h = card.querySelector('h2');
             const p = card.querySelector('p');
-            if (h) h.textContent = r.review.correct ? (r.review.mastered ? 'Dah mahir!' : 'Betul!') : 'Hampir!';
+            if (h) h.textContent = r.review.correct ? (r.review.mastered ? t('Dah mahir!') : t('Betul!')) : t('Hampir!');
             if (p) {
                 p.textContent = r.review.correct
                     ? r.review.mastered
-                        ? 'Awak dah jawab soalan ini dengan betul beberapa kali. Pak Kuda tak akan tanya lagi.'
-                        : 'Pak Kuda akan tanya soalan ini sekali lagi beberapa hari nanti, supaya awak tak lupa.'
-                    : 'Tak apa. Pak Kuda akan bawa soalan ini semula esok.';
+                        ? t('Awak dah jawab soalan ini dengan betul beberapa kali. Pak Kuda tak akan tanya lagi.')
+                        : t('Pak Kuda akan tanya soalan ini sekali lagi beberapa hari nanti, supaya awak tak lupa.')
+                    : t('Tak apa. Pak Kuda akan bawa soalan ini semula esok.');
             }
-            if (r.review.remaining > 0) card.insertAdjacentHTML('beforeend', '<p class="review-count">Lagi ' + r.review.remaining + ' latihan hari ini.</p>');
+            if (r.review.remaining > 0) card.insertAdjacentHTML('beforeend', '<p class="review-count">' + t('Lagi :n latihan hari ini.', { n: r.review.remaining }) + '</p>');
         }
 
         card.querySelector('.xp')?.remove();
@@ -273,15 +274,15 @@ export class LessonRunner {
         }
 
         if (r.xp > 0) card.insertAdjacentHTML('beforeend', '<div class="xp">+' + r.xp + ' XP</div>');
-        else if (this.lesson.daily && !r.message) card.insertAdjacentHTML('beforeend', '<p>XP teka-teki hari ini sudah dikutip.</p>');
+        else if (this.lesson.daily && !r.message) card.insertAdjacentHTML('beforeend', '<p>' + t('XP teka-teki hari ini sudah dikutip.') + '</p>');
         card.querySelector('.new-badges')?.remove();
         card.insertAdjacentHTML('beforeend', newBadgesHtml(r.badges));
 
         const links: string[] = [];
-        if (r.certificateUrl) links.push(link(r.certificateUrl, 'Lihat sijil', 'cta'));
-        if (r.retryUrl) links.push(link(r.retryUrl, 'Cuba lagi', 'cta'));
-        if (r.next) links.push(link(r.next.url, this.lesson.review ? 'Latihan seterusnya' : 'Seterusnya: ' + r.next.title, r.certificateUrl ? 'ghost' : 'cta'));
-        if (r.mapUrl) links.push(link(r.mapUrl, 'Ke peta', 'ghost'));
+        if (r.certificateUrl) links.push(link(r.certificateUrl, t('Lihat sijil'), 'cta'));
+        if (r.retryUrl) links.push(link(r.retryUrl, t('Cuba lagi'), 'cta'));
+        if (r.next) links.push(link(r.next.url, this.lesson.review ? t('Latihan seterusnya') : t('Seterusnya: :lesson', { lesson: r.next.title }), r.certificateUrl ? 'ghost' : 'cta'));
+        if (r.mapUrl) links.push(link(r.mapUrl, t('Ke peta'), 'ghost'));
         if (links.length) {
             card.insertAdjacentHTML('beforeend', '<div class="actions" style="justify-content:center">' + links.join('') + '</div>');
             card.querySelector<HTMLElement>('.actions a')?.focus();
@@ -301,8 +302,10 @@ export class LessonRunner {
             '<div class="card" role="dialog" aria-modal="true"><span class="qico big">' +
             '<i class="pc pk" style="width:52px;height:52px;display:block"></i>' +
             '</span><h2>' +
-            (this.mistakes ? 'Hampir!' : 'Betul!') +
-            '</h2><p>Pak Kuda sedang menyimpan keputusan awak…</p></div>';
+            (this.mistakes ? t('Hampir!') : t('Betul!')) +
+            '</h2><p>' +
+            t('Pak Kuda sedang menyimpan keputusan awak…') +
+            '</p></div>';
     }
 
     private showDailyModal(): void {
@@ -310,7 +313,11 @@ export class LessonRunner {
         this.els.modal.innerHTML =
             '<div class="card" role="dialog" aria-modal="true"><span class="qico flame big">' +
             FLAME_SVG +
-            '</span><h2>Teka-teki selesai!</h2><p>Teka-teki hari ini selesai. Datang lagi esok untuk teka-teki baharu.</p></div>';
+            '</span><h2>' +
+            t('Teka-teki selesai!') +
+            '</h2><p>' +
+            t('Teka-teki hari ini selesai. Datang lagi esok untuk teka-teki baharu.') +
+            '</p></div>';
     }
 
     private showLessonModal(stars: number): void {
@@ -318,10 +325,12 @@ export class LessonRunner {
         this.els.modal.innerHTML =
             '<div class="card" role="dialog" aria-modal="true"><div class="big-stars">' +
             starsHtml(stars) +
-            '</div><h2>Tahniah!</h2><p>Awak habiskan <b>' +
-            this.lesson.title +
-            '</b>' +
-            (this.mistakes ? ' dengan ' + this.mistakes + ' kesilapan kecil.' : ' tanpa sebarang kesilapan!') +
+            '</div><h2>' +
+            t('Tahniah!') +
+            '</h2><p>' +
+            (this.mistakes
+                ? t('Awak habiskan :lesson dengan :n kesilapan kecil.', { lesson: '<b>' + this.lesson.title + '</b>', n: this.mistakes })
+                : t('Awak habiskan :lesson tanpa sebarang kesilapan!', { lesson: '<b>' + this.lesson.title + '</b>' })) +
             '</p>' +
             (this.lesson.tip ? '<div class="tip">' + this.lesson.tip + '</div>' : '') +
             '</div>';
@@ -333,19 +342,17 @@ export class LessonRunner {
         this.els.modal.innerHTML = pass
             ? '<div class="card" role="dialog" aria-modal="true"><div class="big-stars">' +
               starsHtml(score === q ? 3 : score >= q - 1 ? 2 : 1) +
-              '</div><h2>Lulus!</h2><p>Markah awak <b>' +
-              score +
-              '/' +
-              q +
-              '</b>.</p></div>'
+              '</div><h2>' +
+              t('Lulus!') +
+              '</h2><p>' +
+              t('Markah awak :score.', { score: '<b>' + score + '/' + q + '</b>' }) +
+              '</p></div>'
             : '<div class="card" role="dialog" aria-modal="true"><div class="big-stars">' +
               starsHtml(0) +
-              '</div><h2>Hampir!</h2><p>Markah awak <b>' +
-              score +
-              '/' +
-              q +
-              '</b>. Perlu sekurang-kurangnya ' +
-              need +
-              ' untuk lulus. Ulang kaji pelajaran tahap ini dan cuba lagi.</p></div>';
+              '</div><h2>' +
+              t('Hampir!') +
+              '</h2><p>' +
+              t('Markah awak :score. Perlu sekurang-kurangnya :need untuk lulus. Ulang kaji pelajaran tahap ini dan cuba lagi.', { score: '<b>' + score + '/' + q + '</b>', need }) +
+              '</p></div>';
     }
 }

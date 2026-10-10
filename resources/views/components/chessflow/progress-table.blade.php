@@ -4,15 +4,15 @@
     <table class="progress-table">
         <thead>
             <tr>
-                <th scope="col" class="sticky">Murid</th>
+                <th scope="col" class="sticky">{{ __('Murid') }}</th>
                 <th scope="col">XP</th>
                 <th scope="col">Streak</th>
-                <th scope="col">Ujian lulus</th>
-                <th scope="col">Aktiviti terakhir</th>
+                <th scope="col">{{ __('Ujian lulus') }}</th>
+                <th scope="col">{{ __('Aktiviti terakhir') }}</th>
                 @foreach ($lessons as $lesson)
                     <th scope="col" class="lesson-col" title="{{ $lesson->title }}"><span>{{ $lesson->title }}</span></th>
                 @endforeach
-                @if ($actions)<th scope="col"><span class="sr-only">Tindakan</span></th>@endif
+                @if ($actions)<th scope="col"><span class="sr-only">{{ __('Tindakan') }}</span></th>@endif
             </tr>
         </thead>
         <tbody>
@@ -40,7 +40,7 @@
                     @if ($actions)<td>{!! $actions($row['student']) !!}</td>@endif
                 </tr>
             @empty
-                <tr><td colspan="{{ 5 + $lessons->count() + ($actions ? 1 : 0) }}">Belum ada murid.</td></tr>
+                <tr><td colspan="{{ 5 + $lessons->count() + ($actions ? 1 : 0) }}">{{ __('Belum ada murid.') }}</td></tr>
             @endforelse
         </tbody>
     </table>

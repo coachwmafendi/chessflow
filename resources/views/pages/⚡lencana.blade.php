@@ -27,12 +27,12 @@ new #[Layout('layouts::chessflow')] #[Title('Lencana')] class extends Component 
 }; ?>
 
 <div>
-    <p class="no-print" style="margin-block: 8px 0"><a class="ghost" href="{{ route('peta') }}">← Peta</a></p>
+    <p class="no-print" style="margin-block: 8px 0"><a class="ghost" href="{{ route('peta') }}">{{ __('← Peta') }}</a></p>
     <div class="page-head">
-        <h1>Lencana</h1>
-        <span class="pill">{{ $count }}/{{ $total }} dikumpul</span>
+        <h1>{{ __('Lencana') }}</h1>
+        <span class="pill">{{ __(':count/:total dikumpul', ['count' => $count, 'total' => $total]) }}</span>
     </div>
-    <p class="badges-intro">Kumpul lencana dengan belajar, selesaikan teka-teki dan main lawan Pak Kuda. Lencana yang belum dapat menunjukkan berapa lagi yang perlu.</p>
+    <p class="badges-intro">{{ __('Kumpul lencana dengan belajar, selesaikan teka-teki dan main lawan Pak Kuda. Lencana yang belum dapat menunjukkan berapa lagi yang perlu.') }}</p>
     <div class="badge-grid">
         @foreach ($badges as $key => $row)
             <x-chessflow.badge :badge="$row['badge']" :earned="$row['awarded'] !== null" :date="$row['awarded']" :progress="$row['progress']" wire:key="badge-{{ $key }}" />

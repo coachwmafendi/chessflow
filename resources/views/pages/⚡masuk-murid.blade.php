@@ -21,14 +21,14 @@ new #[Layout('layouts::chessflow')] #[Title('Masuk murid')] class extends Compon
         $this->validate([
             'username' => ['required', 'string', 'max:30'],
             'pin' => ['required', 'digits_between:4,6'],
-        ], [], ['username' => 'nama pengguna', 'pin' => 'PIN']);
+        ], [], ['username' => __('nama pengguna'), 'pin' => 'PIN']);
 
         $key = 'student-login:'.Str::lower($this->username).'|'.request()->ip();
         $max = (int) config('chessflow.student_login.max_attempts_per_minute');
 
         if (RateLimiter::tooManyAttempts($key, $max)) {
             throw ValidationException::withMessages([
-                'username' => 'Terlalu banyak cubaan. Cuba lagi dalam '.RateLimiter::availableIn($key).' saat.',
+                'username' => __('Terlalu banyak cubaan. Cuba lagi dalam :seconds saat.', ['seconds' => RateLimiter::availableIn($key)]),
             ]);
         }
 
@@ -38,7 +38,7 @@ new #[Layout('layouts::chessflow')] #[Title('Masuk murid')] class extends Compon
             RateLimiter::hit($key);
             $this->reset('pin');
 
-            throw ValidationException::withMessages(['username' => 'Nama pengguna atau PIN salah.']);
+            throw ValidationException::withMessages(['username' => __('Nama pengguna atau PIN salah.')]);
         }
 
         RateLimiter::clear($key);
@@ -50,10 +50,10 @@ new #[Layout('layouts::chessflow')] #[Title('Masuk murid')] class extends Compon
 }; ?>
 
 <div class="auth-card">
-    <h1>Masuk murid</h1>
-    <p>Tulis nama pengguna dan PIN yang diberi oleh guru atau ibu bapa awak.</p>
+    <h1>{{ __('Masuk murid') }}</h1>
+    <p>{{ __('Tulis nama pengguna dan PIN yang diberi oleh guru atau ibu bapa awak.') }}</p>
     <form wire:submit="login">
-        <label for="username">Nama pengguna</label>
+        <label for="username">{{ __('Nama pengguna') }}</label>
         <input id="username" type="text" wire:model="username" autocomplete="username" autocapitalize="none" autofocus required>
         @error('username') <p class="err">{{ $message }}</p> @enderror
 
@@ -61,7 +61,7 @@ new #[Layout('layouts::chessflow')] #[Title('Masuk murid')] class extends Compon
         <input id="pin" type="password" wire:model="pin" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="current-password" required>
         @error('pin') <p class="err">{{ $message }}</p> @enderror
 
-        <button class="cta" type="submit">Masuk</button>
+        <button class="cta" type="submit">{{ __('Masuk') }}</button>
     </form>
-    <p class="alt">Guru atau ibu bapa? <a href="{{ route('login') }}">Masuk dengan e-mel</a></p>
+    <p class="alt">{{ __('Guru atau ibu bapa?') }} <a href="{{ route('login') }}">{{ __('Masuk dengan e-mel') }}</a></p>
 </div>

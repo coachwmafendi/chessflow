@@ -1,10 +1,10 @@
 @php
     $user = auth()->user();
-    $pageTitle = isset($title) ? $title.' · ChessFlow' : 'ChessFlow';
-    $description = 'ChessFlow: belajar catur langkah demi langkah dalam Bahasa Melayu untuk kanak-kanak dan pemula. Papan interaktif, teka-teki harian, main lawan Pak Kuda, ujian dan sijil.';
+    $pageTitle = isset($title) ? __($title).' · ChessFlow' : 'ChessFlow';
+    $description = __('ChessFlow: belajar catur langkah demi langkah dalam Bahasa Melayu untuk kanak-kanak dan pemula. Papan interaktif, teka-teki harian, main lawan Pak Kuda, ujian dan sijil.');
 @endphp
 <!DOCTYPE html>
-<html lang="ms">
+<html lang="{{ app()->getLocale() }}">
     <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -14,14 +14,14 @@
         <link rel="canonical" href="{{ url()->current() }}" />
         <meta property="og:type" content="website" />
         <meta property="og:site_name" content="ChessFlow" />
-        <meta property="og:locale" content="ms_MY" />
+        <meta property="og:locale" content="{{ app()->getLocale() === 'en' ? 'en_GB' : 'ms_MY' }}" />
         <meta property="og:title" content="{{ $pageTitle }}" />
         <meta property="og:description" content="{{ $description }}" />
         <meta property="og:url" content="{{ url()->current() }}" />
         <meta property="og:image" content="{{ asset('images/og-chessflow.png') }}" />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
-        <meta property="og:image:alt" content="ChessFlow: belajar catur dalam Bahasa Melayu" />
+        <meta property="og:image:alt" content="{{ __('ChessFlow: belajar catur dalam Bahasa Melayu') }}" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="theme-color" content="#0B8577" />
         <link rel="icon" href="/favicon.ico" sizes="any">
@@ -34,19 +34,19 @@
     <body>
         <div class="app">
             <header class="top">
-                <a class="logo" href="{{ $user ? route('peta') : route('home') }}" aria-label="ChessFlow, ke peta">
+                <a class="logo" href="{{ $user ? route('peta') : route('home') }}" aria-label="{{ __('ChessFlow, ke peta') }}">
                     <span class="mark"><i class="pc pk"></i></span><b>Chess<span>Flow</span></b>
                 </a>
                 <div class="stats">
                     @auth
-                        <span class="pill" title="Jumlah bintang"><i class="star-ico ico"></i><span data-stat="stars">{{ $user->totalStars() }}</span></span>
-                        <span class="pill" title="Mata pengalaman"><span class="xp-ico">XP</span><span data-stat="xp">{{ $user->xp }}</span></span>
-                        <a class="pill btn play" href="{{ route('main') }}">Main</a>
+                        <span class="pill" title="{{ __('Jumlah bintang') }}"><i class="star-ico ico"></i><span data-stat="stars">{{ $user->totalStars() }}</span></span>
+                        <span class="pill" title="{{ __('Mata pengalaman') }}"><span class="xp-ico">XP</span><span data-stat="xp">{{ $user->xp }}</span></span>
+                        <a class="pill btn play" href="{{ route('main') }}">{{ __('Main') }}</a>
                         @if ($user->isStaff())
-                            <a class="pill btn" href="{{ route('guru') }}">Kelas</a>
+                            <a class="pill btn" href="{{ route('guru') }}">{{ __('Kelas') }}</a>
                         @endif
                         @can('guardian')
-                            <a class="pill btn" href="{{ route('anak') }}">Anak</a>
+                            <a class="pill btn" href="{{ route('anak') }}">{{ __('Anak') }}</a>
                         @endcan
                         @can('admin')
                             <a class="pill btn" href="{{ url('/admin') }}">Admin</a>
@@ -54,19 +54,20 @@
                     @endauth
                     @guest
                         @unless (request()->routeIs('murid.login'))
-                            <a class="pill btn play" href="{{ route('murid.login') }}">Masuk murid</a>
+                            <a class="pill btn play" href="{{ route('murid.login') }}">{{ __('Masuk murid') }}</a>
                         @endunless
                         @unless (request()->routeIs('login'))
-                            <a class="pill btn" href="{{ route('login') }}">Log masuk</a>
+                            <a class="pill btn" href="{{ route('login') }}">{{ __('Log masuk') }}</a>
                         @endunless
                     @endguest
-                    {{-- Icon toggles; core/toolbar-icons.ts swaps icon, label and tooltip on change. --}}
-                    <button class="pill btn icon-btn" type="button" data-theme-toggle aria-label="Tema: Sistem" data-tip="Tema: Sistem · tekan untuk tukar"><svg class="tb-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg></button>
-                    <button class="pill btn icon-btn" type="button" data-sound-toggle aria-pressed="true" aria-label="Bunyi: Hidup" data-tip="Bunyi: Hidup · tekan untuk tutup"><svg class="tb-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg></button>
+                    {{-- Icon toggles; mount.ts swaps icon, label and tooltip on change (translated with t()). --}}
+                    <button class="pill btn icon-btn" type="button" data-theme-toggle aria-label="{{ __('Tema: :name', ['name' => __('Sistem')]) }}" data-tip="{{ __('Tema: :name · tekan untuk tukar', ['name' => __('Sistem')]) }}"><svg class="tb-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg></button>
+                    <button class="pill btn icon-btn" type="button" data-sound-toggle aria-pressed="true" aria-label="{{ __('Bunyi: Hidup') }}" data-tip="{{ __('Bunyi: Hidup · tekan untuk tutup') }}"><svg class="tb-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg></button>
+                    <x-locale-switch />
                     @auth
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
-                            <button class="pill btn" type="submit">Keluar</button>
+                            <button class="pill btn" type="submit">{{ __('Keluar') }}</button>
                         </form>
                     @endauth
                 </div>
@@ -77,8 +78,8 @@
             </main>
 
             <footer class="foot">
-                <span>© {{ now()->year }} ChessFlow · WM AFENDI ENTERPRISE · Belajar catur dalam Bahasa Melayu untuk kanak-kanak dan pemula</span>
-                <span class="foot-r"><a href="{{ route('tentang') }}">Tentang</a><a href="{{ route('istilah') }}">Istilah catur</a><a href="{{ route('privasi') }}">Privasi</a><a href="{{ route('terma') }}">Terma</a></span>
+                <span>© {{ now()->year }} ChessFlow · WM AFENDI ENTERPRISE · {{ __('Belajar catur dalam Bahasa Melayu untuk kanak-kanak dan pemula') }}</span>
+                <span class="foot-r"><a href="{{ route('tentang') }}">{{ __('Tentang') }}</a><a href="{{ route('istilah') }}">{{ __('Istilah catur') }}</a><a href="{{ route('privasi') }}">{{ __('Privasi') }}</a><a href="{{ route('terma') }}">{{ __('Terma') }}</a></span>
             </footer>
         </div>
     </body>

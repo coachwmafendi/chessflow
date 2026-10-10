@@ -63,14 +63,14 @@ new #[Layout('layouts::chessflow')] #[Title('Istilah catur BM–Inggeris')] clas
 }; ?>
 
 <div class="prose-page glossary">
-    <h1>Istilah catur BM–Inggeris</h1>
-    <p>ChessFlow mengajar dalam Bahasa Melayu. Bila awak baca buku catur, main di laman antarabangsa atau masuk pertandingan, awak akan jumpa istilah dalam bahasa Inggeris. Senarai ini membantu awak kenal kedua-duanya. Huruf notasi pun datang daripada nama Inggeris: <b>N</b> untuk <i>kNight</i> (Kuda), kerana <b>K</b> sudah dipakai untuk <i>King</i> (Raja).</p>
+    <h1>{{ __('Istilah catur BM–Inggeris') }}</h1>
+    <p>{!! __('ChessFlow mengajar dalam Bahasa Melayu. Bila awak baca buku catur, main di laman antarabangsa atau masuk pertandingan, awak akan jumpa istilah dalam bahasa Inggeris. Senarai ini membantu awak kenal kedua-duanya. Huruf notasi pun datang daripada nama Inggeris: <b>N</b> untuk <i>kNight</i> (Kuda), kerana <b>K</b> sudah dipakai untuk <i>King</i> (Raja).') !!}</p>
 
     @foreach ($this->groups() as $title => $rows)
         <table class="glossary-table">
-            <caption>{{ $title }}</caption>
+            <caption>{{ __($title) }}</caption>
             <thead>
-                <tr><th scope="col">Bahasa Melayu</th><th scope="col" lang="en">English</th><th scope="col">Notasi</th></tr>
+                <tr><th scope="col">Bahasa Melayu</th><th scope="col" lang="en">English</th><th scope="col">{{ __('Notasi') }}</th></tr>
             </thead>
             <tbody>
                 @foreach ($rows as $r)
@@ -82,7 +82,7 @@ new #[Layout('layouts::chessflow')] #[Title('Istilah catur BM–Inggeris')] clas
                         <td lang="en">{{ $r[1] }}</td>
                         <td>
                             @if (($r[2] ?? null) === 'tiada huruf')
-                                <span class="glossary-none">tiada huruf</span>
+                                <span class="glossary-none">{{ __('tiada huruf') }}</span>
                             @elseif (isset($r[2]))
                                 <code>{{ $r[2] }}</code>
                             @endif
@@ -93,5 +93,5 @@ new #[Layout('layouts::chessflow')] #[Title('Istilah catur BM–Inggeris')] clas
         </table>
     @endforeach
 
-    <p class="glossary-note">Cara membaca langkah seperti <code>Nf3</code> dan <code>Qxf7#</code> diajar dalam pelajaran <b>Notasi Catur</b> (Tahap 2).</p>
+    <p class="glossary-note">{!! __('Cara membaca langkah seperti :a dan :b diajar dalam pelajaran :lesson (Tahap 2).', ['a' => '<code>Nf3</code>', 'b' => '<code>Qxf7#</code>', 'lesson' => '<b>'.e(__('Notasi Catur')).'</b>']) !!}</p>
 </div>

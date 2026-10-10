@@ -2,6 +2,7 @@ import type { StepContext, TapStep } from '../types';
 import { gen, nm, sq } from '../core/squares';
 import { SFX } from '../core/sound';
 import { base } from './base';
+import { t } from '../i18n';
 
 export function tap(st: TapStep, c: StepContext): void {
     const b = base(st, c);
@@ -12,7 +13,7 @@ export function tap(st: TapStep, c: StepContext): void {
     const show = () => {
         const it = st.seq[idx];
         c.task(it.ask);
-        c.counter(st.seq.length > 1 ? 'Soalan ' + (idx + 1) + '/' + st.seq.length : '');
+        c.counter(st.seq.length > 1 ? t('Soalan :n/:total', { n: idx + 1, total: st.seq.length }) : '');
     };
     show();
 
@@ -27,7 +28,7 @@ export function tap(st: TapStep, c: StepContext): void {
             b.mark({ good: [...got] });
             SFX.good();
             if (it.all && got.size < ok.length) {
-                c.status('Betul! Ada lagi.', 'good');
+                c.status(t('Betul! Ada lagi.'), 'good');
                 return;
             }
             if (it.arrows) b.arrows(it.arrows);
@@ -35,7 +36,7 @@ export function tap(st: TapStep, c: StepContext): void {
                 const list = b.all().map((p) => ({ c: p.c, t: p.t, sq: p.sq }));
                 b.mark({ dots: it.dotsOf.flatMap((s) => gen(list, sq(s))) });
             }
-            c.status(it.ok || 'Betul!', 'good');
+            c.status(it.ok || t('Betul!'), 'good');
             if (idx < st.seq.length - 1) {
                 busy = true;
                 c.later(() => {
@@ -54,7 +55,7 @@ export function tap(st: TapStep, c: StepContext): void {
             b.flash(i);
             SFX.bad();
             c.mistake();
-            const msg = (st.wrongMap && st.wrongMap[nm(i)]) || it.wrong || st.wrong || 'Bukan itu. Cuba lagi.';
+            const msg = (st.wrongMap && st.wrongMap[nm(i)]) || it.wrong || st.wrong || t('Bukan itu. Cuba lagi.');
             c.status(msg.replace('{sq}', nm(i)), 'bad');
         }
     });

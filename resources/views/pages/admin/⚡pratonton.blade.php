@@ -28,6 +28,6 @@ new #[Layout('layouts::playground')] class extends Component {
         'icon' => $lesson->icon,
         'exam' => $lesson->isExam(),
         'tip' => $lesson->tip,
-        'steps' => $lesson->steps,
+        'steps' => $lesson->localizedSteps(),
     ]) }}"></div>
 </div>

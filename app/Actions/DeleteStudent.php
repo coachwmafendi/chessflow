@@ -21,7 +21,7 @@ class DeleteStudent
     public function deniedReason(User $actor, User $student): ?string
     {
         if ($student->role !== Role::Murid) {
-            return 'Hanya akaun murid boleh dipadam di sini.';
+            return __('Hanya akaun murid boleh dipadam di sini.');
         }
         if ($actor->role === Role::Admin || $actor->students()->whereKey($student->id)->exists()) {
             return null;
@@ -29,13 +29,13 @@ class DeleteStudent
 
         $teaches = $actor->taughtClassrooms()->whereHas('students', fn ($q) => $q->whereKey($student->id))->exists();
         if (! $teaches) {
-            return 'Anda tiada kebenaran untuk memadam akaun ini.';
+            return __('Anda tiada kebenaran untuk memadam akaun ini.');
         }
 
         $hasGuardian = $student->guardians()->exists();
         $otherClass = $student->classrooms()->where('teacher_id', '!=', $actor->id)->exists();
         if ($hasGuardian || $otherClass) {
-            return 'Murid ini juga diurus oleh ibu bapa atau guru lain. Keluarkan daripada kelas, atau minta ibu bapa atau pentadbir memadam akaun.';
+            return __('Murid ini juga diurus oleh ibu bapa atau guru lain. Keluarkan daripada kelas, atau minta ibu bapa atau pentadbir memadam akaun.');
         }
 
         return null;

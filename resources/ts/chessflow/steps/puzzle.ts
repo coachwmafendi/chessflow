@@ -3,6 +3,7 @@ import type { PuzzleStep, StepContext } from '../types';
 import { nm, sq, uciToMove } from '../core/squares';
 import { SFX } from '../core/sound';
 import { base } from './base';
+import { t } from '../i18n';
 
 /** True if the side to move in `g` has a mate-in-one available. */
 export function oppHasMate(g: Chess): boolean {
@@ -63,7 +64,7 @@ export function puzzle(st: PuzzleStep, c: StepContext): void {
                 fn: () => {
                     c.mistake();
                     hint();
-                    c.status('Petunjuk: perhatikan petak bulat merah.', 'info');
+                    c.status(t('Petunjuk: perhatikan petak bulat merah.'), 'info');
                 },
             },
         ]);
@@ -118,7 +119,7 @@ export function puzzle(st: PuzzleStep, c: StepContext): void {
                     if (st.after1.arrows) b.arrows(st.after1.arrows);
                     if (st.after1.status) c.status(st.after1.status, 'good');
                 } else {
-                    c.status('Bagus!', 'good');
+                    c.status(t('Bagus!'), 'good');
                 }
                 busy = true;
                 c.later(
@@ -131,21 +132,21 @@ export function puzzle(st: PuzzleStep, c: StepContext): void {
                         ply++;
                         c.later(() => b.quiet(g.fen()), 420);
                         if (ply >= st.line!.length) {
-                            c.status(st.win || 'Betul!', 'good');
+                            c.status(st.win || t('Betul!'), 'good');
                             SFX.win();
                             c.done();
                             return;
                         }
                         busy = false;
                         const mi = (ply - 2) / 2;
-                        c.status((st.mids && st.mids[mi]) || st.mid || 'Teruskan!', 'info');
+                        c.status((st.mids && st.mids[mi]) || st.mid || t('Teruskan!'), 'info');
                     },
                     st.after1 && ply === 1 ? 1700 : 900,
                 );
                 return;
             }
             busy = true;
-            c.status(st.win || 'Betul!', 'good');
+            c.status(st.win || t('Betul!'), 'good');
             SFX.win();
             c.done();
         } else {
@@ -156,10 +157,10 @@ export function puzzle(st: PuzzleStep, c: StepContext): void {
             const rightSquareWrongPiece = !!res.promotion && !!st.line && st.line[ply]?.slice(0, 4) === res.from + res.to;
             c.status(
                 g.isStalemate()
-                    ? 'Stalemate! Itu seri, bukan menang. Raja lawan mesti ada langkah atau kena sah mati.'
+                    ? t('Stalemate! Itu seri, bukan menang. Raja lawan mesti ada langkah atau kena sah mati.')
                     : rightSquareWrongPiece
-                      ? 'Hampir! Petak betul, tapi pilih buah lain untuk promosi.'
-                      : st.wrongMsg || 'Belum betul. Cuba lagi.',
+                      ? t('Hampir! Petak betul, tapi pilih buah lain untuk promosi.')
+                      : st.wrongMsg || t('Belum betul. Cuba lagi.'),
                 'bad',
             );
             busy = true;
