@@ -60,8 +60,9 @@
                             <a class="pill btn" href="{{ route('login') }}">Log masuk</a>
                         @endunless
                     @endguest
-                    <button class="pill btn" type="button" data-theme-toggle title="Tukar tema warna">Tema: Sistem</button>
-                    <button class="pill btn" type="button" data-sound-toggle aria-pressed="true">Bunyi: Hidup</button>
+                    {{-- Icon toggles; core/toolbar-icons.ts swaps icon, label and tooltip on change. --}}
+                    <button class="pill btn icon-btn" type="button" data-theme-toggle aria-label="Tema: Sistem" data-tip="Tema: Sistem · tekan untuk tukar"><svg class="tb-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg></button>
+                    <button class="pill btn icon-btn" type="button" data-sound-toggle aria-pressed="true" aria-label="Bunyi: Hidup" data-tip="Bunyi: Hidup · tekan untuk tutup"><svg class="tb-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg></button>
                     @auth
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
@@ -77,7 +78,7 @@
 
             <footer class="foot">
                 <span>© {{ now()->year }} ChessFlow · WM AFENDI ENTERPRISE · Belajar catur dalam Bahasa Melayu untuk kanak-kanak dan pemula</span>
-                <span class="foot-r"><a href="{{ route('tentang') }}">Tentang</a><a href="{{ route('privasi') }}">Privasi</a><a href="{{ route('terma') }}">Terma</a></span>
+                <span class="foot-r"><a href="{{ route('tentang') }}">Tentang</a><a href="{{ route('istilah') }}">Istilah catur</a><a href="{{ route('privasi') }}">Privasi</a><a href="{{ route('terma') }}">Terma</a></span>
             </footer>
         </div>
     </body>

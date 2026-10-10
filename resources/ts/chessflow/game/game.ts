@@ -125,7 +125,8 @@ export class GameRunner {
             LEVELS.map((l, i) => '<button type="button" data-l="' + i + '">' + l.n + '</button>').join('') +
             '</div><button class="cta" type="button" data-act="new">Permainan baru</button></div>' +
             '<div class="status" role="status" aria-live="polite"></div>' +
-            '<div class="moves"><small>Langkah</small><ol></ol></div>' +
+            '<div class="moves"><small>Langkah</small><ol></ol>' +
+            '<p class="notation-key">K Raja · Q Menteri · R Tir · B Gajah · N Kuda · x makan · + sah · # sah mati · <a href="/istilah">Istilah</a></p></div>' +
             '<div class="analysis" aria-live="polite" hidden></div>' +
             '<div class="actions"><button class="ghost" type="button" data-act="undo">Undur</button><button class="ghost" type="button" data-act="hint">Petunjuk</button><span class="spacer"></span><span class="actions-end"><button class="ghost" type="button" data-act="draw">' + ICON_DRAW + 'Minta seri</button><button class="ghost" type="button" data-act="resign">' + ICON_RESIGN + 'Mengaku kalah</button></span></div>' +
             '</div></div>';

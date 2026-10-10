@@ -3,6 +3,7 @@ import { GameRunner } from './game/game';
 import { destroySharedEngine } from './engine/stockfish';
 import { isSoundOn, setSoundOn, SFX } from './core/sound';
 import { THEME_KEY, THEME_LABEL, applyTheme, getTheme, nextTheme, setTheme } from './core/theme';
+import { ICONS } from './core/toolbar-icons';
 import type { Lesson, ServerLessonResult } from './types';
 import type { NewBadge } from './core/badges';
 
@@ -55,17 +56,21 @@ function mountAll(): void {
 }
 
 function syncSoundButtons(): void {
+    const on = isSoundOn();
     document.querySelectorAll<HTMLElement>('[data-sound-toggle]').forEach((b) => {
-        b.setAttribute('aria-pressed', String(isSoundOn()));
-        b.textContent = 'Bunyi: ' + (isSoundOn() ? 'Hidup' : 'Tutup');
+        b.setAttribute('aria-pressed', String(on));
+        b.innerHTML = on ? ICONS.soundOn : ICONS.soundOff;
+        b.setAttribute('aria-label', 'Bunyi: ' + (on ? 'Hidup' : 'Tutup'));
+        b.dataset.tip = 'Bunyi: ' + (on ? 'Hidup' : 'Tutup') + ' · tekan untuk ' + (on ? 'tutup' : 'hidupkan');
     });
 }
 
 function syncThemeButtons(): void {
     const t = getTheme();
     document.querySelectorAll<HTMLElement>('[data-theme-toggle]').forEach((b) => {
-        b.textContent = 'Tema: ' + THEME_LABEL[t];
-        b.setAttribute('aria-label', 'Tema warna: ' + THEME_LABEL[t] + '. Tekan untuk tukar.');
+        b.innerHTML = ICONS[t];
+        b.setAttribute('aria-label', 'Tema: ' + THEME_LABEL[t]);
+        b.dataset.tip = 'Tema: ' + THEME_LABEL[t] + ' · tekan untuk tukar';
     });
 }
 

@@ -9,6 +9,7 @@ Route::get('sitemap.xml', [SeoController::class, 'sitemap'])->name('sitemap');
 Route::livewire('tentang', 'pages::tentang')->name('tentang');
 Route::livewire('privasi', 'pages::privasi')->name('privasi');
 Route::livewire('terma', 'pages::terma')->name('terma');
+Route::livewire('istilah', 'pages::istilah')->name('istilah');
 
 Route::livewire('masuk-murid', 'pages::masuk-murid')->middleware('guest')->name('murid.login');
 Route::livewire('sijil/{code}', 'pages::sijil')->name('sijil');

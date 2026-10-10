@@ -328,6 +328,10 @@ new #[Layout('layouts::chessflow')] #[Title('Belajar catur dalam Bahasa Melayu')
                 <p>Kanak-kanak sekolah rendah dan sesiapa sahaja yang baru belajar catur. Tahap 1 bermula dari kenal papan, jadi tiada pengalaman diperlukan.</p>
             </details>
             <details>
+                <summary>Adakah murid belajar istilah catur dalam bahasa Inggeris?</summary>
+                <p>Ya. Pelajaran dalam Bahasa Melayu, tetapi setiap buah diperkenalkan dengan nama Inggerisnya juga (contohnya Kuda, <i>Knight</i>), dan notasi langkah guna huruf antarabangsa. Lihat <a href="{{ route('istilah') }}">senarai istilah BM–Inggeris</a>.</p>
+            </details>
+            <details>
                 <summary>Perlu pasang aplikasi?</summary>
                 <p>Tidak. ChessFlow berjalan terus dalam pelayar web di komputer atau tablet.</p>
             </details>
@@ -379,6 +383,7 @@ new #[Layout('layouts::chessflow')] #[Title('Belajar catur dalam Bahasa Melayu')
                 <li><a href="#laluan">Laluan pembelajaran</a></li>
                 <li><a href="#ciri">Ciri-ciri</a></li>
                 <li><a href="{{ route('tentang') }}">Tentang ChessFlow</a></li>
+                <li><a href="{{ route('istilah') }}">Istilah catur BM–Inggeris</a></li>
                 <li><a href="{{ route('privasi') }}">Dasar privasi</a></li>
                 <li><a href="{{ route('terma') }}">Terma penggunaan</a></li>
                 <li><a href="{{ route('tentang') }}#lesen">Perisian dan lesen</a></li>

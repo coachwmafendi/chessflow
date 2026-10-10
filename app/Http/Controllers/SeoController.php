@@ -25,7 +25,7 @@ class SeoController
     /** Public pages only; everything behind login stays out of search results. */
     public function sitemap(): Response
     {
-        $urls = collect(['home', 'tentang', 'privasi', 'terma', 'murid.login', 'register'])
+        $urls = collect(['home', 'tentang', 'istilah', 'privasi', 'terma', 'murid.login', 'register'])
             ->filter(fn (string $name) => Route::has($name))
             ->map(fn (string $name) => route($name));
 

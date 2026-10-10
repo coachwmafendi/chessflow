@@ -238,3 +238,18 @@ it('tells people about the terms and privacy where accounts are made, and the pr
     $this->get(route('register'))->assertSee(route('privasi'), false)->assertSee(route('terma'), false);
     $this->get(route('home'))->assertSee('Percuma untuk tempoh terhad')->assertSee('Berapa kos?');
 });
+
+it('lists the chess terms in Malay and English, with notation', function () {
+    $this->get(route('istilah'))
+        ->assertOk()
+        ->assertSeeInOrder(['Kuda', 'Knight', 'N'])
+        ->assertSeeInOrder(['Sah mati', 'Checkmate', '#'])
+        ->assertSee('Discovered attack');
+    $this->get('/sitemap.xml')->assertSee('<loc>'.route('istilah').'</loc>', false);
+});
+
+it('introduces each piece with its English name in the lessons', function () {
+    foreach (['kuda' => 'Knight', 'gajah' => 'Bishop', 'tir' => 'Rook', 'bidak' => 'Pawn'] as $slug => $english) {
+        expect(Lesson::where('slug', $slug)->firstOrFail()->steps[0]['say'])->toContain('<i>'.$english.'</i>');
+    }
+});

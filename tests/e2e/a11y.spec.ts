@@ -23,8 +23,9 @@ async function loginTeacher(page: Page): Promise<void> {
 
 async function audit(page: Page, path: string): Promise<string[]> {
     await page.goto(path);
-    // Measure the settled page: no fixed sleep, which proved flaky under a full parallel run.
-    await page.waitForLoadState('networkidle');
+    // Measure the settled page (animations are off via reducedMotion): no fixed sleep and no
+    // 'networkidle', both of which proved flaky on a busy machine.
+    await page.waitForLoadState('load');
     await page.evaluate(() => document.fonts.ready);
     const r = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze();
     return r.violations.map((v) => `${path} [${v.impact}] ${v.id}: ${v.help} — ${v.nodes.slice(0, 3).map((n) => n.target.join(' ') + (n.any[0]?.data ? ' ' + JSON.stringify(n.any[0].data) : '')).join(' | ')}`);
@@ -34,10 +35,12 @@ for (const scheme of ['light', 'dark'] as const) {
     test.describe(`a11y (${scheme})`, () => {
         // Reduced motion: colours are measured after transitions, not halfway through one.
         test.use({ colorScheme: scheme, reducedMotion: 'reduce' });
+        // Each test walks several pages and runs axe on every one.
+        test.describe.configure({ timeout: 90_000 });
 
         test('public pages', async ({ page }) => {
             const found: string[] = [];
-            for (const path of ['/', '/tentang', '/privasi', '/terma', '/masuk-murid', '/login', '/register']) found.push(...(await audit(page, path)));
+            for (const path of ['/', '/tentang', '/istilah', '/privasi', '/terma', '/masuk-murid', '/login', '/register']) found.push(...(await audit(page, path)));
             expect(found, found.join('\n')).toEqual([]);
         });
 

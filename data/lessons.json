@@ -170,7 +170,7 @@
      "pcs": "wNd4",
      "showMoves": "d4",
      "initPath": "e6",
-     "say": "Saya Pak Kuda! Kuda bergerak macam huruf <b>L</b>: dua petak lurus, kemudian satu petak ke tepi. Dari tengah papan, kuda boleh pergi ke <b>8 petak</b>. Kuda bernilai 3 mata.",
+     "say": "Saya Pak Kuda! Kuda (dalam bahasa Inggeris: <i>Knight</i>) bergerak macam huruf <b>L</b>: dua petak lurus, kemudian satu petak ke tepi. Dari tengah papan, kuda boleh pergi ke <b>8 petak</b>. Kuda bernilai 3 mata.",
      "task": "Tekan mana-mana titik untuk tengok laluan L kuda."
     },
     {
@@ -246,7 +246,7 @@
      "title": "Ini Gajah",
      "pcs": "wBd4",
      "showMoves": "d4",
-     "say": "Gajah bergerak <b>serong</b> (diagonal), sejauh mana pun selagi tiada halangan. Gajah bernilai 3 mata, sama seperti Kuda.",
+     "say": "Gajah (<i>Bishop</i>) bergerak <b>serong</b> (diagonal), sejauh mana pun selagi tiada halangan. Gajah bernilai 3 mata, sama seperti Kuda.",
      "task": "Tekan mana-mana titik untuk tengok laluan gajah."
     },
     {
@@ -308,7 +308,7 @@
      "title": "Ini Tir",
      "pcs": "wRd4",
      "showMoves": "d4",
-     "say": "Tir bergerak <b>lurus</b>: ke depan, belakang, kiri dan kanan, sejauh mana pun. Tir bernilai <b>5 mata</b>.",
+     "say": "Tir (<i>Rook</i>) bergerak <b>lurus</b>: ke depan, belakang, kiri dan kanan, sejauh mana pun. Tir bernilai <b>5 mata</b>.",
      "task": "Tekan mana-mana titik untuk tengok laluan tir."
     },
     {
@@ -374,7 +374,7 @@
      "title": "Ini Menteri",
      "pcs": "wQd4",
      "showMoves": "d4",
-     "say": "Menteri ialah buah paling kuat, bernilai <b>9 mata</b>. Ia bergerak macam <b>Tir + Gajah</b>: lurus dan serong.",
+     "say": "Menteri (<i>Queen</i>) ialah buah paling kuat, bernilai <b>9 mata</b>. Ia bergerak macam <b>Tir + Gajah</b>: lurus dan serong.",
      "task": "Tekan mana-mana titik untuk tengok laluan menteri."
     },
     {
@@ -397,7 +397,7 @@
      "title": "Ini Raja",
      "pcs": "wKe4",
      "showMoves": "e4",
-     "say": "Raja paling penting tapi bergerak perlahan: <b>1 petak</b> ke mana-mana arah. Kalau Raja tak dapat diselamatkan (sah mati), permainan tamat!",
+     "say": "Raja (<i>King</i>) paling penting tapi bergerak perlahan: <b>1 petak</b> ke mana-mana arah. Kalau Raja tak dapat diselamatkan (sah mati), permainan tamat!",
      "task": "Tekan mana-mana titik untuk tengok langkah raja."
     },
     {
@@ -481,7 +481,7 @@
        "e5"
       ]
      ],
-     "say": "Bidak bergerak <b>ke depan 1 petak</b>. Pada langkah pertamanya, bidak boleh maju <b>2 petak</b>. Bidak <b>makan secara serong</b> ke depan.",
+     "say": "Bidak (<i>Pawn</i>) bergerak <b>ke depan 1 petak</b>. Pada langkah pertamanya, bidak boleh maju <b>2 petak</b>. Bidak <b>makan secara serong</b> ke depan.",
      "task": "Bidak e2 boleh ke e3 atau e4. Bidak d4 tersekat, tapi boleh makan c5 atau e5."
     },
     {
@@ -983,7 +983,7 @@
        "f3"
       ]
      ],
-     "say": "Setiap langkah boleh ditulis: huruf buah + petak tujuan. <b>K</b> Raja, <b>Q</b> Menteri, <b>R</b> Tir, <b>B</b> Gajah, <b>N</b> Kuda. Bidak tiada huruf. Langkah anak panah ini ditulis <kbd>Nf3</kbd>.",
+     "say": "Setiap langkah boleh ditulis: huruf buah + petak tujuan. Hurufnya daripada nama buah dalam bahasa Inggeris: <b>K</b> Raja (<i>King</i>), <b>Q</b> Menteri (<i>Queen</i>), <b>R</b> Tir (<i>Rook</i>), <b>B</b> Gajah (<i>Bishop</i>), <b>N</b> Kuda (<i>kNight</i>; K sudah dipakai Raja). Bidak tiada huruf. Langkah anak panah ini ditulis <kbd>Nf3</kbd>.",
      "task": "Simbol lain: <kbd>x</kbd> makan, <kbd>+</kbd> sah, <kbd>#</kbd> sah mati, <kbd>O-O</kbd> castling."
     },
     {

@@ -158,3 +158,23 @@
 .consent a{color:var(--accent)}
 .legal-address{font-style:normal;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 14px;line-height:1.5;max-width:420px}
 .badge.locked .badge-medal > .badge-glyph{opacity:1;filter:none;color:var(--muted)}
+/* chess terms glossary (/istilah) and the notation key under the game's move list */
+.glossary-table{width:100%;border-collapse:collapse;margin-block:18px;background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.glossary-table caption{text-align:left;font-family:var(--display);font-weight:700;font-size:22px;padding-bottom:8px}
+.glossary-table th,.glossary-table td{padding:8px 12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}
+.glossary-table thead th{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);background:var(--bg)}
+.glossary-table tbody th{font-weight:600}
+.glossary-table tbody th i.pc{width:28px;height:28px;display:inline-block;vertical-align:middle;margin-right:6px}
+.glossary-table tr:last-child > *{border-bottom:0}
+.glossary-table code{font-family:ui-monospace,monospace;font-weight:700;background:var(--accent-soft);color:var(--ink);border-radius:6px;padding:1px 6px}
+.notation-key{margin:6px 2px 0;font-size:12px;color:var(--muted)}
+.notation-key a{color:var(--accent)}
+.glossary-note{color:var(--muted);font-size:14px}
+.glossary-table{table-layout:fixed}
+.glossary-table th:nth-child(1){width:44%}.glossary-table th:nth-child(2){width:36%}
+.glossary-none{color:var(--muted);font-size:14px}
+/* icon-only header toggles with a tooltip (hover and keyboard focus) */
+.pill.icon-btn{position:relative;padding:6px;width:34px;height:34px;justify-content:center}
+.tb-ico{width:20px;height:20px;display:block}
+.icon-btn[data-tip]::after{content:attr(data-tip);position:absolute;top:calc(100% + 8px);right:0;z-index:30;white-space:nowrap;background:var(--ink);color:var(--bg);font-size:12px;font-weight:600;padding:5px 9px;border-radius:8px;pointer-events:none;opacity:0;transform:translateY(-3px);transition:opacity .15s,transform .15s}
+.icon-btn[data-tip]:hover::after,.icon-btn[data-tip]:focus-visible::after{opacity:1;transform:none}

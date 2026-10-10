@@ -25,6 +25,11 @@ describe('GameRunner resign confirmation', () => {
     const resignBtn = () => root.querySelector('[data-act="resign"]') as HTMLButtonElement;
     const dialog = () => root.querySelector('.modal [role="alertdialog"]');
 
+    it('explains the notation letters under the move list', () => {
+        expect(root.querySelector('.notation-key')?.textContent).toContain('N Kuda');
+        expect(root.querySelector('.notation-key a')?.getAttribute('href')).toBe('/istilah');
+    });
+
     it('asks first and focuses "Teruskan main"', () => {
         resignBtn().click();
         expect(dialog()).not.toBeNull();

@@ -163,7 +163,8 @@ test('theme: the toggle cycles, survives a reload and reaches the Flux pages', a
 
     await page.reload();
     await expect(html).toHaveAttribute('data-theme', 'dark');
-    await expect(page.locator('[data-theme-toggle]')).toHaveText('Tema: Gelap');
+    await expect(page.locator('[data-theme-toggle]')).toHaveAttribute('aria-label', 'Tema: Gelap');
+    await expect(page.locator('[data-theme-toggle]')).toHaveAttribute('data-tip', /Tema: Gelap/);
 
     await page.goto('/login');
     await expect(html).toHaveClass(/dark/);
