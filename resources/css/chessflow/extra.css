@@ -223,3 +223,19 @@ details.tahap:not([open]) > summary.tahap-head{border-bottom-style:solid}
 .cert-row small{color:var(--muted)}
 .cert-open{color:var(--accent);font-weight:600;font-size:14px}
 .print-hint{text-align:center;color:var(--muted);font-size:13px;margin-top:8px}
+
+/* Play page: "Big board" scrolls the site header away and sizes the board by the screen height; "Full screen" does
+   the same without the browser bar. The 140px budget covers the title bar and the turn line under the board. */
+.view-btns{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+.view-btns .ghost[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.app:has(.theatre){max-width:none}
+:is(.theatre,[data-chessflow]:fullscreen){--board:max(480px,min(calc(100dvh - 140px),calc(100vw - 48px - 28px - 360px)))}
+:is(.theatre,[data-chessflow]:fullscreen) .lesson{grid-template-columns:minmax(0,var(--board)) minmax(300px,360px);justify-content:center}
+:is(.theatre,[data-chessflow]:fullscreen) .lesson-bar{max-width:calc(var(--board) + 388px);margin-inline:auto;padding-block:8px 10px}
+.theatre{scroll-margin-top:0}
+[data-chessflow]:fullscreen{background:var(--bg);padding:4px 24px 12px;overflow:auto}
+@media (max-width:860px){
+  .theatre-btn{display:none!important}
+  :is(.theatre,[data-chessflow]:fullscreen) .lesson{grid-template-columns:minmax(0,1fr)}
+  [data-chessflow]:fullscreen .board-wrap{max-width:min(100%,calc(100dvh - 140px))}
+}

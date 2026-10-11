@@ -3,6 +3,7 @@ import type { ArrowDrawSpec, BoardApi } from '../types';
 import { createBoard } from '../core/board';
 import { nm, sq } from '../core/squares';
 import { SFX } from '../core/sound';
+import { confetti } from '../core/confetti';
 import { bot } from '../engine/simple-bot';
 import { sharedEngine, type StockfishEngine } from '../engine/stockfish';
 import { judgeDrawOffer } from './draw';
@@ -32,10 +33,16 @@ const LEVELS: { n: string; skill?: number; depth?: number }[] = [
 ];
 
 const PREF_KEY = 'chessflow-game';
+const THEATRE_KEY = 'chessflow-theatre';
 
 // White flag (resign) and ½ (draw), the usual chess symbols.
 const ICON_RESIGN =
     '<svg class="btn-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 21V3" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/><path d="M6 4h12l-2.5 4.5L18 13H6z" fill="currentColor" fill-opacity=".18" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>';
+// Big board (arrows out) and full screen (corner brackets).
+const ICON_THEATRE =
+    '<svg class="btn-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7"/></svg>';
+const ICON_FULLSCREEN =
+    '<svg class="btn-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg>';
 const ICON_DRAW = '<span class="btn-ico half" aria-hidden="true">½</span>';
 
 type ColorChoice = 'w' | 'b' | 'r';
@@ -73,6 +80,13 @@ export class GameRunner {
     private drawRefusedAt: number | null = null;
     /** Closes the open confirm dialog, if any. */
     private closeDialog: (() => void) | null = null;
+    /** Stops the running confetti burst, if any. */
+    private stopConfetti: () => void = () => {};
+    private readonly onViewKey = (e: KeyboardEvent): void => {
+        // Esc leaves the big board (the browser handles Esc for full screen; an open dialog handles its own Esc).
+        if (e.key === 'Escape' && !this.closeDialog && !document.fullscreenElement && this.root.classList.contains('theatre')) this.setTheatre(false);
+    };
+    private readonly onFullscreen = (): void => this.syncViewButtons();
 
     constructor(root: HTMLElement, handlers: GameHandlers = {}, engine: StockfishEngine = sharedEngine()) {
         this.root = root;
@@ -87,6 +101,10 @@ export class GameRunner {
 
     destroy(): void {
         this.closeDialog?.();
+        this.stopConfetti();
+        document.removeEventListener('keydown', this.onViewKey);
+        document.removeEventListener('fullscreenchange', this.onFullscreen);
+        if (document.fullscreenElement === this.root) void document.exitFullscreen().catch(() => {});
         this.clearTimers();
         this.gameId++;
     }
@@ -119,7 +137,10 @@ export class GameRunner {
 
     private render(): void {
         this.root.innerHTML =
-            '<div class="lesson-bar"><h2>' + t('Main lawan Pak Kuda') + '</h2></div>' +
+            '<div class="lesson-bar"><h2>' + t('Main lawan Pak Kuda') + '</h2><span class="view-btns">' +
+            '<button class="ghost theatre-btn" type="button" data-act="theatre" aria-pressed="false">' + ICON_THEATRE + t('Papan besar') + '</button>' +
+            '<button class="ghost" type="button" data-act="fullscreen" aria-pressed="false" hidden>' + ICON_FULLSCREEN + '<span>' + t('Skrin penuh') + '</span></button>' +
+            '</span></div>' +
             '<div class="lesson"><div class="board-wrap"><div class="gbw"></div><p class="turn"></p></div><div class="panel">' +
             '<div class="setup"><div class="seg" role="group" aria-label="' + t('Warna') + '"><span class="seg-l">' + t('Warna') + '</span><button type="button" data-c="w">' + t('Putih') + '</button><button type="button" data-c="b">' + t('Hitam') + '</button><button type="button" data-c="r">' + t('Rawak') + '</button></div>' +
             '<div class="seg" role="group" aria-label="' + t('Tahap') + '"><span class="seg-l">' + t('Tahap') + '</span>' +
@@ -155,7 +176,47 @@ export class GameRunner {
         this.$('[data-act="hint"]').onclick = () => this.hint();
         this.$('[data-act="draw"]').onclick = () => this.offerDraw();
         this.$('[data-act="resign"]').onclick = () => this.confirmResign();
+        this.$('[data-act="theatre"]').onclick = () => this.setTheatre(!this.root.classList.contains('theatre'));
+        const fs = this.$('[data-act="fullscreen"]');
+        fs.hidden = !document.fullscreenEnabled;
+        fs.onclick = () => this.toggleFullscreen();
+        document.addEventListener('keydown', this.onViewKey);
+        document.addEventListener('fullscreenchange', this.onFullscreen);
+        let theatre = false;
+        try {
+            theatre = localStorage.getItem(THEATRE_KEY) === '1';
+        } catch {
+            // ignore
+        }
+        this.setTheatre(theatre);
         this.segs();
+    }
+
+    // ---- board size: big board (remembered on this device) and full screen ----
+
+    private setTheatre(on: boolean): void {
+        this.root.classList.toggle('theatre', on);
+        // Like a video "theatre mode": the site header scrolls away so the board can use the screen height.
+        if (on && !document.fullscreenElement) this.root.scrollIntoView({ block: 'start' });
+        try {
+            localStorage.setItem(THEATRE_KEY, on ? '1' : '0');
+        } catch {
+            // ignore
+        }
+        this.syncViewButtons();
+    }
+
+    private toggleFullscreen(): void {
+        if (document.fullscreenElement) void document.exitFullscreen().catch(() => {});
+        else void this.root.requestFullscreen().catch(() => {});
+    }
+
+    private syncViewButtons(): void {
+        const full = document.fullscreenElement === this.root;
+        this.$('[data-act="theatre"]').setAttribute('aria-pressed', String(this.root.classList.contains('theatre')));
+        const fs = this.$('[data-act="fullscreen"]');
+        fs.setAttribute('aria-pressed', String(full));
+        fs.querySelector('span')!.textContent = full ? t('Keluar skrin penuh') : t('Skrin penuh');
     }
 
     private segs(): void {
@@ -181,6 +242,7 @@ export class GameRunner {
 
     private start(): void {
         this.closeDialog?.();
+        this.stopConfetti();
         this.clearTimers();
         this.gameId++;
         this.user = this.color === 'r' ? (Math.random() < 0.5 ? 'w' : 'b') : this.color;
@@ -230,10 +292,12 @@ export class GameRunner {
             if (g.turn() !== this.user) {
                 this.status(t('Sah mati! Awak menang lawan Pak Kuda (:level).', { level: t(LEVELS[this.level].n) }), 'good');
                 SFX.win();
+                this.celebrate();
                 this.report('win');
             } else {
                 this.status(t('Sah mati. Pak Kuda menang kali ini. Cuba lagi!'), 'bad');
                 SFX.bad();
+                this.celebrate();
                 this.report('loss');
             }
         } else {
@@ -252,6 +316,12 @@ export class GameRunner {
         this.showMoves();
         this.offerAnalysis();
         return true;
+    }
+
+    /** Confetti whenever the game has a winner (checkmate either way, or a resignation); not for draws. */
+    private celebrate(): void {
+        this.stopConfetti();
+        this.stopConfetti = confetti();
     }
 
     private apply(m: { from: string; to: string; promotion?: string }): Move {
@@ -434,6 +504,7 @@ export class GameRunner {
         if (this.over) return;
         this.over = true;
         this.status(t('Awak mengaku kalah. Tekan "Permainan baru" untuk cuba lagi.'), 'bad');
+        this.celebrate();
         this.report('resign');
         this.showMoves();
         this.offerAnalysis();
