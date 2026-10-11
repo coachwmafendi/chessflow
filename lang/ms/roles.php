@@ -4,5 +4,5 @@ return [
     'murid' => 'Murid',
     'ibubapa' => 'Ibu bapa',
     'guru' => 'Guru',
-    'admin' => 'Admin',
+    'admin' => 'Pentadbir',
 ];

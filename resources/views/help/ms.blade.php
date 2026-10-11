@@ -86,11 +86,11 @@
 <h2 id="tetapan">6. Tetapan</h2>
 <ul>
     <li>Butang di atas kanan: <b>tema warna</b> (Sistem, Cerah, Gelap), <b>bunyi</b> (hidup atau tutup) dan <b>bahasa</b> (BM atau EN). Tetapan ini disimpan pada peranti.</li>
-    <li>Ibu bapa dan guru: ikon gear membuka <b>Tetapan akaun</b> untuk menukar nama, e-mel, kata laluan, pengesahan dua faktor dan passkey.</li>
+    <li>Ibu bapa dan guru: ikon gear membuka <b>Tetapan akaun</b>. Tab <b>Profil</b> (nama, e-mel, jenis akaun dan permohonan akaun guru), <b>Keselamatan</b> (kata laluan, pengesahan dua faktor, passkey), <b>Paparan &amp; bahasa</b> (tema, bahasa, bunyi) dan <b>Data &amp; privasi</b> (muat turun atau padam akaun).</li>
 </ul>
 
 <h2 id="privasi">7. Privasi dan data</h2>
-<p>Kami simpan data sesedikit yang boleh dan tidak meminta e-mel murid. Baca <a href="{{ route('privasi') }}">Dasar Privasi</a> (Akta Perlindungan Data Peribadi 2010) dan <a href="{{ route('terma') }}">Terma Penggunaan</a>. Muat turun data anda sendiri di Tetapan akaun, atau data anak di halaman Anak.</p>
+<p>Kami simpan data sesedikit yang boleh dan tidak meminta e-mel murid. Baca <a href="{{ route('privasi') }}">Dasar Privasi</a> (Akta Perlindungan Data Peribadi 2010) dan <a href="{{ route('terma') }}">Terma Penggunaan</a>. Muat turun data anda sendiri di Tetapan akaun → Data &amp; privasi, atau data anak di halaman Anak.</p>
 
 <h2 id="masalah">8. Masalah lazim</h2>
 <details><summary>Saya lupa PIN.</summary><p>Minta guru atau ibu bapa yang mencipta akaun awak tekan <b>PIN baru</b>.</p></details>

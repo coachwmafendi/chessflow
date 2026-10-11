@@ -30,7 +30,7 @@
     <p>We work to keep ChessFlow available and accurate, but the service is provided "as is". It may be interrupted from time to time for maintenance. To the extent the law allows, we are not liable for indirect losses arising from the use of ChessFlow.</p>
 
     <h2 id="tamat">8. Ending an account</h2>
-    <p>You may stop using ChessFlow and ask for your account to be deleted at any time. Parents and teachers can delete their own account in the account settings. Parents can delete a child's account on the Children page, and teachers can delete student accounts that only they look after on the class page. Deletion cannot be undone.</p>
+    <p>You may stop using ChessFlow and ask for your account to be deleted at any time. Parents and teachers can delete their own account under <i>Account settings → Data &amp; privacy</i>. Parents can delete a child's account on the Children page, and teachers can delete student accounts that only they look after on the class page. Deletion cannot be undone.</p>
 
     <h2 id="perubahan">9. Changes and governing law</h2>
     <p>We may update these terms; the date above will be updated and major changes will be announced. These terms are governed by the laws of Malaysia.</p>

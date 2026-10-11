@@ -29,7 +29,7 @@
     <p>Kami berusaha memastikan ChessFlow sentiasa tersedia dan tepat, tetapi perkhidmatan disediakan "seperti sedia ada". Perkhidmatan mungkin terganggu sekali-sekala untuk penyelenggaraan. Setakat yang dibenarkan undang-undang, kami tidak bertanggungjawab atas kerugian tidak langsung akibat penggunaan ChessFlow.</p>
 
     <h2 id="tamat">8. Menamatkan akaun</h2>
-    <p>Anda boleh berhenti menggunakan ChessFlow dan meminta akaun dipadam pada bila-bila masa. Ibu bapa dan guru boleh memadam akaun sendiri di tetapan akaun. Ibu bapa boleh memadam akaun anak di halaman Anak, dan guru boleh memadam akaun murid yang hanya diurus oleh mereka di halaman kelas. Pemadaman tidak boleh dibatalkan.</p>
+    <p>Anda boleh berhenti menggunakan ChessFlow dan meminta akaun dipadam pada bila-bila masa. Ibu bapa dan guru boleh memadam akaun sendiri di <i>Tetapan akaun → Data &amp; privasi</i>. Ibu bapa boleh memadam akaun anak di halaman Anak, dan guru boleh memadam akaun murid yang hanya diurus oleh mereka di halaman kelas. Pemadaman tidak boleh dibatalkan.</p>
 
     <h2 id="perubahan">9. Perubahan dan undang-undang</h2>
     <p>Kami mungkin mengemas kini terma ini; tarikh di atas akan dikemas kini dan perubahan besar akan dimaklumkan. Terma ini tertakluk kepada undang-undang Malaysia.</p>

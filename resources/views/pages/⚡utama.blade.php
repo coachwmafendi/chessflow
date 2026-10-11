@@ -384,7 +384,7 @@ new #[Layout('layouts::chessflow')] #[Title('Belajar catur dalam Bahasa Melayu')
                 <li><a href="#ciri">{{ __('Ciri-ciri') }}</a></li>
                 <li><a href="{{ route('tentang') }}">{{ __('Tentang ChessFlow') }}</a></li>
                 <li><a href="{{ route('istilah') }}">{{ __('Istilah catur BM–Inggeris') }}</a></li>
-                <li><a href="{{ route('bantuan') }}">{{ __('Bantuan') }}</a></li>
+                <li><a href="{{ route('bantuan') }}" target="_blank" rel="noopener">{{ __('Bantuan') }}<span class="sr-only"> {{ __('(tab baharu)') }}</span></a></li>
                 <li><a href="{{ route('privasi') }}">{{ __('Dasar privasi') }}</a></li>
                 <li><a href="{{ route('terma') }}">{{ __('Terma penggunaan') }}</a></li>
                 <li><a href="{{ route('tentang') }}#lesen">{{ __('Perisian dan lesen') }}</a></li>

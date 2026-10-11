@@ -1,7 +1,6 @@
 <?php
 
 use App\Concerns\ProfileValidationRules;
-use App\Support\UserDataExport;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Flux\Flux;
 use Illuminate\Support\Facades\Auth;
@@ -63,11 +62,6 @@ new #[Title('Tetapan profil')] class extends Component {
         Session::flash('status', 'verification-link-sent');
     }
 
-    /** A copy of everything held about this account, as JSON (PDPA access / portability). */
-    public function downloadMyData(UserDataExport $export)
-    {
-        return $export->download(Auth::user());
-    }
 
     #[Computed]
     public function hasUnverifiedEmail(): bool
@@ -75,12 +69,6 @@ new #[Title('Tetapan profil')] class extends Component {
         return Auth::user() instanceof MustVerifyEmail && ! Auth::user()->hasVerifiedEmail();
     }
 
-    #[Computed]
-    public function showDeleteUser(): bool
-    {
-        return ! Auth::user() instanceof MustVerifyEmail
-            || (Auth::user() instanceof MustVerifyEmail && Auth::user()->hasVerifiedEmail());
-    }
 }; ?>
 
 <section class="w-full">
@@ -124,14 +112,21 @@ new #[Title('Tetapan profil')] class extends Component {
             </div>
         </form>
 
-        <section class="mt-10 space-y-3">
-            <flux:heading>{{ __('Data peribadi anda') }}</flux:heading>
-            <flux:subheading>{{ __('Muat turun salinan semua data akaun ini dalam format JSON, seperti dalam') }} <flux:link :href="route('privasi')">{{ __('Dasar Privasi') }}</flux:link>.</flux:subheading>
-            <flux:button wire:click="downloadMyData" icon="arrow-down-tray" data-test="download-my-data">{{ __('Muat turun data saya') }}</flux:button>
+        {{-- Account type: what this account can do, and how a parent becomes a teacher. --}}
+        @php $role = auth()->user()->role; @endphp
+        <section class="mt-10 space-y-3" data-test="account-type">
+            <flux:heading>{{ __('Jenis akaun') }}</flux:heading>
+            <div><flux:badge color="teal">{{ __("roles.{$role->value}") }}</flux:badge></div>
+            @if ($role === App\Enums\Role::IbuBapa)
+                <flux:text>{{ __('Anda seorang guru? Minta pentadbir aktifkan akaun guru untuk mencipta kelas dan memberi tugasan.') }}</flux:text>
+                <flux:button icon="envelope" :href="'mailto:wmafendi@gmail.com?subject='.rawurlencode(__('Permohonan akaun guru ChessFlow')).'&body='.rawurlencode(__('E-mel akaun: :email', ['email' => auth()->user()->email]))">{{ __('Mohon akaun guru') }}</flux:button>
+            @elseif ($role === App\Enums\Role::Guru)
+                <flux:text>{{ __('Anda boleh mencipta kelas, menambah murid dan memberi tugasan di halaman Kelas.') }}</flux:text>
+            @elseif ($role === App\Enums\Role::Admin)
+                <flux:text>{{ __('Anda boleh mengurus pengguna dan pelajaran di panel pentadbir.') }}</flux:text>
+            @endif
         </section>
 
-        @if ($this->showDeleteUser)
-            <livewire:pages::settings.delete-user-form />
-        @endif
+        <flux:text class="mt-10 text-sm">{{ __('Muat turun atau padam data akaun anda di') }} <flux:link :href="route('data.edit')" wire:navigate>{{ __('Data & privasi') }}</flux:link>.</flux:text>
     </x-pages::settings.layout>
 </section>

@@ -86,11 +86,11 @@
 <h2 id="tetapan">6. Settings</h2>
 <ul>
     <li>Buttons at the top right: <b>colour theme</b> (System, Light, Dark), <b>sound</b> (on or off) and <b>language</b> (BM or EN). These are saved on the device.</li>
-    <li>Parents and teachers: the gear icon opens <b>Account settings</b> to change your name, email, password, two-factor authentication and passkeys.</li>
+    <li>Parents and teachers: the gear icon opens <b>Account settings</b>. Tabs: <b>Profile</b> (name, email, account type and teacher account request), <b>Security</b> (password, two-factor authentication, passkeys), <b>Display &amp; language</b> (theme, language, sound) and <b>Data &amp; privacy</b> (download or delete the account).</li>
 </ul>
 
 <h2 id="privasi">7. Privacy and data</h2>
-<p>We keep as little data as we can and never ask for a student's email. Read the <a href="{{ route('privasi') }}">Privacy Policy</a> (Personal Data Protection Act 2010) and the <a href="{{ route('terma') }}">Terms of Use</a>. Download your own data in Account settings, or a child's data on the Children page.</p>
+<p>We keep as little data as we can and never ask for a student's email. Read the <a href="{{ route('privasi') }}">Privacy Policy</a> (Personal Data Protection Act 2010) and the <a href="{{ route('terma') }}">Terms of Use</a>. Download your own data under Account settings → Data &amp; privacy, or a child's data on the Children page.</p>
 
 <h2 id="masalah">8. Common problems</h2>
 <details><summary>I forgot my PIN.</summary><p>Ask the teacher or parent who created your account to press <b>New PIN</b>.</p></details>

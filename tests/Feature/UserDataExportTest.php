@@ -45,8 +45,8 @@ it('lets a parent download their child\'s data, and nobody else', function () {
         ->assertNotFound();
 });
 
-it('lets an adult download their own data from the profile settings', function () {
-    Livewire::actingAs($this->parent)->test('pages::settings.profile')
+it('lets an adult download their own data from Data & privacy', function () {
+    Livewire::actingAs($this->parent)->test('pages::settings.data')
         ->assertSee('Muat turun data saya')
         ->call('downloadMyData')
         ->assertFileDownloaded();

@@ -295,7 +295,7 @@ it('links help for everyone and account settings for adults only', function () {
     $help = 'href="'.route('bantuan').'"';
     $settings = 'href="'.route('profile.edit').'"';
 
-    $this->get(route('tentang'))->assertSee($help, false)->assertDontSee($settings, false);
+    $this->get(route('tentang'))->assertSee($help.' target="_blank" rel="noopener"', false)->assertDontSee($settings, false);
     $this->actingAs($this->student)->get(route('peta'))->assertSee($help, false)->assertDontSee($settings, false);
     $this->actingAs(User::factory()->create())->get(route('tentang'))->assertSee($help, false)->assertSee($settings, false);
 });

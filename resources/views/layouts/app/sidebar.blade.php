@@ -11,14 +11,25 @@
             </flux:sidebar.header>
 
             <flux:sidebar.nav>
+                {{-- Same destinations as the ChessFlow header, by role. --}}
                 <flux:sidebar.group :heading="__('Platform')" class="grid">
-                    <flux:sidebar.item icon="home" :href="route('peta')">
-                        {{ __('Dashboard') }}
-                    </flux:sidebar.item>
+                    <flux:sidebar.item icon="map" :href="route('peta')">{{ __('Peta') }}</flux:sidebar.item>
+                    <flux:sidebar.item icon="play" :href="route('main')">{{ __('Main') }}</flux:sidebar.item>
+                    <flux:sidebar.item icon="trophy" :href="route('lencana')">{{ __('Lencana') }}</flux:sidebar.item>
+                    @if (auth()->user()->isStaff())
+                        <flux:sidebar.item icon="academic-cap" :href="route('guru')">{{ __('Kelas') }}</flux:sidebar.item>
+                    @endif
+                    @can('guardian')
+                        <flux:sidebar.item icon="users" :href="route('anak')">{{ __('Anak') }}</flux:sidebar.item>
+                    @endcan
+                    @can('admin')
+                        <flux:sidebar.item icon="shield-check" :href="url('/admin')">Admin</flux:sidebar.item>
+                    @endcan
+                    <flux:sidebar.item icon="cog-6-tooth" :href="route('profile.edit')" :current="request()->is('settings/*')">{{ __('Settings') }}</flux:sidebar.item>
                 </flux:sidebar.group>
 
                 <flux:sidebar.group :heading="__('Bantuan')" class="grid">
-                    <flux:sidebar.item icon="question-mark-circle" :href="route('bantuan')">{{ __('Bantuan') }}</flux:sidebar.item>
+                    <flux:sidebar.item icon="question-mark-circle" :href="route('bantuan')" target="_blank" rel="noopener">{{ __('Bantuan') }}<span class="sr-only"> {{ __('(tab baharu)') }}</span></flux:sidebar.item>
                 </flux:sidebar.group>
             </flux:sidebar.nav>
 
