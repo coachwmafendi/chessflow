@@ -48,7 +48,7 @@
 <h3>Badges</h3>
 <p>There are 14 badges for lessons, stars, exams, streaks, puzzles and games. See them all, including how many more you need, on the <b>Badges</b> page (card on the map).</p>
 <h3>Exams and certificates</h3>
-<p>Each level ends with an exam. Get at least <b>70%</b> right to pass and earn a <b>certificate</b>. On the certificate page, write your own name, then print it. Every certificate has a verification code that anyone can check on the home page (Check a certificate).</p>
+<p>Each level ends with an exam. Get at least <b>70%</b> right to pass and earn a <b>certificate</b>. On the certificate page, write your own name, then press <b>Print / Save PDF</b> (in the print dialog, choose "Save as PDF" for a PDF file). Find your certificates again under <b>My certificates</b> on the Badges page, or on the exam stop on the map. Every certificate has a verification code that anyone can check on the home page (Check a certificate).</p>
 <h3>Tasks from your teacher and classes</h3>
 <p>When a teacher sets a task it appears above the map with its due date. That lesson is unlocked for you straight away. Got a class code from your teacher? Press <b>Join a class</b> on the map.</p>
 <h3>Malay and English chess words</h3>
@@ -69,7 +69,7 @@
     <li>After logging in, press <b>Children</b> at the top.</li>
     <li><b>Create a child account</b>: type a nickname. We generate a username and PIN. Save or print them straight away; the PIN is not shown again.</li>
     <li>Your child already has an account (made by a teacher, for example)? <b>Link</b> it with the child's username and PIN.</li>
-    <li>The progress table shows each child's lessons, stars, XP and streak.</li>
+    <li>The progress table shows each child's lessons, stars, XP and streak. The ✓ on a passed exam opens the child's certificate.</li>
     <li>Forgot the PIN? Press <b>New PIN</b>. <b>Unlink</b> only removes the link; the child's account stays.</li>
     <li><b>Download data</b> gives a copy of the child's data (JSON). <b>Delete account</b> permanently deletes the child's account and all its data (type PADAM to confirm).</li>
 </ul>
@@ -80,7 +80,7 @@
     <li>Press <b>Classes</b> at the top, then <b>Create a class</b>. Each class has a <b>join code</b>.</li>
     <li><b>Add students</b>: one name per line (up to 40 at a time). Usernames and PINs are shown once only; print them to hand out. Students who already have an account can join with the class code.</li>
     <li><b>Tasks</b>: pick a lesson or exam, an optional due date and note, then <b>Set task</b>. The lesson unlocks for everyone in the class. See how many have finished and who has not.</li>
-    <li>The progress table shows every student's stars for every lesson. For each student: <b>New PIN</b>, <b>Remove</b> from the class, or <b>Delete account</b> (only when the student is not linked to a parent or another teacher's class).</li>
+    <li>The progress table shows every student's stars for every lesson; the ✓ on a passed exam opens that student's certificate. For each student: <b>New PIN</b>, <b>Remove</b> from the class, or <b>Delete account</b> (only when the student is not linked to a parent or another teacher's class).</li>
 </ul>
 
 <h2 id="tetapan">6. Settings</h2>

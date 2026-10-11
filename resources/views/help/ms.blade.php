@@ -48,7 +48,7 @@
 <h3>Lencana</h3>
 <p>Ada 14 lencana untuk pelajaran, bintang, ujian, streak, teka-teki dan permainan. Lihat semuanya, termasuk berapa lagi yang perlu, di halaman <b>Lencana</b> (kad di peta).</p>
 <h3>Ujian dan sijil</h3>
-<p>Setiap tahap berakhir dengan ujian. Jawab sekurang-kurangnya <b>70%</b> dengan betul untuk lulus dan dapat <b>sijil</b>. Di halaman sijil, tulis nama awak sendiri, kemudian cetak. Setiap sijil ada kod pengesahan; sesiapa boleh menyemaknya di laman utama (Semak sijil).</p>
+<p>Setiap tahap berakhir dengan ujian. Jawab sekurang-kurangnya <b>70%</b> dengan betul untuk lulus dan dapat <b>sijil</b>. Di halaman sijil, tulis nama awak sendiri, kemudian tekan <b>Cetak / Simpan PDF</b> (dalam dialog cetak, pilih "Simpan sebagai PDF" untuk fail PDF). Cari semula sijil awak di bahagian <b>Sijil saya</b> di halaman Lencana, atau pada nod ujian di peta. Setiap sijil ada kod pengesahan; sesiapa boleh menyemaknya di laman utama (Semak sijil).</p>
 <h3>Tugasan guru dan kelas</h3>
 <p>Jika guru memberi tugasan, ia muncul di atas peta bersama tarikh akhir. Pelajaran yang ditugaskan terus dibuka untuk awak. Ada kod kelas daripada guru? Tekan <b>Sertai kelas</b> di peta.</p>
 <h3>Istilah dalam bahasa Inggeris</h3>
@@ -69,7 +69,7 @@
     <li>Selepas log masuk, tekan <b>Anak</b> di atas.</li>
     <li><b>Cipta akaun anak</b>: tulis nama panggilan. Kami jana nama pengguna dan PIN. Simpan atau cetak segera, kerana PIN tidak dipaparkan lagi.</li>
     <li>Anak sudah ada akaun (contohnya dicipta oleh guru)? <b>Pautkan</b> dengan nama pengguna dan PIN anak.</li>
-    <li>Jadual kemajuan menunjukkan pelajaran, bintang, XP dan streak setiap anak.</li>
+    <li>Jadual kemajuan menunjukkan pelajaran, bintang, XP dan streak setiap anak. Tanda ✓ pada ujian yang lulus membuka sijil anak.</li>
     <li>Lupa PIN? Tekan <b>PIN baru</b>. <b>Buang pautan</b> hanya memutuskan pautan; akaun anak kekal.</li>
     <li><b>Muat turun data</b> memberi salinan data anak (JSON). <b>Padam akaun</b> memadam akaun anak dan semua datanya selama-lamanya (taip PADAM untuk sahkan).</li>
 </ul>
@@ -80,7 +80,7 @@
     <li>Tekan <b>Kelas</b> di atas, kemudian <b>Cipta kelas</b>. Setiap kelas ada <b>kod sertai</b>.</li>
     <li><b>Tambah murid</b>: tulis satu nama setiap baris (sehingga 40 sekali gus). Nama pengguna dan PIN dipaparkan sekali sahaja; cetak untuk diedarkan. Murid yang sudah ada akaun boleh sertai dengan kod kelas.</li>
     <li><b>Tugasan</b>: pilih pelajaran atau ujian, tarikh akhir dan nota (pilihan), kemudian <b>Beri tugasan</b>. Pelajaran itu terus dibuka untuk semua murid kelas. Lihat berapa murid sudah siap dan siapa yang belum.</li>
-    <li>Jadual kemajuan menunjukkan bintang setiap murid untuk setiap pelajaran. Untuk setiap murid: <b>PIN baru</b>, <b>Keluarkan</b> daripada kelas, atau <b>Padam akaun</b> (hanya jika murid itu tidak dipautkan dengan ibu bapa atau kelas guru lain).</li>
+    <li>Jadual kemajuan menunjukkan bintang setiap murid untuk setiap pelajaran; tanda ✓ pada ujian yang lulus membuka sijil murid itu. Untuk setiap murid: <b>PIN baru</b>, <b>Keluarkan</b> daripada kelas, atau <b>Padam akaun</b> (hanya jika murid itu tidak dipautkan dengan ibu bapa atau kelas guru lain).</li>
 </ul>
 
 <h2 id="tetapan">6. Tetapan</h2>

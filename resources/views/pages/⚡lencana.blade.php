@@ -21,6 +21,8 @@ new #[Layout('layouts::chessflow')] #[Title('Lencana')] class extends Component 
                 'progress' => Badges::progress($b, $stats),
             ]),
             'count' => $earned->count(),
+            'certificates' => $user->certificates()->with('level')->get()->sortBy(fn ($c) => $c->level->number),
+            'isStudent' => $user->isStudent(),
             'total' => count(Badges::all()),
         ];
     }
@@ -38,4 +40,19 @@ new #[Layout('layouts::chessflow')] #[Title('Lencana')] class extends Component 
             <x-chessflow.badge :badge="$row['badge']" :earned="$row['awarded'] !== null" :date="$row['awarded']" :progress="$row['progress']" wire:key="badge-{{ $key }}" />
         @endforeach
     </div>
+
+    @if ($isStudent || $certificates->isNotEmpty())
+        <section class="my-certs" aria-labelledby="my-certs-h">
+            <h2 id="my-certs-h">{{ __('Sijil saya') }}</h2>
+            @forelse ($certificates as $c)
+                <a class="cert-row" href="{{ route('sijil', $c->code) }}">
+                    <span class="qico"><x-chessflow.medal /></span>
+                    <span><b>{{ __('Tahap :n: :name', ['n' => $c->level->number, 'name' => $c->level->name]) }}</b><small>{{ $c->score }}/{{ $c->total }} · {{ $c->issued_at->locale(app()->getLocale())->translatedFormat('j F Y') }}</small></span>
+                    <span class="cert-open">{{ __('Lihat sijil') }}</span>
+                </a>
+            @empty
+                <p class="muted">{{ __('Belum ada sijil. Lulus ujian tahap (70% ke atas) untuk mendapat sijil pertama.') }}</p>
+            @endforelse
+        </section>
+    @endif
 </div>

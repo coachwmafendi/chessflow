@@ -54,8 +54,9 @@ new #[Layout('layouts::chessflow')] #[Title('Sijil')] class extends Component {
             @error('displayName') <p class="status bad">{{ $message }}</p> @enderror
         @endif
         <div class="actions" style="justify-content: center; margin-top: 12px">
-            <button class="ghost" type="button" onclick="window.print()">{{ __('Cetak') }}</button>
+            <button class="ghost" type="button" onclick="window.print()">{{ __('Cetak / Simpan PDF') }}</button>
             @auth <a class="ghost" href="{{ route('peta') }}">{{ __('Ke peta') }}</a> @endauth
         </div>
+        <p class="print-hint">{{ __('Untuk fail PDF, pilih "Simpan sebagai PDF" dalam dialog cetak.') }}</p>
     </div>
 </div>

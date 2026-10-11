@@ -1,5 +1,5 @@
 @props(['rows', 'lessons', 'actions' => null])
-{{-- Students × lessons: best stars per lesson (✓ for passed exams). --}}
+{{-- Students × lessons: best stars per lesson (✓ for passed exams, linking to the certificate). --}}
 <div class="progress-wrap">
     <table class="progress-table">
         <thead>
@@ -22,7 +22,7 @@
                     <td>{{ $row['student']->xp }}</td>
                     <td>{{ $row['streak'] }}</td>
                     <td>{{ $row['examsPassed'] }}</td>
-                    <td>{{ $row['lastActive']?->locale('ms')->diffForHumans() ?? '—' }}</td>
+                    <td>{{ $row['lastActive']?->locale(app()->getLocale())->diffForHumans() ?? '—' }}</td>
                     @foreach ($lessons as $lesson)
                         @php
                             $stars = $row['stars'][$lesson->id] ?? null;
@@ -31,7 +31,11 @@
                             @if ($stars === null)
                                 ·
                             @elseif ($lesson->isExam())
-                                ✓
+                                @if ($code = $row['certificates'][$lesson->level_id] ?? null)
+                                    <a class="cert-link" href="{{ route('sijil', $code) }}" aria-label="{{ __('Sijil Tahap :n', ['n' => $lesson->level->number]) }}" title="{{ __('Sijil Tahap :n', ['n' => $lesson->level->number]) }}">✓</a>
+                                @else
+                                    ✓
+                                @endif
                             @else
                                 {{ str_repeat('★', $stars) }}
                             @endif

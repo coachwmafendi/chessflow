@@ -55,6 +55,7 @@ new #[Layout('layouts::chessflow')] #[Title('Peta')] class extends Component {
             'newBadges' => $newBadges,
             'badgeCount' => $user->badges()->count(),
             'badgeTotal' => count($catalogue),
+            'certificates' => $user->certificates()->pluck('code', 'level_id'),
             'reviewDue' => $user->reviewItems()->due()->count(),
             'reviewTotal' => $user->reviewItems()->count(),
         ];
@@ -209,7 +210,10 @@ new #[Layout('layouts::chessflow')] #[Title('Peta')] class extends Component {
                         <span class="lbl">{{ $l->title }}</span>
                         <span class="sub">
                             @if ($s['done'])
-                                @if ($exam) {{ __('Lulus · :score', ['score' => $s['score']]) }} @else <x-chessflow.stars :n="$s['stars']" /> @endif
+                                @if ($exam)
+                                    {{ __('Lulus · :score', ['score' => $s['score']]) }}
+                                    @if ($code = $certificates->get($l->level_id)) · <a class="cert-link" href="{{ route('sijil', $code) }}">{{ __('Sijil') }}</a>@endif
+                                @else <x-chessflow.stars :n="$s['stars']" /> @endif
                             @elseif ($s['locked'])
                                 {{ __('Terkunci') }}
                             @else

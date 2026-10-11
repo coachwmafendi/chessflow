@@ -210,3 +210,16 @@ details.tahap:not([open]) > summary.tahap-head{border-bottom-style:solid}
 .help details p{margin:0 0 12px;color:var(--muted)}
 .help code{font-family:ui-monospace,monospace;background:var(--accent-soft);color:var(--ink);border-radius:6px;padding:1px 6px;font-size:.92em}
 @media (max-width:560px){.help .help-toc ol{columns:1}}
+/* certificate links: map exam stops, progress tables, "Sijil saya" on /lencana, print hint on /sijil */
+.cert-link{color:var(--accent);font-weight:600}
+.progress-table .cert-link{text-decoration:none;color:var(--good);font-weight:700}
+.my-certs{margin-top:28px}
+.my-certs h2{font-size:24px;margin-bottom:10px}
+.my-certs .muted{color:var(--muted)}
+.cert-row{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px 14px;margin-bottom:10px;text-decoration:none;color:inherit}
+.cert-row:hover{border-color:var(--accent)}
+.cert-row .qico{background:var(--sun-soft)} .cert-row .qico svg{fill:var(--sun)}
+.cert-row b{font-family:var(--display);font-size:18px;display:block}
+.cert-row small{color:var(--muted)}
+.cert-open{color:var(--accent);font-weight:600;font-size:14px}
+.print-hint{text-align:center;color:var(--muted);font-size:13px;margin-top:8px}
