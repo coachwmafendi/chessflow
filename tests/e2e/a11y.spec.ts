@@ -40,7 +40,7 @@ for (const scheme of ['light', 'dark'] as const) {
 
         test('public pages', async ({ page }) => {
             const found: string[] = [];
-            for (const path of ['/', '/tentang', '/istilah', '/privasi', '/terma', '/masuk-murid', '/login', '/register']) found.push(...(await audit(page, path)));
+            for (const path of ['/', '/tentang', '/bantuan', '/istilah', '/privasi', '/terma', '/masuk-murid', '/login', '/register']) found.push(...(await audit(page, path)));
             expect(found, found.join('\n')).toEqual([]);
         });
 

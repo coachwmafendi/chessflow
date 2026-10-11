@@ -4,6 +4,7 @@ use App\Models\Certificate;
 use App\Models\Lesson;
 use App\Models\LessonProgress;
 use App\Models\User;
+use App\Support\Locale;
 use Database\Seeders\LessonSeeder;
 use Livewire\Livewire;
 
@@ -274,4 +275,27 @@ it('opens every level for staff, who have every lesson unlocked', function () {
     $html = $this->actingAs($teacher)->get(route('peta'))->getContent();
 
     expect(substr_count($html, 'class="tahap tahap-current"'))->toBe(5);
+});
+
+it('shows the help docs in Malay and in English', function () {
+    $this->get(route('bantuan'))
+        ->assertOk()
+        ->assertSee('<html lang="ms"', false)
+        ->assertSeeInOrder(['Untuk murid', 'Main lawan Pak Kuda', 'Untuk ibu bapa', 'Untuk guru', 'Masalah lazim']);
+
+    $this->withCookie(Locale::COOKIE, 'en')->get(route('bantuan'))
+        ->assertOk()
+        ->assertSee('<html lang="en"', false)
+        ->assertSeeInOrder(['For students', 'Playing Pak Kuda', 'For parents', 'For teachers', 'Common problems']);
+
+    $this->get('/sitemap.xml')->assertSee('<loc>'.route('bantuan').'</loc>', false);
+});
+
+it('links help for everyone and account settings for adults only', function () {
+    $help = 'href="'.route('bantuan').'"';
+    $settings = 'href="'.route('profile.edit').'"';
+
+    $this->get(route('tentang'))->assertSee($help, false)->assertDontSee($settings, false);
+    $this->actingAs($this->student)->get(route('peta'))->assertSee($help, false)->assertDontSee($settings, false);
+    $this->actingAs(User::factory()->create())->get(route('tentang'))->assertSee($help, false)->assertSee($settings, false);
 });

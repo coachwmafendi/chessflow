@@ -11,6 +11,7 @@ Route::livewire('tentang', 'pages::tentang')->name('tentang');
 Route::livewire('privasi', 'pages::privasi')->name('privasi');
 Route::livewire('terma', 'pages::terma')->name('terma');
 Route::livewire('istilah', 'pages::istilah')->name('istilah');
+Route::livewire('bantuan', 'pages::bantuan')->name('bantuan');
 
 Route::post('bahasa/{locale}', LocaleController::class)->name('locale.switch');
 

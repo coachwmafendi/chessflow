@@ -16,6 +16,10 @@
                         {{ __('Dashboard') }}
                     </flux:sidebar.item>
                 </flux:sidebar.group>
+
+                <flux:sidebar.group :heading="__('Bantuan')" class="grid">
+                    <flux:sidebar.item icon="question-mark-circle" :href="route('bantuan')">{{ __('Bantuan') }}</flux:sidebar.item>
+                </flux:sidebar.group>
             </flux:sidebar.nav>
 
             <flux:spacer />

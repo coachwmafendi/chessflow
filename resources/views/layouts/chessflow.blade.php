@@ -60,7 +60,14 @@
                             <a class="pill btn" href="{{ route('login') }}">{{ __('Log masuk') }}</a>
                         @endunless
                     @endguest
-                    {{-- Icon toggles; mount.ts swaps icon, label and tooltip on change (translated with t()). --}}
+                    {{-- Help and (for adults) account settings, then the icon toggles; mount.ts swaps the toggles' icon, label and tooltip on change (translated with t()). --}}
+                    <a class="pill btn icon-btn" href="{{ route('bantuan') }}" aria-label="{{ __('Bantuan') }}" data-tip="{{ __('Bantuan') }}"><svg class="tb-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6v.6"/><path d="M12 17.5h.01"/></svg></a>
+                    @auth
+                        @unless ($user->isStudent())
+                            <a class="pill btn icon-btn" href="{{ route('profile.edit') }}" aria-label="{{ __('Tetapan akaun') }}" data-tip="{{ __('Tetapan akaun') }}"><svg class="tb-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></a>
+                        @endunless
+                    @endauth
+                    
                     <button class="pill btn icon-btn" type="button" data-theme-toggle aria-label="{{ __('Tema: :name', ['name' => __('Sistem')]) }}" data-tip="{{ __('Tema: :name · tekan untuk tukar', ['name' => __('Sistem')]) }}"><svg class="tb-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg></button>
                     <button class="pill btn icon-btn" type="button" data-sound-toggle aria-pressed="true" aria-label="{{ __('Bunyi: Hidup') }}" data-tip="{{ __('Bunyi: Hidup · tekan untuk tutup') }}"><svg class="tb-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg></button>
                     <x-locale-switch />
@@ -79,7 +86,7 @@
 
             <footer class="foot">
                 <span>© {{ now()->year }} ChessFlow · WM AFENDI ENTERPRISE · {{ __('Belajar catur dalam Bahasa Melayu untuk kanak-kanak dan pemula') }}</span>
-                <span class="foot-r"><a href="{{ route('tentang') }}">{{ __('Tentang') }}</a><a href="{{ route('istilah') }}">{{ __('Istilah catur') }}</a><a href="{{ route('privasi') }}">{{ __('Privasi') }}</a><a href="{{ route('terma') }}">{{ __('Terma') }}</a></span>
+                <span class="foot-r"><a href="{{ route('tentang') }}">{{ __('Tentang') }}</a><a href="{{ route('bantuan') }}">{{ __('Bantuan') }}</a><a href="{{ route('istilah') }}">{{ __('Istilah catur') }}</a><a href="{{ route('privasi') }}">{{ __('Privasi') }}</a><a href="{{ route('terma') }}">{{ __('Terma') }}</a></span>
             </footer>
         </div>
     </body>
