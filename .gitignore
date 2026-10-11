@@ -44,3 +44,6 @@ yarn-error.log
 /test-results
 /playwright-report
 /.playwright-mcp
+
+# macOS Finder metadata
+.DS_Store
