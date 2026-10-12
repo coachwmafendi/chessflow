@@ -19,7 +19,9 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
+use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 /**
  * Lesson content lives in data/lessons.json (git). Admins only see it, preview it,
@@ -35,12 +37,12 @@ class LessonResource extends Resource
 
     public static function getModelLabel(): string
     {
-        return __('pelajaran');
+        return __('admin.lesson');
     }
 
     public static function getPluralModelLabel(): string
     {
-        return __('pelajaran');
+        return __('admin.lessons');
     }
 
     public static function infolist(Schema $schema): Schema
@@ -88,6 +90,14 @@ class LessonResource extends Resource
     {
         return $table
             ->recordTitleAttribute('title')
+            // How students do on each lesson: how many finished it and their average best stars.
+            ->modifyQueryUsing(fn (Builder $query) => $query
+                ->withCount(['progress as done_count' => fn (Builder $p) => $p->whereNotNull('completed_at')])
+                ->withAvg(['progress as avg_stars' => fn (Builder $p) => $p->whereNotNull('completed_at')], 'best_stars'))
+            ->defaultGroup(Group::make('level.number')->label(__('Tahap'))
+                ->getTitleFromRecordUsing(fn (Lesson $record) => $record->level->number.'. '.$record->level->name)
+                ->orderQueryUsing(fn (Builder $query, string $direction) => $query->orderBy('position', $direction === 'desc' ? 'desc' : 'asc'))
+                ->collapsible())
             ->defaultSort('position')
             ->reorderable('position')
             ->paginated(false)
@@ -95,13 +105,18 @@ class LessonResource extends Resource
                 TextColumn::make('position')->label(__('#'))->sortable(),
                 TextColumn::make('title')->label(__('Tajuk'))->searchable()
                     ->description(fn (Lesson $record) => $record->slug),
-                TextColumn::make('level.number')->label(__('Tahap'))->sortable(),
+                TextColumn::make('level.number')->label(__('Tahap'))->sortable()->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('kind')->label(__('Jenis'))->badge()
                     ->formatStateUsing(fn (LessonKind $state) => $state === LessonKind::Exam ? __('Ujian') : __('Pelajaran'))
                     ->color(fn (LessonKind $state) => $state === LessonKind::Exam ? 'warning' : 'gray'),
                 TextColumn::make('steps')->label(__('Langkah'))
                     ->state(fn (Lesson $record) => count($record->steps)),
                 TextColumn::make('xp')->label(__('XP')),
+                TextColumn::make('done_count')->label(__('Murid siap'))->sortable()->alignEnd(),
+                TextColumn::make('avg_stars')->label(__('Purata ★'))->sortable()->alignEnd()->placeholder('—')
+                    ->formatStateUsing(fn ($state) => number_format((float) $state, 1))
+                    // Low averages point at lessons that are too hard or unclear.
+                    ->color(fn ($state) => $state === null ? null : ((float) $state < 2 ? 'danger' : ((float) $state < 2.5 ? 'warning' : 'success'))),
                 TextColumn::make('content_version')->label(__('Versi')),
                 ToggleColumn::make('is_published')->label(__('Diterbitkan')),
             ])

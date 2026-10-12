@@ -1,10 +1,13 @@
 <?php
 
+use App\Actions\CompleteLesson;
 use App\Enums\Role;
 use App\Filament\Resources\Lessons\LessonResource;
 use App\Filament\Resources\Lessons\Pages\ListLessons;
 use App\Filament\Resources\Lessons\Pages\ViewLesson;
 use App\Filament\Resources\Users\Pages\ManageUsers;
+use App\Filament\Widgets\ChessflowStats;
+use App\Filament\Widgets\SignupsChart;
 use App\Models\Lesson;
 use App\Models\User;
 use App\Support\LessonStepView;
@@ -35,6 +38,16 @@ it('lists lessons in curriculum order and shows a preview', function () {
 
     $this->actingAs($this->admin)->get(route('pratonton', $papan))->assertOk()->assertSee('data-chessflow="lesson"', false);
     $this->actingAs(User::factory()->teacher()->create())->get(route('pratonton', $papan))->assertForbidden();
+});
+
+it('shows the dashboard stats and sign-up chart', function () {
+    $student = User::factory()->create(['role' => Role::Murid, 'email' => null]);
+    app(CompleteLesson::class)->handle($student, Lesson::where('slug', 'papan')->first(), 0);
+
+    $this->actingAs($this->admin)->get('/admin')->assertOk();
+    Livewire::actingAs($this->admin)->test(ChessflowStats::class)->assertOk()->assertSee(__('Pelajaran disiapkan'));
+    Livewire::actingAs($this->admin)->test(SignupsChart::class)->assertOk();
+    Livewire::actingAs($this->admin)->test(ManageUsers::class)->assertOk()->assertSee(__('Aktif terakhir'));
 });
 
 it('shows each step readably and can open the preview at a step', function () {

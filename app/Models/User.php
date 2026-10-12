@@ -41,6 +41,7 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
  * @property string|null $remember_token
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
+ * @property-read string|null $xp_events_max_created_at Last XP time, when loaded with withMax('xpEvents', 'created_at') (admin users table)
  */
 #[Fillable(['name', 'username', 'email', 'password', 'role', 'pin', 'preferences'])]
 #[Hidden(['password', 'pin', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]

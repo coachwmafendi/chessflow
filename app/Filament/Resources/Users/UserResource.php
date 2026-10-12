@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Support\UserDataExport;
 use BackedEnum;
 use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
@@ -16,9 +17,12 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Enums\Width;
 use Filament\Support\Icons\Heroicon;
+use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 /** Admins promote teachers/admins and fix names. Accounts are created by users, teachers and parents. */
 class UserResource extends Resource
@@ -31,12 +35,12 @@ class UserResource extends Resource
 
     public static function getModelLabel(): string
     {
-        return __('pengguna');
+        return __('admin.user');
     }
 
     public static function getPluralModelLabel(): string
     {
-        return __('pengguna');
+        return __('admin.users');
     }
 
     /**
@@ -72,27 +76,57 @@ class UserResource extends Resource
         return $table
             ->recordTitleAttribute('name')
             ->defaultSort('created_at', 'desc')
+            // Last activity = last XP earned (lessons, daily puzzle, practice, games); links = classes, children, guardians.
+            ->modifyQueryUsing(fn (Builder $query) => $query->withMax('xpEvents', 'created_at')
+                ->withCount(['classrooms', 'taughtClassrooms', 'students', 'guardians']))
             ->columns([
-                TextColumn::make('name')->label(__('Nama'))->searchable(),
-                TextColumn::make('username')->label(__('Nama pengguna'))->searchable()->placeholder('—'),
-                TextColumn::make('email')->label(__('E-mel'))->searchable()->placeholder('—'),
+                // Students sign in with a username, adults with an email: show whichever the account has.
+                TextColumn::make('name')->label(__('Nama'))->searchable(['name', 'username', 'email'])
+                    ->description(fn (User $record) => $record->email ?? '@'.$record->username),
                 TextColumn::make('role')->label(__('Peranan'))->badge()
                     ->formatStateUsing(fn (Role $state) => self::roleOptions()[$state->value]),
+                IconColumn::make('email_verified_at')->label(__('E-mel disahkan'))
+                    ->state(fn (User $record) => $record->email === null ? null : $record->email_verified_at !== null)
+                    ->boolean()->placeholder('—')->alignCenter(),
+                TextColumn::make('links')->label(__('Kaitan'))
+                    ->state(fn (User $record) => self::links($record))->placeholder('—')->color('gray'),
                 TextColumn::make('xp')->label(__('XP'))->sortable(),
+                TextColumn::make('xp_events_max_created_at')->label(__('Aktif terakhir'))
+                    ->since()->sortable()->placeholder('—')
+                    ->tooltip(fn (User $record) => $record->xp_events_max_created_at),
                 TextColumn::make('created_at')->label(__('Dicipta'))->date()->sortable(),
             ])
             ->filters([
                 SelectFilter::make('role')->label(__('Peranan'))->options(self::roleOptions()),
+                Filter::make('unverified')->label(__('E-mel belum disahkan'))
+                    ->query(fn (Builder $query) => $query->whereNotNull('email')->whereNull('email_verified_at')),
+                Filter::make('inactive')->label(__('Tidak aktif 30 hari'))
+                    ->query(fn (Builder $query) => $query->whereDoesntHave('xpEvents', fn (Builder $x) => $x->where('created_at', '>=', now()->subDays(30)))),
             ])
             ->recordActions([
-                EditAction::make()
-                    ->modalWidth(Width::Large)
-                    ->modalDescription(fn (User $record) => $record->email ?? '@'.$record->username),
-                // For PDPA access requests sent by email.
-                Action::make('exportData')->label(__('Eksport data'))->icon(Heroicon::OutlinedArrowDownTray)->color('gray')
-                    ->action(fn (User $record) => app(UserDataExport::class)->download($record)),
-                DeleteAction::make()->hidden(fn (User $record) => $record->is(auth()->user())),
+                ActionGroup::make([
+                    EditAction::make()
+                        ->modalWidth(Width::Large)
+                        ->modalDescription(fn (User $record) => $record->email ?? '@'.$record->username),
+                    // For PDPA access requests sent by email.
+                    Action::make('exportData')->label(__('Eksport data'))->icon(Heroicon::OutlinedArrowDownTray)->color('gray')
+                        ->action(fn (User $record) => app(UserDataExport::class)->download($record)),
+                    DeleteAction::make()->hidden(fn (User $record) => $record->is(auth()->user())),
+                ]),
             ]);
+    }
+
+    /** "2 kelas", "1 anak", "1 kelas · 1 penjaga": what this account is connected to. */
+    public static function links(User $user): ?string
+    {
+        $parts = array_filter([
+            $user->taught_classrooms_count ? trans_choice(':n kelas diajar', $user->taught_classrooms_count, ['n' => $user->taught_classrooms_count]) : null,
+            $user->classrooms_count ? trans_choice(':n kelas', $user->classrooms_count, ['n' => $user->classrooms_count]) : null,
+            $user->students_count ? trans_choice(':n anak', $user->students_count, ['n' => $user->students_count]) : null,
+            $user->guardians_count ? trans_choice(':n penjaga', $user->guardians_count, ['n' => $user->guardians_count]) : null,
+        ]);
+
+        return $parts ? implode(' · ', $parts) : null;
     }
 
     public static function canCreate(): bool
