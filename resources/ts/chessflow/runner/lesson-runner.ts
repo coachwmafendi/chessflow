@@ -25,6 +25,8 @@ interface Els {
 
 export interface LessonRunnerHandlers {
     complete?: (result: LessonResult) => void;
+    /** Open at this step (0-based). Admin preview only; students always start at 0. */
+    startStep?: number;
 }
 
 const FLAME_SVG =
@@ -64,6 +66,7 @@ export class LessonRunner {
         this.lesson = lesson;
         this.handlers = handlers;
         this.startedAt = Date.now();
+        this.step = Math.min(Math.max(Math.trunc(handlers.startStep ?? 0), 0), Math.max(lesson.steps.length - 1, 0));
         this.els = this.render();
         this.load();
     }

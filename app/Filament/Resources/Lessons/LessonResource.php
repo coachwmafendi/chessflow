@@ -46,9 +46,10 @@ class LessonResource extends Resource
     public static function infolist(Schema $schema): Schema
     {
         return $schema
+            ->columns(1)
             ->components([
                 Section::make(__('Butiran'))
-                    ->columns(3)
+                    ->columns(['default' => 2, 'lg' => 4])
                     ->schema([
                         TextEntry::make('slug'),
                         TextEntry::make('level.name')->label(__('Tahap'))
@@ -62,15 +63,20 @@ class LessonResource extends Resource
                         TextEntry::make('steps')->label(__('Langkah'))
                             ->state(fn (Lesson $record) => count($record->steps)),
                         TextEntry::make('updated_at')->label(__('Dikemas kini'))->dateTime(),
-                        TextEntry::make('tip')->columnSpanFull()->placeholder('—'),
+                        TextEntry::make('tip')->columnSpanFull()->hidden(fn (Lesson $record) => blank($record->tip)),
                     ]),
                 Section::make(__('Pratonton'))
                     ->description(__('Pulau TS yang sama seperti murid lihat. Keputusan tidak disimpan.'))
                     ->schema([
                         ViewEntry::make('preview')->hiddenLabel()->view('filament.lesson-preview'),
                     ]),
+                Section::make(__('Langkah'))
+                    ->description(__('Semakan kandungan. Untuk ubah: edit data/lessons.json, jalankan npm run validate:lessons, kemudian import.'))
+                    ->schema([
+                        ViewEntry::make('steps_readable')->hiddenLabel()->view('filament.lesson-steps-readable'),
+                    ]),
                 Section::make(__('Langkah (JSON)'))
-                    ->description(__('Untuk ubah kandungan: edit data/lessons.json, jalankan npm run validate:lessons, kemudian import.'))
+                    ->description(__('Data mentah, untuk pembangun.'))
                     ->collapsed()
                     ->schema([
                         ViewEntry::make('steps_json')->hiddenLabel()->view('filament.lesson-steps'),

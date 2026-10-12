@@ -37,7 +37,12 @@ class AdminPanelProvider extends PanelProvider
                 '<style>input:is([type=checkbox],[type=radio]):not(:disabled){cursor:pointer}</style>'
             ))
             ->colors([
-                'primary' => Color::Teal,
+                // Tailwind teal shifted one step darker, so 600 is the site's #087466-like teal and buttons get white text.
+                'primary' => [
+                    50 => Color::Teal[50], 100 => Color::Teal[100], 200 => Color::Teal[200], 300 => Color::Teal[300],
+                    400 => Color::Teal[500], 500 => Color::Teal[600], 600 => Color::Teal[700], 700 => Color::Teal[800],
+                    800 => Color::Teal[900], 900 => Color::Teal[950], 950 => Color::Teal[950],
+                ],
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')

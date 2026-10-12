@@ -40,6 +40,7 @@ function mountOne(el: HTMLElement): void {
     islands.set(
         el,
         new LessonRunner(el, lesson, {
+            startStep: Number(el.dataset.start) || 0,
             complete(result) {
                 window.Livewire?.dispatch('lesson-completed', result);
             },

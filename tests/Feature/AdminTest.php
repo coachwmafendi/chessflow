@@ -7,6 +7,7 @@ use App\Filament\Resources\Lessons\Pages\ViewLesson;
 use App\Filament\Resources\Users\Pages\ManageUsers;
 use App\Models\Lesson;
 use App\Models\User;
+use App\Support\LessonStepView;
 use Database\Seeders\LessonSeeder;
 use Filament\Facades\Filament;
 use Livewire\Livewire;
@@ -34,6 +35,29 @@ it('lists lessons in curriculum order and shows a preview', function () {
 
     $this->actingAs($this->admin)->get(route('pratonton', $papan))->assertOk()->assertSee('data-chessflow="lesson"', false);
     $this->actingAs(User::factory()->teacher()->create())->get(route('pratonton', $papan))->assertForbidden();
+});
+
+it('shows each step readably and can open the preview at a step', function () {
+    $fork = Lesson::where('slug', 'fork')->first();
+
+    Livewire::actingAs($this->admin)->test(ViewLesson::class, ['record' => $fork->getRouteKey()])
+        ->assertOk()
+        ->assertSee($fork->steps[1]['title'])
+        ->assertSee('cf-preview-step', false)
+        ->assertSee(LessonStepView::move($fork->steps[1]['line'][0]));
+
+    $this->actingAs($this->admin)->get(route('pratonton', $fork).'?langkah=3')->assertSee('data-start="2"', false);
+});
+
+it('describes steps for the admin view', function () {
+    $board = collect(LessonStepView::board(['fen' => '4k3/8/8/8/8/8/8/R3K3 w - - 0 1', 'ring' => ['e1'], 'hl' => ['rank:8']]))->keyBy('name');
+    expect($board['a1'])->toMatchArray(['light' => false, 'piece' => 'wR'])
+        ->and($board['h1']['light'])->toBeTrue()
+        ->and($board['e8'])->toMatchArray(['piece' => 'bK', 'hl' => true])
+        ->and($board['e1']['ring'])->toBeTrue();
+    expect(collect(LessonStepView::board(['pcs' => '', 'orient' => 'b']))->first()['name'])->toBe('h1');
+    expect(LessonStepView::move('e7e8q'))->toBe('e7→e8=Q')
+        ->and(LessonStepView::acceptText(['piece' => 'n']))->toBe('Langkah Kuda');
 });
 
 it('publishes, hides and reorders lessons', function () {

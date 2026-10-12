@@ -14,6 +14,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
+use Filament\Support\Enums\Width;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -56,10 +57,14 @@ class UserResource extends Resource
         return $schema
             ->components([
                 TextInput::make('name')->label(__('Nama'))->required()->maxLength(60),
-                Select::make('role')->label(__('Peranan'))->options(self::roleOptions())->required()
+                Select::make('role')->label(__('Peranan'))->options(self::roleOptions())->required()->native(false)->selectablePlaceholder(false)
                     // Students have no email/password login, so they stay students.
-                    ->disabled(fn (?User $record) => $record?->email === null),
-            ]);
+                    ->disabled(fn (?User $record) => $record?->email === null)
+                    ->helperText(fn (?User $record) => $record?->email === null
+                        ? __('Murid log masuk dengan nama pengguna dan PIN, jadi peranannya kekal Murid.')
+                        : __('Guru boleh mencipta kelas dan murid. Pentadbir boleh membuka panel ini.')),
+            ])
+            ->columns(1);
     }
 
     public static function table(Table $table): Table
@@ -80,7 +85,9 @@ class UserResource extends Resource
                 SelectFilter::make('role')->label(__('Peranan'))->options(self::roleOptions()),
             ])
             ->recordActions([
-                EditAction::make(),
+                EditAction::make()
+                    ->modalWidth(Width::Large)
+                    ->modalDescription(fn (User $record) => $record->email ?? '@'.$record->username),
                 // For PDPA access requests sent by email.
                 Action::make('exportData')->label(__('Eksport data'))->icon(Heroicon::OutlinedArrowDownTray)->color('gray')
                     ->action(fn (User $record) => app(UserDataExport::class)->download($record)),

@@ -21,7 +21,7 @@ new #[Layout('layouts::playground')] class extends Component {
 }; ?>
 
 <div class="app" style="padding-block: 12px">
-    <div wire:ignore data-chessflow="lesson" data-lesson="{{ json_encode([
+    <div wire:ignore data-chessflow="lesson" data-start="{{ max(0, request()->integer('langkah', 1) - 1) }}" data-lesson="{{ json_encode([
         'id' => $lesson->slug,
         'tahap' => $lesson->level->number,
         'title' => $lesson->title,
