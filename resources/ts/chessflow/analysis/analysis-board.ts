@@ -289,10 +289,35 @@ export class AnalysisRunner {
     private copyUrl(): void {
         if (typeof location === 'undefined') return;
         const url = location.href;
-        void navigator.clipboard.writeText(url).then(
-            () => this.setLoadStatus(t('URL disalin.')),
-            () => this.setLoadStatus(t('Gagal salin URL.')),
-        );
+        const markDone = () => this.setLoadStatus(t('URL disalin.'));
+        const markFail = () => this.setLoadStatus(t('Gagal salin URL.'));
+        if (navigator.clipboard?.writeText) {
+            void navigator.clipboard.writeText(url).then(markDone, () => {
+                if (this.copyWithFallback(url)) markDone();
+                else markFail();
+            });
+        } else {
+            if (this.copyWithFallback(url)) markDone();
+            else markFail();
+        }
+    }
+
+    private copyWithFallback(text: string): boolean {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.setAttribute('readonly', '');
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        try {
+            const ok = document.execCommand('copy');
+            document.body.removeChild(ta);
+            return ok;
+        } catch {
+            document.body.removeChild(ta);
+            return false;
+        }
     }
 
     private goToPly(ply: number): void {
