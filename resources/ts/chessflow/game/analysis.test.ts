@@ -106,4 +106,32 @@ describe('analyseGame', () => {
         expect(seen[seen.length - 1]).toBe(1);
         expect(await analyseGame(moves, 'w', engine(t), () => {}, () => true)).toBeNull();
     });
+
+    it('skips positions where the engine returns no evaluation', async () => {
+        const { moves, fens } = game(['e4', 'e5', 'Qh5', 'Nc6', 'Qxf7+', 'Kxf7']);
+        const t = new Map<string, Evaluation>([
+            [fens[0], ev(30, 'e2e4')],
+            [fens[1], ev(-30, 'e7e5')],
+            [fens[2], ev(30, 'g1f3')],
+            [fens[3], ev(-10, 'b8c6')],
+            // fens[4] and fens[5] missing => Qxf7+ cannot be scored
+        ]);
+        const out = await analyseGame(moves, 'w', engine(t));
+        expect(out).toEqual([]);
+    });
+
+    it('falls back to a generic message when the engine has no best move', async () => {
+        const { moves, fens } = game(['h4', 'e5', 'h5', 'Qh4']);
+        const t = new Map<string, Evaluation>([
+            [fens[0], ev(0, null)],
+            [fens[1], ev(0, null)],
+            [fens[2], ev(0, null)],
+            [fens[3], ev(450, null)], // black is much better after h5, so it is a mistake from White
+        ]);
+        const out = await analyseGame(moves, 'w', engine(t));
+        expect(out).toHaveLength(1);
+        expect(out![0].san).toBe('h5');
+        expect(out![0].best).toBeNull();
+        expect(out![0].text).toBe('Langkah ini melemahkan kedudukan awak.');
+    });
 });

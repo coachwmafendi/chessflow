@@ -76,6 +76,7 @@ export class GameRunner {
     private sel: Square | null = null;
     private reported = false;
     private gameId = 0;
+    private analysisToken = 0;
     /** Ply count when Pak Kuda last refused a draw offer. */
     private drawRefusedAt: number | null = null;
     /** Closes the open confirm dialog, if any. */
@@ -540,22 +541,28 @@ export class GameRunner {
             return;
         }
         const id = this.gameId;
+        const token = ++this.analysisToken;
         box.innerHTML =
-            '<p class="analysis-note">' + t('Pak Kuda sedang menyemak permainan…') + ' <b class="pct">0%</b></p><div class="meter analysis-meter"><span style="width:0%"></span></div>';
+            '<p class="analysis-note">' + t('Pak Kuda sedang menyemak permainan…') + ' <b class="pct">0%</b></p><div class="meter analysis-meter"><span style="width:0%"></span></div><button type="button" class="ghost" data-act="cancel-analysis">' + t('Batal') + '</button>';
         const bar = box.querySelector('.analysis-meter span') as HTMLElement;
         const pct = box.querySelector('.pct') as HTMLElement;
+        (box.querySelector('[data-act="cancel-analysis"]') as HTMLElement).onclick = () => {
+            this.analysisToken++;
+            this.hideAnalysis();
+        };
         const result = await analyseGame(
             this.g.history({ verbose: true }),
             this.user,
             (fen) => this.engine.analyse({ fen, depth: 12, timeoutMs: 4000 }),
             (done) => {
+                if (token !== this.analysisToken) return;
                 const v = Math.round(done * 100) + '%';
                 bar.style.width = v;
                 pct.textContent = v;
             },
-            () => id !== this.gameId,
+            () => token !== this.analysisToken,
         );
-        if (result === null || id !== this.gameId) return;
+        if (result === null || id !== this.gameId || token !== this.analysisToken) return;
         this.showMistakes(result);
     }
 
@@ -587,9 +594,15 @@ export class GameRunner {
             t('Anak panah merah: langkah awak. Hijau: cadangan Pak Kuda.') +
             '</p><button class="ghost" type="button" data-act="final" hidden>' +
             t('Kembali ke kedudukan akhir') +
+            '</button><button class="ghost" type="button" data-act="close-analysis">' +
+            t('Tutup analisis') +
             '</button>';
         box.querySelectorAll<HTMLElement>('.mistake').forEach((b) => (b.onclick = () => this.showMistake(list, Number(b.dataset.k))));
         (box.querySelector('[data-act="final"]') as HTMLElement).onclick = () => this.showFinalPosition();
+        (box.querySelector('[data-act="close-analysis"]') as HTMLElement).onclick = () => {
+            this.showFinalPosition();
+            this.hideAnalysis();
+        };
     }
 
     /** Put the position before the mistake on the board, with the move played and the better one. */
