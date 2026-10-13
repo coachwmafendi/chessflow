@@ -39,10 +39,9 @@ describe('AnalysisRunner', () => {
 
     it('undoes the last move', () => {
         const runner = new AnalysisRunner(root, fakeEngine({ cp: 0, mate: null, best: null }));
-        const g = (runner as unknown as { g: Chess }).g;
-        g.move('e4');
+        (runner as unknown as { g: Chess }).g.move('e4');
         (runner as unknown as { undo: () => void }).undo();
-        expect(g.history()).toEqual([]);
+        expect((runner as unknown as { g: Chess }).g.history()).toEqual([]);
         runner.destroy();
     });
 

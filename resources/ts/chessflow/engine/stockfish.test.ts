@@ -30,7 +30,12 @@ describe('StockfishEngine', () => {
 
     it('sends the position and resolves with the best move', async () => {
         const p = engine.bestMove({ fen: 'startpos-fen', skill: 6, depth: 8 });
-        expect(fake.sent).toEqual(['uci', 'isready', 'setoption name Skill Level value 6', 'position fen startpos-fen', 'go depth 8']);
+        expect(fake.sent).toEqual([
+            'uci', 'isready',
+            'setoption name Skill Level value 6',
+            'setoption name MultiPV value 1',
+            'position fen startpos-fen', 'go depth 8',
+        ]);
         fake.emit('info depth 8 score cp 20');
         fake.emit('bestmove e2e4 ponder e7e5');
         await expect(p).resolves.toBe('e2e4');
@@ -107,6 +112,22 @@ describe('StockfishEngine', () => {
         });
         await expect(broken.bestMove({ fen: 'A', skill: 0, depth: 2 })).resolves.toBeNull();
         expect(broken.available).toBe(false);
+    });
+
+    it('collects multiple analysis lines when lines is requested', async () => {
+        const p = engine.analyse({ fen: 'A', depth: 10, lines: 3 });
+        expect(fake.sent).toContain('setoption name MultiPV value 3');
+        fake.emit('info depth 10 multipv 1 score cp 100 pv e2e4 e7e5 g1f3');
+        fake.emit('info depth 10 multipv 2 score cp 60 pv d2d4 d7d5');
+        fake.emit('info depth 10 multipv 3 score mate 2 pv g1f3 h7h5 e2e4');
+        fake.emit('bestmove e2e4 ponder e7e5');
+        const result = await p;
+        expect(result?.best).toBe('e2e4');
+        expect(result?.lines).toEqual([
+            { pv: ['e2e4', 'e7e5', 'g1f3'], cp: 100, mate: null },
+            { pv: ['d2d4', 'd7d5'], cp: 60, mate: null },
+            { pv: ['g1f3', 'h7h5', 'e2e4'], cp: null, mate: 2 },
+        ]);
     });
 
     it('maps "(none)" to null and terminates on destroy', async () => {

@@ -4,14 +4,18 @@ const START_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
 import type { ArrowDrawSpec, BoardApi } from '../types';
 import { createBoard } from '../core/board';
 import { nm, sq } from '../core/squares';
-import { sharedEngine, type StockfishEngine, type Evaluation } from '../engine/stockfish';
+import { sharedEngine, type StockfishEngine, type Evaluation, type EngineLine } from '../engine/stockfish';
 import { t } from '../i18n';
 
-/** A free-form analysis board: move both sides, ask Stockfish for evaluation and best move. */
+const MAX_LINE_MOVES = 6;
+
+/** A free-form analysis board: move both sides, ask Stockfish for evaluation, lines and best moves. */
 export class AnalysisRunner {
     private readonly root: HTMLElement;
     private readonly engine: StockfishEngine;
     private g = new Chess();
+    private startFen = START_FEN;
+    private moves: Move[] = [];
     private board!: BoardApi;
     private orient: 'w' | 'b' = 'w';
     private sel: Square | null = null;
@@ -55,13 +59,22 @@ export class AnalysisRunner {
             '<div class="eval-bar-wrap" aria-hidden="true"><div class="eval-bar"><span class="eval-white"></span><span class="eval-black"></span><span class="eval-needle"></span></div></div>' +
             '<p class="eval-score">' + t('Gerakkan buah dan Pak Kuda akan nilai kedudukan.') + '</p>' +
             '<p class="eval-best"></p>' +
+            '<ol class="engine-lines"></ol>' +
             '</div>' +
             '<div class="actions analysis-actions">' +
             '<button class="ghost" type="button" data-act="reset">' + t('Mula semula') + '</button>' +
             '<button class="ghost" type="button" data-act="undo">' + t('Undur') + '</button>' +
             '<button class="ghost" type="button" data-act="flip">' + t('Terbalikkan papan') + '</button>' +
+            '<button class="ghost" type="button" data-act="copy">' + t('Salin URL') + '</button>' +
             '<button class="cta" type="button" data-act="best">' + t('Main langkah terbaik') + '</button>' +
             '</div>' +
+            '<div class="analysis-moves"><small>' + t('Langkah') + '</small><ol></ol>' +
+            '<div class="nav-btns">' +
+            '<button type="button" class="ghost" data-act="first" title="' + t('Mula') + '">|←</button>' +
+            '<button type="button" class="ghost" data-act="prev" title="' + t('Undur satu') + '">←</button>' +
+            '<button type="button" class="ghost" data-act="next" title="' + t('Maju satu') + '">→</button>' +
+            '<button type="button" class="ghost" data-act="last" title="' + t('Akhir') + '">→|</button>' +
+            '</div></div>' +
             '<div class="analysis-import">' +
             '<label for="fen-pgn">' + t('Muat FEN atau PGN:') + '</label>' +
             '<textarea id="fen-pgn" data-input="fen-pgn" rows="2" placeholder="rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"></textarea>' +
@@ -75,6 +88,11 @@ export class AnalysisRunner {
         this.$('[data-act="undo"]').onclick = () => this.undo();
         this.$('[data-act="flip"]').onclick = () => this.flip();
         this.$('[data-act="best"]').onclick = () => this.playBestMove();
+        this.$('[data-act="copy"]').onclick = () => this.copyUrl();
+        this.$('[data-act="first"]').onclick = () => this.goToPly(0);
+        this.$('[data-act="prev"]').onclick = () => this.goToPly(this.g.history().length - 1);
+        this.$('[data-act="next"]').onclick = () => this.goToPly(this.g.history().length + 1);
+        this.$('[data-act="last"]').onclick = () => this.goToPly(this.moves.length);
         this.$('[data-act="load"]').onclick = () => this.loadFromInput();
         const input = this.$('[data-input="fen-pgn"]') as HTMLTextAreaElement;
         input.addEventListener('keydown', (e) => {
@@ -94,6 +112,8 @@ export class AnalysisRunner {
 
     private reset(): void {
         this.clearTimer();
+        this.startFen = START_FEN;
+        this.moves = [];
         this.g = new Chess();
         this.sel = null;
         this.board.setFen(this.g.fen());
@@ -105,15 +125,7 @@ export class AnalysisRunner {
     }
 
     private undo(): void {
-        this.clearTimer();
-        this.g.undo();
-        this.sel = null;
-        this.board.quiet(this.g.fen());
-        this.board.mark({ sel: null, dots: [], last: [], check: [] });
-        this.board.arrows([]);
-        this.currentEval = null;
-        this.updateInfo();
-        this.syncUrl();
+        this.goToPly(this.g.history().length - 1);
     }
 
     private flip(): void {
@@ -129,14 +141,21 @@ export class AnalysisRunner {
         if (this.busy) return;
         const s = nm(i) as Square;
         const p = this.g.get(s);
-        if (p) {
-            this.sel = s;
-            this.board.mark({ sel: i, dots: this.g.moves({ square: s, verbose: true }).map((m) => sq(m.to)) });
+        if (!this.sel) {
+            if (p) {
+                this.sel = s;
+                this.board.mark({ sel: i, dots: this.g.moves({ square: s, verbose: true }).map((m) => sq(m.to)) });
+            }
             return;
         }
-        if (!this.sel) return;
         const legal = this.g.moves({ square: this.sel, verbose: true }).filter((m) => m.to === s);
-        if (!legal.length) return;
+        if (!legal.length) {
+            if (p) {
+                this.sel = s;
+                this.board.mark({ sel: i, dots: this.g.moves({ square: s, verbose: true }).map((m) => sq(m.to)) });
+            }
+            return;
+        }
         const from = this.sel;
         this.sel = null;
         if (legal[0].promotion) {
@@ -158,6 +177,9 @@ export class AnalysisRunner {
         } catch {
             return null;
         }
+        const ply = this.g.history().length - 1;
+        this.moves = this.moves.slice(0, ply);
+        this.moves.push(m);
         this.board.applyMove(m);
         this.board.mark({ sel: null, dots: [], last: [sq(m.from), sq(m.to)], check: [] });
         this.board.arrows([]);
@@ -177,8 +199,8 @@ export class AnalysisRunner {
         if (!this.engine.available) return;
         this.setScoreText(t('Pak Kuda sedang fikir…'));
         const fen = this.g.fen();
-        const ev = await this.engine.analyse({ fen, depth: 14, timeoutMs: 5000 });
-        if (fen !== this.g.fen()) return; // position changed while engine thought
+        const ev = await this.engine.analyse({ fen, depth: 14, timeoutMs: 5000, lines: 3 });
+        if (fen !== this.g.fen()) return;
         this.currentEval = ev;
         this.updateInfo();
     }
@@ -188,6 +210,9 @@ export class AnalysisRunner {
         const u = this.currentEval.best;
         try {
             const m = this.g.move({ from: u.slice(0, 2) as Square, to: u.slice(2, 4) as Square, promotion: u[4] });
+            const ply = this.g.history().length - 1;
+            this.moves = this.moves.slice(0, ply);
+            this.moves.push(m);
             this.board.applyMove(m);
             this.board.mark({ sel: null, dots: [], last: [sq(m.from), sq(m.to)], check: [] });
             this.currentEval = null;
@@ -200,14 +225,19 @@ export class AnalysisRunner {
     }
 
     private updateInfo(): void {
+        this.setTurnText();
+        this.renderMoves();
         if (!this.engine.available) {
             this.setScoreText(t('Enjin catur tidak dapat dimuatkan. Awak masih boleh gerakkan buah.'));
             this.setBestText('');
+            this.renderLines(null);
             this.setEvalBar(null);
             return;
         }
         if (!this.currentEval) {
-            this.setTurnText();
+            this.setScoreText(t('Gerakkan buah dan Pak Kuda akan nilai kedudukan.'));
+            this.setBestText('');
+            this.renderLines(null);
             this.setEvalBar(null);
             return;
         }
@@ -228,8 +258,82 @@ export class AnalysisRunner {
             }
         }
         this.setBestText(bestText);
+        this.renderLines(ev);
         this.setEvalBar(ev);
-        this.setTurnText();
+    }
+
+    private copyUrl(): void {
+        if (typeof location === 'undefined') return;
+        const url = location.href;
+        void navigator.clipboard.writeText(url).then(
+            () => this.setLoadStatus(t('URL disalin.')),
+            () => this.setLoadStatus(t('Gagal salin URL.')),
+        );
+    }
+
+    private goToPly(ply: number): void {
+        const target = Math.max(0, Math.min(ply, this.moves.length));
+        if (target === this.g.history().length && this.g.fen() === this.currentPositionFen(target)) return;
+        this.clearTimer();
+        this.g = new Chess(this.startFen);
+        for (let i = 0; i < target; i++) this.g.move(this.moves[i].san);
+        this.sel = null;
+        this.board.setFen(this.g.fen());
+        this.board.mark({ sel: null, dots: [], last: target > 0 ? [sq(this.moves[target - 1].from), sq(this.moves[target - 1].to)] : [], check: [] });
+        this.board.arrows([]);
+        this.currentEval = null;
+        this.updateInfo();
+        this.syncUrl();
+        this.debouncedAnalyse();
+    }
+
+    private currentPositionFen(ply: number): string {
+        const temp = new Chess(this.startFen);
+        for (let i = 0; i < ply; i++) temp.move(this.moves[i].san);
+        return temp.fen();
+    }
+
+    private renderMoves(): void {
+        const ol = this.$('.analysis-moves ol');
+        const h = this.g.history();
+        let out = '';
+        for (let i = 0; i < this.moves.length; i += 2) {
+            const white = this.moves[i];
+            const black = this.moves[i + 1];
+            const activeW = i + 1 === h.length;
+            const activeB = i + 2 === h.length;
+            out +=
+                '<li>' +
+                '<button type="button" class="move-btn' + (activeW ? ' active' : '') + '" data-ply="' + (i + 1) + '">' +
+                white.san +
+                '</button>' +
+                (black
+                    ? '<button type="button" class="move-btn' + (activeB ? ' active' : '') + '" data-ply="' + (i + 2) + '">' + black.san + '</button>'
+                    : '') +
+                '</li>';
+        }
+        ol.innerHTML = out;
+        ol.querySelectorAll<HTMLElement>('.move-btn').forEach((b) => (b.onclick = () => this.goToPly(Number(b.dataset.ply))));
+        const wrap = this.$('.analysis-moves');
+        wrap.hidden = this.moves.length === 0;
+    }
+
+    private renderLines(ev: Evaluation | null): void {
+        const box = this.$('.engine-lines');
+        if (!ev?.lines?.length) {
+            box.innerHTML = '';
+            return;
+        }
+        box.innerHTML =
+            '<small>' + t('Line terbaik') + '</small>' +
+            ev.lines
+                .slice(0, 3)
+                .map((line, k) => {
+                    const score = formatLineScore(line);
+                    const text = formatLine(this.g, line, MAX_LINE_MOVES);
+                    return '<li><span class="line-score">' + (k + 1) + '. ' + score + '</span><span class="line-pv">' + text + '</span></li>';
+                })
+                .join('');
     }
 
     private setTurnText(): void {
@@ -253,13 +357,15 @@ export class AnalysisRunner {
         const text = raw.trim();
         if (!text) return false;
         try {
-            const next = new Chess();
             if (text.includes('/')) {
+                const next = new Chess();
                 next.load(text);
+                this.setGame(next, { startFen: next.fen(), moves: [], shouldSyncUrl });
             } else {
+                const next = new Chess();
                 next.loadPgn(text);
+                this.setGame(next, { startFen: START_FEN, moves: next.history({ verbose: true }), shouldSyncUrl });
             }
-            this.setGame(next, shouldSyncUrl);
             this.setLoadStatus(t('Kedudukan dimuatkan.'));
             return true;
         } catch {
@@ -268,8 +374,10 @@ export class AnalysisRunner {
         }
     }
 
-    private setGame(next: Chess, shouldSyncUrl: boolean): void {
+    private setGame(next: Chess, opts?: { startFen?: string; moves?: Move[]; shouldSyncUrl?: boolean }): void {
         this.clearTimer();
+        this.startFen = opts?.startFen ?? next.fen();
+        this.moves = opts?.moves ?? [];
         this.g = next;
         this.sel = null;
         this.board.setFen(this.g.fen());
@@ -277,7 +385,7 @@ export class AnalysisRunner {
         this.board.arrows([]);
         this.currentEval = null;
         this.updateInfo();
-        if (shouldSyncUrl) this.syncUrl();
+        if (opts?.shouldSyncUrl) this.syncUrl();
         this.debouncedAnalyse();
     }
 
@@ -328,4 +436,40 @@ function formatEval(ev: Evaluation): string {
         return (v > 0 ? '+' : '') + v.toFixed(1);
     }
     return '?';
+}
+
+function formatLineScore(line: EngineLine): string {
+    if (line.mate !== null) {
+        return line.mate > 0 ? '#+' + line.mate : '#-' + Math.abs(line.mate);
+    }
+    if (line.cp !== null) {
+        const v = line.cp / 100;
+        return (v > 0 ? '+' : '') + v.toFixed(1);
+    }
+    return '?';
+}
+
+function formatLine(g: Chess, line: EngineLine, maxMoves: number): string {
+    let out = '';
+    let moveNo = Math.floor(g.history().length / 2) + 1;
+    let whiteTurn = g.turn() === 'w';
+    const temp = new Chess(g.fen());
+    for (let i = 0; i < Math.min(line.pv.length, maxMoves); i++) {
+        const uci = line.pv[i];
+        try {
+            const m = temp.move({ from: uci.slice(0, 2) as Square, to: uci.slice(2, 4) as Square, promotion: uci[4] });
+            if (whiteTurn) {
+                if (out) out += ' ';
+                out += moveNo + '. ' + m.san;
+            } else {
+                out += ' ' + m.san;
+                moveNo++;
+            }
+            whiteTurn = !whiteTurn;
+        } catch {
+            break;
+        }
+    }
+    if (line.pv.length > maxMoves) out += ' …';
+    return out || '-';
 }

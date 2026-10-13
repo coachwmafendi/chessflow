@@ -14,11 +14,19 @@ export interface EngineRequest {
     skill: number;
     depth: number;
     timeoutMs?: number;
+    lines?: number;
 }
 
 /** Engine verdict for a position, from the side to move: centipawns, or moves to mate (negative = being mated). */
 export interface Evaluation {
     best: string | null;
+    cp: number | null;
+    mate: number | null;
+    lines?: EngineLine[];
+}
+
+export interface EngineLine {
+    pv: string[];
     cp: number | null;
     mate: number | null;
 }
@@ -29,6 +37,8 @@ interface Job {
     timer?: ReturnType<typeof setTimeout>;
     cp: number | null;
     mate: number | null;
+    lines: number;
+    collected: Map<number, EngineLine>;
 }
 
 const WORKER_URL = '/stockfish/stockfish.js';
@@ -55,14 +65,14 @@ export class StockfishEngine {
     }
 
     /** Full-strength search that also returns the score (post-game analysis). */
-    analyse(req: { fen: string; depth: number; timeoutMs?: number }): Promise<Evaluation | null> {
+    analyse(req: { fen: string; depth: number; timeoutMs?: number; lines?: number }): Promise<Evaluation | null> {
         return this.run({ ...req, skill: 20 });
     }
 
     private run(req: EngineRequest): Promise<Evaluation | null> {
         if (!this.ensure()) return Promise.resolve(null);
         return new Promise((resolve) => {
-            this.queue.push({ req, resolve, cp: null, mate: null });
+            this.queue.push({ req, resolve, cp: null, mate: null, lines: req.lines ?? 1, collected: new Map() });
             this.pump();
         });
     }
@@ -97,8 +107,9 @@ export class StockfishEngine {
         const job = this.queue.shift();
         if (!job) return;
         this.current = job;
-        const { fen, skill, depth, timeoutMs } = job.req;
+        const { fen, skill, depth, timeoutMs, lines } = job.req;
         this.worker.postMessage('setoption name Skill Level value ' + skill);
+        this.worker.postMessage('setoption name MultiPV value ' + (lines && lines > 1 ? lines : 1));
         this.worker.postMessage('position fen ' + fen);
         this.worker.postMessage('go depth ' + depth);
         job.timer = setTimeout(() => {
@@ -113,6 +124,20 @@ export class StockfishEngine {
 
     private onLine(line: string): void {
         if (line.startsWith('info') && this.current && this.discard === 0) {
+            const job = this.current;
+            // Collect multi-PV analysis lines when requested.
+            if (job.lines > 1) {
+                const mpv = / multipv (\d+) /i.exec(line);
+                const pvMatch = / pv ([a-h1-8]+(?: [a-h1-8]+)*)/.exec(line);
+                const score = / score (cp|mate) (-?\d+)/.exec(line);
+                if (mpv && pvMatch && score) {
+                    job.collected.set(Number(mpv[1]), {
+                        pv: pvMatch[1].split(' '),
+                        cp: score[1] === 'cp' ? Number(score[2]) : null,
+                        mate: score[1] === 'mate' ? Number(score[2]) : null,
+                    });
+                }
+            }
             // Keep the deepest score seen; "score cp 34" / "score mate -2" (side to move).
             const m = / score (cp|mate) (-?\d+)/.exec(line);
             if (m && !/ (lowerbound|upperbound)/.test(line)) {
@@ -131,7 +156,17 @@ export class StockfishEngine {
         clearTimeout(job.timer);
         this.current = null;
         const move = line.split(' ')[1];
-        job.resolve({ best: move && move !== '(none)' ? move : null, cp: job.cp, mate: job.mate });
+        let best: string | null = move && move !== '(none)' ? move : null;
+        let lines: EngineLine[] | undefined;
+        if (job.lines > 1) {
+            lines = [];
+            for (let k = 1; k <= job.lines; k++) {
+                const l = job.collected.get(k);
+                if (l) lines.push(l);
+            }
+            best = lines[0]?.pv[0] ?? best;
+        }
+        job.resolve({ best, cp: job.cp, mate: job.mate, lines });
         this.pump();
     }
 
