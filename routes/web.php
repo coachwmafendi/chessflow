@@ -26,6 +26,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::livewire('latih', 'pages::latih')->name('latih');
     Route::livewire('lencana', 'pages::lencana')->name('lencana');
     Route::livewire('main', 'pages::main')->name('main');
+    Route::livewire('analisis', 'pages::analisis')->name('analisis');
     Route::livewire('sertai', 'pages::sertai')->name('sertai');
 
     Route::livewire('anak', 'pages::anak')->middleware('can:guardian')->name('anak');

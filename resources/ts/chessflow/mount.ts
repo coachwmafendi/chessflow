@@ -1,5 +1,6 @@
 import { LessonRunner } from './runner/lesson-runner';
 import { GameRunner } from './game/game';
+import { AnalysisRunner } from './analysis/analysis-board';
 import { destroySharedEngine } from './engine/stockfish';
 import { isSoundOn, setSoundOn, SFX } from './core/sound';
 import { THEME_KEY, THEME_LABEL, applyTheme, getTheme, nextTheme, setTheme } from './core/theme';
@@ -15,7 +16,7 @@ declare global {
     }
 }
 
-type Island = LessonRunner | GameRunner;
+type Island = LessonRunner | GameRunner | AnalysisRunner;
 
 const islands = new Map<HTMLElement, Island>();
 
@@ -31,6 +32,11 @@ function mountOne(el: HTMLElement): void {
                 },
             }),
         );
+        return;
+    }
+
+    if (el.dataset.chessflow === 'analysis') {
+        islands.set(el, new AnalysisRunner(el));
         return;
     }
 
