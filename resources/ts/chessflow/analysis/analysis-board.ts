@@ -9,6 +9,12 @@ import { t } from '../i18n';
 
 const MAX_LINE_MOVES = 6;
 
+const ICON_SVG = '<svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">';
+const ICON_FIRST = '<span class="nav-ico-wrap">' + ICON_SVG + '<path d="M17 5l-9 7 9 7"/><path d="M5 5v14"/></svg></span>';
+const ICON_PREV = '<span class="nav-ico-wrap">' + ICON_SVG + '<path d="M15 5l-7 7 7 7"/></svg></span>';
+const ICON_NEXT = '<span class="nav-ico-wrap">' + ICON_SVG + '<path d="M9 5l7 7-7 7"/></svg></span>';
+const ICON_LAST = '<span class="nav-ico-wrap">' + ICON_SVG + '<path d="M7 5l9 7-9 7"/><path d="M19 5v14"/></svg></span>';
+
 /** A free-form analysis board: move both sides, ask Stockfish for evaluation, lines and best moves. */
 export class AnalysisRunner {
     private readonly root: HTMLElement;
@@ -22,6 +28,22 @@ export class AnalysisRunner {
     private busy = false;
     private timer: ReturnType<typeof setTimeout> | null = null;
     private currentEval: Evaluation | null = null;
+    private readonly onKey = (e: KeyboardEvent): void => {
+        if (e.target instanceof HTMLTextAreaElement || e.target instanceof HTMLInputElement) return;
+        if (e.key === 'Home') {
+            e.preventDefault();
+            this.goToPly(0);
+        } else if (e.key === 'End') {
+            e.preventDefault();
+            this.goToPly(this.moves.length);
+        } else if (e.key === 'ArrowLeft') {
+            e.preventDefault();
+            this.goToPly(this.g.history().length - 1);
+        } else if (e.key === 'ArrowRight') {
+            e.preventDefault();
+            this.goToPly(this.g.history().length + 1);
+        }
+    };
 
     constructor(root: HTMLElement, engine: StockfishEngine = sharedEngine()) {
         this.root = root;
@@ -37,6 +59,7 @@ export class AnalysisRunner {
 
     destroy(): void {
         this.clearTimer();
+        document.removeEventListener('keydown', this.onKey);
     }
 
     private clearTimer(): void {
@@ -70,10 +93,10 @@ export class AnalysisRunner {
             '</div>' +
             '<div class="analysis-moves"><small>' + t('Langkah') + '</small><ol></ol>' +
             '<div class="nav-btns">' +
-            '<button type="button" class="ghost" data-act="first" title="' + t('Mula') + '">|←</button>' +
-            '<button type="button" class="ghost" data-act="prev" title="' + t('Undur satu') + '">←</button>' +
-            '<button type="button" class="ghost" data-act="next" title="' + t('Maju satu') + '">→</button>' +
-            '<button type="button" class="ghost" data-act="last" title="' + t('Akhir') + '">→|</button>' +
+            '<button type="button" class="ghost nav-first" data-act="first" aria-label="' + t('Mula') + '" title="' + t('Mula') + ' (Home)">' + ICON_FIRST + '</button>' +
+            '<button type="button" class="ghost nav-prev" data-act="prev" aria-label="' + t('Undur satu') + '" title="' + t('Undur satu') + ' (←)">' + ICON_PREV + '</button>' +
+            '<button type="button" class="ghost nav-next" data-act="next" aria-label="' + t('Maju satu') + '" title="' + t('Maju satu') + ' (→)">' + ICON_NEXT + '</button>' +
+            '<button type="button" class="ghost nav-last" data-act="last" aria-label="' + t('Akhir') + '" title="' + t('Akhir') + ' (End)">' + ICON_LAST + '</button>' +
             '</div></div>' +
             '<div class="analysis-import">' +
             '<label for="fen-pgn">' + t('Muat FEN atau PGN:') + '</label>' +
@@ -93,6 +116,7 @@ export class AnalysisRunner {
         this.$('[data-act="prev"]').onclick = () => this.goToPly(this.g.history().length - 1);
         this.$('[data-act="next"]').onclick = () => this.goToPly(this.g.history().length + 1);
         this.$('[data-act="last"]').onclick = () => this.goToPly(this.moves.length);
+        document.addEventListener('keydown', this.onKey);
         this.$('[data-act="load"]').onclick = () => this.loadFromInput();
         const input = this.$('[data-input="fen-pgn"]') as HTMLTextAreaElement;
         input.addEventListener('keydown', (e) => {
