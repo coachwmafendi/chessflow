@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { Chess } from 'chess.js';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { AnalysisRunner } from './analysis-board';
 import type { Evaluation, StockfishEngine } from '../engine/stockfish';
 
@@ -60,6 +60,43 @@ describe('AnalysisRunner', () => {
         const g = (runner as unknown as { g: Chess }).g;
         (runner as unknown as { playBestMove: () => void }).playBestMove();
         expect(g.history()[0]).toBe('e4');
+        runner.destroy();
+    });
+
+    it('loads a FEN position', () => {
+        const runner = new AnalysisRunner(root, fakeEngine({ cp: 0, mate: null, best: null }));
+        const ok = (runner as unknown as { applyInput: (raw: string, sync: boolean) => boolean }).applyInput(
+            'r1bqkbnr/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 0 1',
+            false,
+        );
+        expect(ok).toBe(true);
+        expect((runner as unknown as { g: Chess }).g.fen()).toContain('r1bqkbnr');
+        runner.destroy();
+    });
+
+    it('loads a PGN string', () => {
+        const runner = new AnalysisRunner(root, fakeEngine({ cp: 0, mate: null, best: null }));
+        const ok = (runner as unknown as { applyInput: (raw: string, sync: boolean) => boolean }).applyInput('1. e4 e5 2. Nf3', false);
+        expect(ok).toBe(true);
+        expect((runner as unknown as { g: Chess }).g.history()).toEqual(['e4', 'e5', 'Nf3']);
+        runner.destroy();
+    });
+
+    it('shows an error for an invalid FEN or PGN', () => {
+        const runner = new AnalysisRunner(root, fakeEngine({ cp: 0, mate: null, best: null }));
+        const ok = (runner as unknown as { applyInput: (raw: string, sync: boolean) => boolean }).applyInput('not a position', false);
+        expect(ok).toBe(false);
+        expect(root.querySelector('.load-status')?.textContent).toContain('FEN atau PGN tidak sah');
+        runner.destroy();
+    });
+
+    it('syncs the position to the URL', async () => {
+        const spy = vi.spyOn(window.history, 'replaceState');
+        const runner = new AnalysisRunner(root, fakeEngine({ cp: 0, mate: null, best: null }));
+        (runner as unknown as { g: Chess }).g.move('e4');
+        (runner as unknown as { syncUrl: () => void }).syncUrl();
+        expect(spy).toHaveBeenCalled();
+        expect(spy.mock.calls[spy.mock.calls.length - 1][2]).toContain('fen=');
         runner.destroy();
     });
 });

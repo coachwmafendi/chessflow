@@ -1,4 +1,6 @@
 import { Chess, type Move, type Square } from 'chess.js';
+
+const START_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
 import type { ArrowDrawSpec, BoardApi } from '../types';
 import { createBoard } from '../core/board';
 import { nm, sq } from '../core/squares';
@@ -24,6 +26,9 @@ export class AnalysisRunner {
         this.buildBoard();
         this.updateInfo();
         this.debouncedAnalyse();
+
+        const initial = this.root.dataset.fen?.trim();
+        if (initial) this.applyInput(initial, false);
     }
 
     destroy(): void {
@@ -57,6 +62,12 @@ export class AnalysisRunner {
             '<button class="ghost" type="button" data-act="flip">' + t('Terbalikkan papan') + '</button>' +
             '<button class="cta" type="button" data-act="best">' + t('Main langkah terbaik') + '</button>' +
             '</div>' +
+            '<div class="analysis-import">' +
+            '<label for="fen-pgn">' + t('Muat FEN atau PGN:') + '</label>' +
+            '<textarea id="fen-pgn" data-input="fen-pgn" rows="2" placeholder="rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"></textarea>' +
+            '<button class="ghost" type="button" data-act="load">' + t('Muatkan') + '</button>' +
+            '<span class="load-status" aria-live="polite"></span>' +
+            '</div>' +
             '<p class="analysis-help">' + t('Ketuk buah, kemudian ketuk petak untuk bergerak. Pusingan giliran ikut peraturan catur.') + '</p>' +
             '</div></div>';
 
@@ -64,6 +75,14 @@ export class AnalysisRunner {
         this.$('[data-act="undo"]').onclick = () => this.undo();
         this.$('[data-act="flip"]').onclick = () => this.flip();
         this.$('[data-act="best"]').onclick = () => this.playBestMove();
+        this.$('[data-act="load"]').onclick = () => this.loadFromInput();
+        const input = this.$('[data-input="fen-pgn"]') as HTMLTextAreaElement;
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+                e.preventDefault();
+                this.loadFromInput();
+            }
+        });
     }
 
     private buildBoard(): void {
@@ -82,6 +101,7 @@ export class AnalysisRunner {
         this.board.arrows([]);
         this.currentEval = null;
         this.updateInfo();
+        this.syncUrl();
     }
 
     private undo(): void {
@@ -93,6 +113,7 @@ export class AnalysisRunner {
         this.board.arrows([]);
         this.currentEval = null;
         this.updateInfo();
+        this.syncUrl();
     }
 
     private flip(): void {
@@ -142,6 +163,7 @@ export class AnalysisRunner {
         this.board.arrows([]);
         this.currentEval = null;
         this.updateInfo();
+        this.syncUrl();
         this.debouncedAnalyse();
         return m;
     }
@@ -170,6 +192,7 @@ export class AnalysisRunner {
             this.board.mark({ sel: null, dots: [], last: [sq(m.from), sq(m.to)], check: [] });
             this.currentEval = null;
             this.updateInfo();
+            this.syncUrl();
             this.debouncedAnalyse();
         } catch {
             // illegal best move (should not happen): ignore
@@ -219,6 +242,60 @@ export class AnalysisRunner {
 
     private setBestText(text: string): void {
         this.$('.eval-best').textContent = text;
+    }
+
+    private loadFromInput(): void {
+        const raw = (this.$('[data-input="fen-pgn"]') as HTMLTextAreaElement).value;
+        this.applyInput(raw, true);
+    }
+
+    private applyInput(raw: string, shouldSyncUrl: boolean): boolean {
+        const text = raw.trim();
+        if (!text) return false;
+        try {
+            const next = new Chess();
+            if (text.includes('/')) {
+                next.load(text);
+            } else {
+                next.loadPgn(text);
+            }
+            this.setGame(next, shouldSyncUrl);
+            this.setLoadStatus(t('Kedudukan dimuatkan.'));
+            return true;
+        } catch {
+            this.setLoadStatus(t('FEN atau PGN tidak sah. Semak semula teks tersebut.'));
+            return false;
+        }
+    }
+
+    private setGame(next: Chess, shouldSyncUrl: boolean): void {
+        this.clearTimer();
+        this.g = next;
+        this.sel = null;
+        this.board.setFen(this.g.fen());
+        this.board.mark({ sel: null, dots: [], last: [], check: [] });
+        this.board.arrows([]);
+        this.currentEval = null;
+        this.updateInfo();
+        if (shouldSyncUrl) this.syncUrl();
+        this.debouncedAnalyse();
+    }
+
+    private syncUrl(): void {
+        if (typeof location === 'undefined') return;
+        const url = new URL(location.href);
+        if (this.g.fen() === START_FEN) {
+            url.searchParams.delete('fen');
+        } else {
+            url.searchParams.set('fen', this.g.fen());
+        }
+        history.replaceState({}, '', url.toString());
+    }
+
+    private setLoadStatus(text: string): void {
+        const el = this.$('.load-status');
+        el.textContent = text;
+        if (text) setTimeout(() => (el.textContent = ''), 3000);
     }
 
     private setEvalBar(ev: Evaluation | null): void {
