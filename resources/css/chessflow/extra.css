@@ -265,6 +265,10 @@ details.tahap:not([open]) > summary.tahap-head{border-bottom-style:solid}
 .analysis-actions .cta{margin-left:auto}
 .analysis-help{color:var(--muted);font-size:14px;margin:0}
 .engine-name{margin:0;color:var(--muted);font-size:12px}
+.analysis-info>*{transition:opacity .15s}
+.analysis-info.is-thinking :is(.eval-bar-wrap,.eval-verdict,.eval-best,.engine-lines){opacity:.45}
+.analysis-info.is-thinking .engine-lines{pointer-events:none}
+.analysis-moves ol{position:relative}
 .engine-name:empty{display:none}
 .analysis-import{display:flex;flex-direction:column;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px}
 .analysis-import label{font-weight:600;font-size:14px}

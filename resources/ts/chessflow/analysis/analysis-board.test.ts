@@ -124,6 +124,24 @@ describe('AnalysisRunner', () => {
         expect(text(root, '.load-status')).toContain('FEN atau PGN tidak sah');
     });
 
+    it('keeps the last panel while thinking and reuses scores when stepping back', async () => {
+        root.dataset.moves = 'e4 e5 Nf3';
+        const engine = fakeEngine({ cp: 25, mate: null, best: 'b8c6', lines: [{ pv: ['b8c6'], cp: 25, mate: null }] });
+        runner = new AnalysisRunner(root, engine);
+        await flush();
+        expect(engine.calls.length).toBe(1);
+        click(root, '[data-act="prev"]');
+        // not scored yet: the old lines stay (faded) instead of disappearing
+        expect(root.querySelector('.analysis-info')?.classList.contains('is-thinking')).toBe(true);
+        expect(root.querySelectorAll('.engine-lines li').length).toBe(1);
+        await flush();
+        expect(root.querySelector('.analysis-info')?.classList.contains('is-thinking')).toBe(false);
+        click(root, '[data-act="next"]');
+        await flush();
+        expect(engine.calls.length).toBe(2); // the position after Nf3 came from the cache
+        expect(text(root, '.eval-score')).toContain('Penilaian');
+    });
+
     it('announces checkmate itself and does not ask the engine', async () => {
         root.dataset.moves = 'f3 e5 g4 Qh4#';
         const engine = fakeEngine({ cp: 0, mate: 0, best: null });

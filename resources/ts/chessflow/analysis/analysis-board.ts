@@ -96,6 +96,8 @@ export class AnalysisRunner {
     private timer: ReturnType<typeof setTimeout> | null = null;
     private statusTimer: ReturnType<typeof setTimeout> | null = null;
     private currentEval: Evaluation | null = null;
+    /** Evaluations by FEN, so stepping back and forth through a game shows them at once. */
+    private readonly cache = new Map<string, Evaluation>();
     private readonly onKey = (e: KeyboardEvent): void => {
         if (e.metaKey || e.ctrlKey || e.altKey || e.defaultPrevented) return;
         const el = e.target instanceof HTMLElement ? e.target : null;
@@ -284,11 +286,11 @@ export class AnalysisRunner {
 
     private afterPositionChange(): void {
         this.sel = null;
-        this.currentEval = null;
+        this.currentEval = this.cache.get(this.g.fen()) ?? null;
         this.drawMarks();
         this.updateInfo();
         this.syncUrl();
-        this.debouncedAnalyse();
+        if (!this.currentEval) this.debouncedAnalyse();
     }
 
     private debouncedAnalyse(): void {
@@ -299,13 +301,16 @@ export class AnalysisRunner {
 
     private async analyse(): Promise<void> {
         if (!this.engine.available) return;
-        this.$('.eval-score').textContent = t('Pak Kuda sedang fikir…');
         const fen = this.g.fen();
         let ev = await this.engine.analyse({ fen, depth: 14, timeoutMs: 5000, lines: ENGINE_LINES });
         // Stockfish 19 needs a newer browser (e.g. iOS 16+); fall back to the Stockfish 10 used everywhere else.
         if (!this.engine.available && this.engine !== sharedEngine()) {
             this.engine = sharedEngine();
             ev = await this.engine.analyse({ fen, depth: 14, timeoutMs: 5000, lines: ENGINE_LINES });
+        }
+        if (ev && (ev.cp !== null || ev.mate !== null)) {
+            if (this.cache.size >= 300) this.cache.delete(this.cache.keys().next().value as string);
+            this.cache.set(fen, ev);
         }
         if (fen !== this.g.fen()) return;
         this.currentEval = ev;
@@ -320,14 +325,27 @@ export class AnalysisRunner {
         (this.$('[data-act="best"]') as HTMLButtonElement).disabled = !this.currentEval?.best;
 
         const over = this.gameOverText();
-        if (over) return this.showScore(over.text, '', '', over.white);
+        if (over) {
+            this.$('.analysis-info').classList.remove('is-thinking', 'has-eval');
+            return this.showScore(over.text, '', '', over.white);
+        }
         if (!this.engine.available) {
             return this.showScore(t('Enjin catur tidak dapat dimuatkan. Awak masih boleh gerakkan buah.'), '', '', null);
         }
         const ev = this.currentEval;
+        const info = this.$('.analysis-info');
+        if (!ev && info.classList.contains('has-eval')) {
+            // New position, not scored yet: keep the last panel faded so the layout does not jump.
+            info.classList.add('is-thinking');
+            this.$('.eval-score').textContent = t('Pak Kuda sedang fikir…');
+            return;
+        }
+        info.classList.remove('is-thinking');
         if (!ev || (ev.cp === null && ev.mate === null)) {
+            info.classList.remove('has-eval');
             return this.showScore(t('Gerakkan buah dan Pak Kuda akan nilai kedudukan.'), '', '', null);
         }
+        info.classList.add('has-eval');
         const score = toWhite(ev, this.g.turn());
         let best = '';
         if (ev.best) {
@@ -395,7 +413,12 @@ export class AnalysisRunner {
         ol.innerHTML = out;
         ol.querySelectorAll<HTMLElement>('.move-btn').forEach((b) => (b.onclick = () => this.goToPly(Number(b.dataset.ply))));
         this.$('.analysis-moves').hidden = this.moves.length === 0;
-        ol.querySelector('.active')?.scrollIntoView?.({ block: 'nearest' });
+        // Scroll the move list only (scrollIntoView would also scroll the page).
+        const active = ol.querySelector<HTMLElement>('.active');
+        if (active) {
+            const top = active.offsetTop; // the list is position:relative, so this is inside it
+            if (top < ol.scrollTop || top + active.offsetHeight > ol.scrollTop + ol.clientHeight) ol.scrollTop = top - ol.clientHeight / 2;
+        }
     }
 
     private goToPly(ply: number): void {
