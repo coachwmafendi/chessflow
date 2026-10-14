@@ -284,3 +284,10 @@ details.tahap:not([open]) > summary.tahap-head{border-bottom-style:solid}
 .nav-btns button:hover{border-color:var(--accent)}
 .nav-btns .nav-ico-wrap{pointer-events:none;display:grid;place-items:center}
 .nav-btns .nav-ico{width:20px;height:20px;color:var(--ink)}
+
+/* Play page: nothing moves while a game is played. The status keeps its space when empty, the buttons sit above the
+   move list, and the move list has a fixed height and scrolls. */
+[data-chessflow="game"] .status:empty{min-height:52px;padding:12px 14px}
+[data-chessflow="game"] .moves ol{height:180px;max-height:none}
+[data-chessflow="game"] .moves ol:empty{display:block;padding:12px 14px;color:var(--muted);font-size:14px}
+[data-chessflow="game"] .moves ol:empty::before{content:attr(data-empty)}
