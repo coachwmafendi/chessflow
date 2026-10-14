@@ -50,5 +50,6 @@ new #[Layout('layouts::chessflow')] #[Title('Main lawan Pak Kuda')] class extend
 
 <div>
     <p class="no-print" style="margin-block: 8px 0"><a class="ghost" href="{{ route('peta') }}">{{ __('← Peta') }}</a></p>
-    <div wire:ignore data-chessflow="game"></div>
+    {{-- Lessons a mistake in the post-game review can point to, and whether this player can open them yet. --}}
+    <div wire:ignore data-chessflow="game" data-lessons="{{ json_encode(\App\Support\PatternLessons::for(auth()->user())) }}"></div>
 </div>

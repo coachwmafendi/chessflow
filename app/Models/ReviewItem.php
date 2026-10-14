@@ -16,7 +16,7 @@ use Illuminate\Support\Carbon;
  * @property int|null $step_index
  * @property int|null $game_id
  * @property int|null $ply
- * @property array{fen: string, best: string, bestSan: string, also: list<string>, played: string}|null $position
+ * @property array{fen: string, best: string, bestSan: string, also: list<string>, played: string, lesson?: string|null}|null $position
  * @property int $box
  * @property Carbon $due_on
  * @property Carbon|null $created_at

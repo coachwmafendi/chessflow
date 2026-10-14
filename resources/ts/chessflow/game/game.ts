@@ -21,9 +21,15 @@ export interface GameReport {
     moveCount: number;
 }
 
+export interface PatternLessonInfo {
+    title: string;
+    level: number;
+    open: boolean;
+}
+
 export interface GameMistakesReport {
     gameId: number;
-    mistakes: { ply: number; fen: string; best: string; bestSan: string; also: string[]; played: string }[];
+    mistakes: { ply: number; fen: string; best: string; bestSan: string; also: string[]; played: string; lesson: string | null }[];
 }
 
 export interface GameHandlers {
@@ -91,6 +97,8 @@ export class GameRunner {
     private analysisToken = 0;
     /** Id of the finished game on the server (from `game-result`), and mistakes waiting for it. */
     private serverGameId: number | null = null;
+    /** Lessons a mistake can point to (from the page), by slug. */
+    private lessons: Record<string, PatternLessonInfo> = {};
     private pendingMistakes: Mistake[] | null = null;
     /** Ply count when Pak Kuda last refused a draw offer. */
     private drawRefusedAt: number | null = null;
@@ -106,6 +114,11 @@ export class GameRunner {
 
     constructor(root: HTMLElement, handlers: GameHandlers = {}, engine: StockfishEngine = sharedEngine()) {
         this.root = root;
+        try {
+            this.lessons = JSON.parse(root.dataset.lessons || '{}') as Record<string, PatternLessonInfo>;
+        } catch {
+            this.lessons = {};
+        }
         this.handlers = handlers;
         this.engine = engine;
         const pref = loadPref();
@@ -126,12 +139,22 @@ export class GameRunner {
     }
 
     /** Server reply to a reported game (Livewire `game-result`). */
+    /** "Belajar: Fork Kuda →" under a mistake, or the level where it is taught if that lesson is still locked. */
+    private lessonLink(slug: string | null): string {
+        const l = slug ? this.lessons[slug] : undefined;
+        if (!slug || !l) return '';
+        const title = l.title.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c] as string);
+        return l.open
+            ? '<a class="mistake-lesson" href="/pelajaran/' + encodeURIComponent(slug) + '">' + t('Belajar: :lesson →', { lesson: title }) + '</a>'
+            : '<span class="mistake-lesson locked">' + t('Corak ini diajar dalam :lesson (Tahap :n).', { lesson: title, n: l.level }) + '</span>';
+    }
+
     /** Mistakes go to "Latih semula" once the server has told us which game they belong to. */
     private sendMistakes(): void {
         if (!this.serverGameId || !this.pendingMistakes?.length) return;
         this.handlers.mistakes?.({
             gameId: this.serverGameId,
-            mistakes: this.pendingMistakes.map((m) => ({ ply: m.ply, fen: m.fenBefore, best: m.best!.uci, bestSan: m.best!.san, also: m.alsoGood, played: m.san })),
+            mistakes: this.pendingMistakes.map((m) => ({ ply: m.ply, fen: m.fenBefore, best: m.best!.uci, bestSan: m.best!.san, also: m.alsoGood, played: m.san, lesson: m.lesson })),
         });
         this.pendingMistakes = null;
     }
@@ -638,7 +661,9 @@ export class GameRunner {
                         t('Langkah :n: :san', { n: m.moveNo, san: m.san }) +
                         '</b><span>' +
                         m.text +
-                        '</span></button></li>',
+                        '</span></button>' +
+                        this.lessonLink(m.lesson) +
+                        '</li>',
                 )
                 .join('') +
             '</ol><p class="analysis-legend" hidden>' +

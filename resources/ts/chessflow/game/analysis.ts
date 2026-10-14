@@ -2,6 +2,7 @@ import { Chess, type Move } from 'chess.js';
 import { PNAME } from '../core/names';
 import type { Evaluation } from '../engine/stockfish';
 import { t } from '../i18n';
+import { lessonForMistake, type PatternLesson } from './patterns';
 
 // Post-game review: score the position before and after each of the player's moves and
 // explain the biggest drops in words a child can follow. Pure (the engine is passed in) so it
@@ -19,6 +20,8 @@ export interface Mistake {
     best: { from: string; to: string; san: string; uci: string } | null;
     /** Other moves (SAN) about as good as the best one, also accepted when the position is practised again. */
     alsoGood: string[];
+    /** Lesson that teaches the idea (fork, pin, …), when the mistake fits a pattern. */
+    lesson: PatternLesson | null;
     loss: number;
     severity: 'besar' | 'kecil';
     text: string;
@@ -146,6 +149,7 @@ export async function analyseGame(
             fenBefore: m.before,
             best: best ? { from: best.from, to: best.to, san: best.san, uci: best.from + best.to + (best.promotion ?? '') } : null,
             alsoGood,
+            lesson: lessonForMistake({ played: m, best, reply, mateBefore: evB.mate, mateAfter: evA.mate }),
             loss,
             severity: loss >= BIG_CP ? 'besar' : 'kecil',
             text: explain(m.san, evB, evA, best, reply, loss),

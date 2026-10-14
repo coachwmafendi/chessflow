@@ -543,5 +543,6 @@
     "Putih untuk bergerak. Cari langkah yang lebih baik.": "White to move. Find the better move.",
     "Hitam untuk bergerak. Cari langkah yang lebih baik.": "Black to move. Find the better move.",
     "Belum. Semak dulu: ada sah, ada buah yang boleh dimakan, ada ancaman?": "Not yet. Check first: any checks, any pieces to capture, any threats?",
-    "Betul! :san ialah langkah yang lebih baik.": "Right! :san is the better move."
+    "Betul! :san ialah langkah yang lebih baik.": "Right! :san is the better move.",
+    "Corak ini diajar dalam pelajaran :lesson.": "This idea is taught in the lesson :lesson."
 }

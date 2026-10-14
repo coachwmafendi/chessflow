@@ -6,6 +6,8 @@ use App\Enums\GameResult;
 use App\Models\Game;
 use App\Models\ReviewItem;
 use App\Models\User;
+use App\Support\PatternLessons;
+use Database\Seeders\LessonSeeder;
 use Livewire\Livewire;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
@@ -90,4 +92,28 @@ it('practises a game position in Latih semula as a one-move puzzle', function ()
 
     $r = app(CompleteReview::class)->handle($user, $item->fresh(), true);
     expect($r['counted'])->toBeTrue()->and($item->fresh()->box)->toBe(2);
+});
+
+it('points a game mistake to the lesson for its pattern, linked only when that lesson is open', function () {
+    $this->seed(LessonSeeder::class);
+    $user = User::factory()->student()->create();
+    $game = blackGame($user);
+
+    $lessons = PatternLessons::for($user);
+    expect($lessons['scholar'])->toMatchArray(['level' => 2, 'open' => false])
+        ->and(PatternLessons::for(User::factory()->teacher()->create())['scholar']['open'])->toBeTrue();
+
+    $this->actingAs($user)->get(route('main'))->assertSee('data-lessons=', false)->assertSee('scholar', false);
+
+    app(ScheduleGameReview::class)->handle($user, $game, [nf6Mistake(['lesson' => 'scholar'])]);
+    $item = ReviewItem::sole();
+    expect($item->position['lesson'])->toBe('scholar');
+    $item->update(['due_on' => now()->subDay()]);
+
+    $say = Livewire::actingAs($user)->test('pages::latih')->instance()->payload()['steps'][0]['say'];
+    expect($say)->toContain(__('Corak ini diajar dalam pelajaran :lesson.', ['lesson' => '<b>Elak Scholar’s Mate</b>']));
+
+    // an unknown slug is dropped
+    app(ScheduleGameReview::class)->handle($user, blackGame($user), [nf6Mistake(['lesson' => 'javascript:alert(1)'])]);
+    expect(ReviewItem::latest('id')->first()->position['lesson'])->toBeNull();
 });

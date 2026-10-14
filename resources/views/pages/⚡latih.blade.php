@@ -115,12 +115,26 @@ new #[Layout('layouts::chessflow')] #[Title('Latih semula')] class extends Compo
                     'date' => $item->game->finished_at->setTimezone(\App\Support\Chessflow::timezone())->locale(app()->getLocale())->translatedFormat('j M'),
                     'played' => '<b>'.e($p['played']).'</b>',
                     'n' => $moveNo,
-                ]),
+                ]).$this->lessonHint($p['lesson'] ?? null),
                 'task' => $color === 'w' ? __('Putih untuk bergerak. Cari langkah yang lebih baik.') : __('Hitam untuk bergerak. Cari langkah yang lebih baik.'),
                 'wrongMsg' => __('Belum. Semak dulu: ada sah, ada buah yang boleh dimakan, ada ancaman?'),
                 'win' => __('Betul! :san ialah langkah yang lebih baik.', ['san' => $p['bestSan']]),
             ]],
         ];
+    }
+
+    /** " Corak ini diajar dalam Fork Kuda." with a link when the player can open that lesson. */
+    private function lessonHint(?string $slug): string
+    {
+        $info = $slug ? (\App\Support\PatternLessons::for(auth()->user())[$slug] ?? null) : null;
+        if (! $info) {
+            return '';
+        }
+        $title = $info['open']
+            ? '<a href="'.e(route('pelajaran', $slug)).'">'.e($info['title']).'</a>'
+            : '<b>'.e($info['title']).'</b>';
+
+        return ' '.__('Corak ini diajar dalam pelajaran :lesson.', ['lesson' => $title]);
     }
 
     public function with(): array

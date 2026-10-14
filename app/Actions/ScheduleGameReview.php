@@ -6,6 +6,7 @@ use App\Models\Game;
 use App\Models\ReviewItem;
 use App\Models\User;
 use App\Support\Chessflow;
+use App\Support\PatternLessons;
 use App\Support\PgnMoves;
 
 /**
@@ -21,7 +22,7 @@ class ScheduleGameReview
     private const SAN = '/^(?:O-O(?:-O)?|[KQRBN]?[a-h]?[1-8]?x?[a-h][1-8](?:=[QRBN])?)[+#]?$/';
 
     /**
-     * @param  array<mixed>  $mistakes  [{ply, fen, best, bestSan, also, played}], as reported by the browser
+     * @param  array<mixed>  $mistakes  [{ply, fen, best, bestSan, also, played, lesson}], as reported by the browser
      * @return int number of positions queued
      */
     public function handle(User $user, Game $game, array $mistakes): int
@@ -45,6 +46,7 @@ class ScheduleGameReview
             $best = $m['best'] ?? null;
             $bestSan = $m['bestSan'] ?? null;
             $played = $m['played'] ?? null;
+            $lesson = in_array($m['lesson'] ?? null, PatternLessons::SLUGS, true) ? $m['lesson'] : null;
             $also = array_values(array_filter((array) ($m['also'] ?? []), fn ($s) => is_string($s) && preg_match(self::SAN, $s)));
 
             $valid = is_int($ply) && $ply % 2 === $userParity && ($moves[$ply] ?? null) === $played
@@ -60,7 +62,7 @@ class ScheduleGameReview
             ReviewItem::updateOrCreate(
                 ['user_id' => $user->id, 'game_id' => $game->id, 'ply' => $ply],
                 [
-                    'position' => ['fen' => $fen, 'best' => $best, 'bestSan' => $bestSan, 'also' => array_slice($also, 0, 3), 'played' => $played],
+                    'position' => ['fen' => $fen, 'best' => $best, 'bestSan' => $bestSan, 'also' => array_slice($also, 0, 3), 'played' => $played, 'lesson' => $lesson],
                     'box' => 1,
                     'due_on' => $tomorrow,
                 ],

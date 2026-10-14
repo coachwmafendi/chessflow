@@ -185,5 +185,7 @@
     "Belum ada langkah.": "No moves yet.",
     "Sejarah": "History",
     "1 kedudukan disimpan ke Latih semula. Cuba lagi esok!": "1 position saved to Practise again. Try it again tomorrow!",
-    ":n kedudukan disimpan ke Latih semula. Cuba lagi esok!": ":n positions saved to Practise again. Try them again tomorrow!"
+    ":n kedudukan disimpan ke Latih semula. Cuba lagi esok!": ":n positions saved to Practise again. Try them again tomorrow!",
+    "Belajar: :lesson →": "Learn: :lesson →",
+    "Corak ini diajar dalam :lesson (Tahap :n).": "This idea is taught in :lesson (Level :n)."
 }
