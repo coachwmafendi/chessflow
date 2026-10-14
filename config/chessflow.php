@@ -36,6 +36,9 @@ return [
         'xp' => 5,
         // Step types that stand on their own and can be asked again.
         'step_types' => ['puzzle', 'quiz', 'find', 'tap', 'play', 'collect'],
+        // Positions from the player's own games (the post-game review shows at most 3 mistakes).
+        'game_positions_per_game' => 3,
+        'game_positions_per_day' => 9,
     ],
 
     // Results are reported by the browser, so the server limits how often they count.

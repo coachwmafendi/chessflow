@@ -61,7 +61,10 @@ new #[Layout('layouts::chessflow')] #[Title('Latih semula')] class extends Compo
      */
     public function payload(): ?array
     {
-        $item = $this->itemId ? ReviewItem::with('lesson.level')->find($this->itemId) : null;
+        $item = $this->itemId ? ReviewItem::with(['lesson.level', 'game'])->find($this->itemId) : null;
+        if ($item?->isFromGame()) {
+            return $this->gamePayload($item);
+        }
         if (! $item || ! isset($item->lesson->steps[$item->step_index])) {
             return null;
         }
@@ -76,6 +79,47 @@ new #[Layout('layouts::chessflow')] #[Title('Latih semula')] class extends Compo
             'steps' => [array_merge($step, [
                 'say' => __('Dari pelajaran :lesson. Awak tersilap di sini sebelum ini, jom cuba lagi!', ['lesson' => '<b>'.e($item->lesson->title).'</b>']).'<br>'.($step['say'] ?? ''),
             ])],
+        ];
+    }
+
+    /**
+     * A position from the player's own game as a one-move puzzle: find the better move.
+     *
+     * @return array<string, mixed>|null
+     */
+    private function gamePayload(ReviewItem $item): ?array
+    {
+        $p = $item->position;
+        if (! $p || ! $item->game) {
+            return null;
+        }
+        $color = $item->game->user_color === 'b' ? 'b' : 'w';
+        $level = [__('Mudah'), __('Sederhana'), __('Sukar')][$item->game->level] ?? '';
+        $moveNo = intdiv((int) $item->ply, 2) + 1;
+
+        return [
+            'id' => 'latih',
+            'review' => true,
+            'tahap' => 0,
+            'title' => __('Latih semula'),
+            'icon' => 'game',
+            'steps' => [[
+                'type' => 'puzzle',
+                'title' => __('Dari permainan awak'),
+                'fen' => $p['fen'],
+                'orient' => $color,
+                'line' => [$p['best']],
+                'acceptSan' => $p['also'] ?? [],
+                'say' => __('Dalam permainan lawan Pak Kuda (tahap :level, :date), awak main :played pada langkah :n. Ada langkah yang lebih baik.', [
+                    'level' => $level,
+                    'date' => $item->game->finished_at->setTimezone(\App\Support\Chessflow::timezone())->locale(app()->getLocale())->translatedFormat('j M'),
+                    'played' => '<b>'.e($p['played']).'</b>',
+                    'n' => $moveNo,
+                ]),
+                'task' => $color === 'w' ? __('Putih untuk bergerak. Cari langkah yang lebih baik.') : __('Hitam untuk bergerak. Cari langkah yang lebih baik.'),
+                'wrongMsg' => __('Belum. Semak dulu: ada sah, ada buah yang boleh dimakan, ada ancaman?'),
+                'win' => __('Betul! :san ialah langkah yang lebih baik.', ['san' => $p['bestSan']]),
+            ]],
         ];
     }
 

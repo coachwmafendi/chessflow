@@ -537,5 +537,11 @@
     "Tapis keputusan": "Filter by result",
     "Tiada permainan untuk pilihan ini.": "No games for this choice.",
     "Tunjuk lagi": "Show more",
-    "tahap :level": "level :level"
+    "tahap :level": "level :level",
+    "Dari permainan awak": "From your game",
+    "Dalam permainan lawan Pak Kuda (tahap :level, :date), awak main :played pada langkah :n. Ada langkah yang lebih baik.": "In your game against Pak Kuda (:level level, :date) you played :played on move :n. There was a better move.",
+    "Putih untuk bergerak. Cari langkah yang lebih baik.": "White to move. Find the better move.",
+    "Hitam untuk bergerak. Cari langkah yang lebih baik.": "Black to move. Find the better move.",
+    "Belum. Semak dulu: ada sah, ada buah yang boleh dimakan, ada ancaman?": "Not yet. Check first: any checks, any pieces to capture, any threats?",
+    "Betul! :san ialah langkah yang lebih baik.": "Right! :san is the better move."
 }

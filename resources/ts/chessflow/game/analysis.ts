@@ -16,7 +16,9 @@ export interface Mistake {
     from: string;
     to: string;
     fenBefore: string;
-    best: { from: string; to: string; san: string } | null;
+    best: { from: string; to: string; san: string; uci: string } | null;
+    /** Other moves (SAN) about as good as the best one, also accepted when the position is practised again. */
+    alsoGood: string[];
     loss: number;
     severity: 'besar' | 'kecil';
     text: string;
@@ -27,13 +29,15 @@ const CAP = 1500;
 /** A drop of this many centipawns or more is a mistake; BIG or more is a blunder. */
 export const MISTAKE_CP = 200;
 export const BIG_CP = 300;
+/** A second engine line within this many centipawns of the best counts as an equally good answer. */
+export const ALSO_GOOD_CP = 50;
 /** Show at most this many, the worst ones. */
 export const MAX_SHOWN = 3;
 /** Long games: only the first plies are analysed, to keep the wait short. */
 export const MAX_PLIES = 160;
 
 /** Engine score (side to move) turned into the player's point of view, clamped. */
-export function scoreFor(ev: Evaluation, sideToMove: 'w' | 'b', user: 'w' | 'b'): number | null {
+export function scoreFor(ev: Pick<Evaluation, 'cp' | 'mate'>, sideToMove: 'w' | 'b', user: 'w' | 'b'): number | null {
     let s: number;
     if (ev.mate !== null) s = ev.mate > 0 ? CAP : -CAP; // mate 0: the side to move is already mated
     else if (ev.cp !== null) s = Math.max(-CAP, Math.min(CAP, ev.cp));
@@ -124,6 +128,15 @@ export async function analyseGame(
         const best = uciMove(m.before, evB.best);
         if (best && best.from === m.from && best.to === m.to) return;
         const reply = uciMove(m.after, evA.best);
+        // Lines are scored for the side to move, so they compare directly with each other.
+        const scored = (evB.lines ?? []).map((l) => ({ l, s: scoreFor(l, user, user) }));
+        const top = scored[0]?.s ?? null;
+        const alsoGood = scored
+            .slice(1)
+            .filter(({ s }) => top !== null && s !== null && top - s <= ALSO_GOOD_CP)
+            .map(({ l }) => uciMove(m.before, l.pv[0] ?? null))
+            .filter((x): x is Move => x !== null && x.san !== m.san && x.san !== best?.san)
+            .map((x) => x.san);
         found.push({
             ply: i,
             moveNo: Math.floor(i / 2) + 1,
@@ -131,7 +144,8 @@ export async function analyseGame(
             from: m.from,
             to: m.to,
             fenBefore: m.before,
-            best: best ? { from: best.from, to: best.to, san: best.san } : null,
+            best: best ? { from: best.from, to: best.to, san: best.san, uci: best.from + best.to + (best.promotion ?? '') } : null,
+            alsoGood,
             loss,
             severity: loss >= BIG_CP ? 'besar' : 'kecil',
             text: explain(m.san, evB, evA, best, reply, loss),

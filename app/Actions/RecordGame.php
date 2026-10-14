@@ -16,7 +16,7 @@ class RecordGame
      * Games are played in the browser, so the result is trusted as reported; XP for wins is
      * capped per day to limit what a forged request can earn.
      *
-     * @return array{xp: int, wins: int}
+     * @return array{xp: int, wins: int, game: int}
      */
     public function handle(User $user, string $userColor, int $level, GameResult $result, string $pgn, int $moveCount): array
     {
@@ -40,7 +40,7 @@ class RecordGame
                 $xp = $this->awardXp->handle($user, $levelXp[$level], $game);
             }
 
-            return ['xp' => $xp, 'wins' => $user->games()->where('result', GameResult::Win)->count()];
+            return ['xp' => $xp, 'wins' => $user->games()->where('result', GameResult::Win)->count(), 'game' => $game->id];
         });
     }
 

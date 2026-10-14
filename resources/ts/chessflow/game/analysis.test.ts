@@ -43,6 +43,18 @@ describe('analyseGame', () => {
         expect(out![0].text).toBe('Selepas Qxf7+, Pak Kuda boleh makan Menteri awak dengan Kxf7.');
     });
 
+    it('lists other moves about as good as the best one, for practising the position again', async () => {
+        const { moves, fens } = game(['e4', 'e5', 'Qh5', 'Nc6', 'Qxf7+', 'Kxf7']);
+        const lines = (pairs: [string, number][]) => pairs.map(([u, cp]) => ({ pv: [u], cp, mate: null }));
+        const t = new Map<string, Evaluation>([
+            [fens[4], { ...ev(20, 'g1f3'), lines: lines([['g1f3', 20], ['b1c3', -10], ['h5h3', -200]]) }],
+            [fens[5], ev(800, 'e8f7')],
+        ]);
+        const out = await analyseGame(moves, 'w', engine(t));
+        expect(out![0].best).toMatchObject({ san: 'Nf3', uci: 'g1f3' });
+        expect(out![0].alsoGood).toEqual(['Nc3']); // within 50 cp; Qh3 is not
+    });
+
     it('points out a missed mate in one', async () => {
         const { moves, fens } = game(['Kf1'], '6k1/5ppp/8/8/8/8/8/R5K1 w - - 0 1');
         const t = new Map<string, Evaluation>([

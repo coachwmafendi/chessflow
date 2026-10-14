@@ -30,6 +30,9 @@ function mountOne(el: HTMLElement): void {
                 finished(report) {
                     window.Livewire?.dispatch('game-finished', report);
                 },
+                mistakes(report) {
+                    window.Livewire?.dispatch('game-mistakes', report);
+                },
             }),
         );
         return;
@@ -91,8 +94,15 @@ window.addEventListener('lesson-result', (e) => {
     });
 });
 
+window.addEventListener('game-mistakes-saved', (e) => {
+    const { count } = (e as CustomEvent<{ count: number }>).detail;
+    islands.forEach((island) => {
+        if (island instanceof GameRunner) island.showMistakesSaved(count);
+    });
+});
+
 window.addEventListener('game-result', (e) => {
-    const detail = (e as CustomEvent<{ xp: number; totalXp?: number; badges?: NewBadge[] }>).detail;
+    const detail = (e as CustomEvent<{ xp: number; totalXp?: number; badges?: NewBadge[]; gameId?: number }>).detail;
     islands.forEach((island) => {
         if (island instanceof GameRunner) island.showResult(detail);
     });

@@ -183,5 +183,7 @@
     "Papan analisis": "Analysis board",
     "Enjin: :name": "Engine: :name",
     "Belum ada langkah.": "No moves yet.",
-    "Sejarah": "History"
+    "Sejarah": "History",
+    "1 kedudukan disimpan ke Latih semula. Cuba lagi esok!": "1 position saved to Practise again. Try it again tomorrow!",
+    ":n kedudukan disimpan ke Latih semula. Cuba lagi esok!": ":n positions saved to Practise again. Try them again tomorrow!"
 }

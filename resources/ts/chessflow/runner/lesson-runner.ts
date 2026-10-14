@@ -194,7 +194,8 @@ export class LessonRunner {
             .join('');
         this.els.stepTitle.textContent = st.title;
         this.els.say.innerHTML = st.say || '';
-        this.els.taskText.innerHTML = '';
+        // As in the prototype (engine.js load): the step's task; "tap" steps replace it per question.
+        this.els.taskText.innerHTML = st.task || '';
         this.els.opts.innerHTML = '';
         this.els.counter.textContent = '';
         this.els.status.className = 'status';

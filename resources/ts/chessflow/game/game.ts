@@ -21,8 +21,15 @@ export interface GameReport {
     moveCount: number;
 }
 
+export interface GameMistakesReport {
+    gameId: number;
+    mistakes: { ply: number; fen: string; best: string; bestSan: string; also: string[]; played: string }[];
+}
+
 export interface GameHandlers {
     finished?: (report: GameReport) => void;
+    /** Mistakes found by the post-game review, for "Latih semula". */
+    mistakes?: (report: GameMistakesReport) => void;
 }
 
 // Same three levels as the prototype. Mudah uses simple-bot only.
@@ -43,6 +50,11 @@ const ICON_THEATRE =
     '<svg class="btn-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7"/></svg>';
 const ICON_FULLSCREEN =
     '<svg class="btn-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg>';
+// Undo (curved arrow back) and hint (light bulb).
+const ICON_UNDO =
+    '<svg class="btn-ico undo-ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg>';
+const ICON_HINT =
+    '<svg class="btn-ico hint-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6M10 21h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M12 3a6 6 0 0 0-3.6 10.8c.6.5 1.1 1.3 1.1 2.2h5c0-.9.5-1.7 1.1-2.2A6 6 0 0 0 12 3z" fill="currentColor" fill-opacity=".25" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>';
 const ICON_DRAW = '<span class="btn-ico half" aria-hidden="true">½</span>';
 
 type ColorChoice = 'w' | 'b' | 'r';
@@ -77,6 +89,9 @@ export class GameRunner {
     private reported = false;
     private gameId = 0;
     private analysisToken = 0;
+    /** Id of the finished game on the server (from `game-result`), and mistakes waiting for it. */
+    private serverGameId: number | null = null;
+    private pendingMistakes: Mistake[] | null = null;
     /** Ply count when Pak Kuda last refused a draw offer. */
     private drawRefusedAt: number | null = null;
     /** Closes the open confirm dialog, if any. */
@@ -111,7 +126,31 @@ export class GameRunner {
     }
 
     /** Server reply to a reported game (Livewire `game-result`). */
-    showResult(r: { xp: number; totalXp?: number; badges?: NewBadge[] }): void {
+    /** Mistakes go to "Latih semula" once the server has told us which game they belong to. */
+    private sendMistakes(): void {
+        if (!this.serverGameId || !this.pendingMistakes?.length) return;
+        this.handlers.mistakes?.({
+            gameId: this.serverGameId,
+            mistakes: this.pendingMistakes.map((m) => ({ ply: m.ply, fen: m.fenBefore, best: m.best!.uci, bestSan: m.best!.san, also: m.alsoGood, played: m.san })),
+        });
+        this.pendingMistakes = null;
+    }
+
+    /** Server reply to the mistakes sent for practice (Livewire `game-mistakes-saved`). */
+    showMistakesSaved(count: number): void {
+        if (count <= 0) return;
+        this.root.querySelector('.review-saved')?.remove();
+        this.$('.analysis').insertAdjacentHTML(
+            'beforeend',
+            '<p class="review-saved">' + (count === 1 ? t('1 kedudukan disimpan ke Latih semula. Cuba lagi esok!') : t(':n kedudukan disimpan ke Latih semula. Cuba lagi esok!', { n: count })) + '</p>',
+        );
+    }
+
+    showResult(r: { xp: number; totalXp?: number; badges?: NewBadge[]; gameId?: number }): void {
+        if (typeof r.gameId === 'number') {
+            this.serverGameId = r.gameId;
+            this.sendMistakes();
+        }
         if (r.xp > 0) {
             const s = this.$('.status');
             s.textContent = s.textContent + ' +' + r.xp + ' XP';
@@ -150,7 +189,7 @@ export class GameRunner {
             LEVELS.map((l, i) => '<button type="button" data-l="' + i + '">' + t(l.n) + '</button>').join('') +
             '</div><button class="cta" type="button" data-act="new">' + t('Permainan baru') + '</button></div>' +
             '<div class="status" role="status" aria-live="polite"></div>' +
-            '<div class="actions"><button class="ghost" type="button" data-act="undo">' + t('Undur') + '</button><button class="ghost" type="button" data-act="hint">' + t('Petunjuk') + '</button><span class="spacer"></span><span class="actions-end"><button class="ghost" type="button" data-act="draw">' + ICON_DRAW + t('Minta seri') + '</button><button class="ghost" type="button" data-act="resign">' + ICON_RESIGN + t('Mengaku kalah') + '</button></span></div>' +
+            '<div class="actions"><button class="ghost" type="button" data-act="undo">' + ICON_UNDO + t('Undur') + '</button><button class="ghost" type="button" data-act="hint">' + ICON_HINT + t('Petunjuk') + '</button><span class="spacer"></span><span class="actions-end"><button class="ghost" type="button" data-act="draw">' + ICON_DRAW + t('Minta seri') + '</button><button class="ghost" type="button" data-act="resign">' + ICON_RESIGN + t('Mengaku kalah') + '</button></span></div>' +
             '<div class="moves"><small>' + t('Langkah') + '</small><ol data-empty="' + t('Belum ada langkah.') + '"></ol>' +
             '<p class="notation-key">' +
             t('K Raja · Q Menteri · R Tir · B Gajah · N Kuda · x makan · + sah · # sah mati') +
@@ -248,6 +287,8 @@ export class GameRunner {
         this.stopConfetti();
         this.clearTimers();
         this.gameId++;
+        this.serverGameId = null;
+        this.pendingMistakes = null;
         this.user = this.color === 'r' ? (Math.random() < 0.5 ? 'w' : 'b') : this.color;
         try {
             localStorage.setItem(PREF_KEY, JSON.stringify({ color: this.color, level: this.level }));
@@ -561,7 +602,7 @@ export class GameRunner {
         const result = await analyseGame(
             this.g.history({ verbose: true }),
             this.user,
-            (fen) => this.engine.analyse({ fen, depth: 12, timeoutMs: 4000 }),
+            (fen) => this.engine.analyse({ fen, depth: 12, timeoutMs: 4000, lines: 2 }),
             (done) => {
                 if (token !== this.analysisToken) return;
                 const v = Math.round(done * 100) + '%';
@@ -572,6 +613,8 @@ export class GameRunner {
         );
         if (result === null || id !== this.gameId || token !== this.analysisToken) return;
         this.showMistakes(result);
+        this.pendingMistakes = result.filter((m) => m.best);
+        this.sendMistakes();
     }
 
     private showMistakes(list: Mistake[]): void {

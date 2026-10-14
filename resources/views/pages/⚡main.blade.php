@@ -2,6 +2,7 @@
 
 use App\Actions\AwardBadges;
 use App\Actions\RecordGame;
+use App\Actions\ScheduleGameReview;
 use App\Enums\GameResult;
 use App\Support\ProgressGuard;
 use Livewire\Attributes\Layout;
@@ -25,7 +26,25 @@ new #[Layout('layouts::chessflow')] #[Title('Main lawan Pak Kuda')] class extend
 
         $r = app(RecordGame::class)->handle($user, $userColor, $level, $gameResult, $pgn, $moveCount);
 
-        $this->dispatch('game-result', xp: $r['xp'], wins: $r['wins'], totalXp: $user->fresh()->xp, badges: app(AwardBadges::class)->handle($user->fresh()));
+        $this->dispatch('game-result', xp: $r['xp'], wins: $r['wins'], gameId: $r['game'], totalXp: $user->fresh()->xp, badges: app(AwardBadges::class)->handle($user->fresh()));
+    }
+
+    /**
+     * Mistakes the post-game review found, to practise again in "Latih semula". ScheduleGameReview checks them
+     * against the stored game.
+     *
+     * @param  array<mixed>  $mistakes
+     */
+    #[On('game-mistakes')]
+    public function saveMistakes(int $gameId = 0, array $mistakes = []): void
+    {
+        $user = auth()->user();
+        $game = $user->games()->find($gameId);
+        if (! $game || ! ProgressGuard::allow($user, 'games')) {
+            return;
+        }
+
+        $this->dispatch('game-mistakes-saved', count: app(ScheduleGameReview::class)->handle($user, $game, $mistakes));
     }
 }; ?>
 

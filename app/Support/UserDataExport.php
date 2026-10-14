@@ -93,7 +93,9 @@ class UserDataExport
             'xp_history' => XpEvent::where('user_id', $user->id)->orderBy('id')->get()
                 ->map(fn (XpEvent $x) => ['amount' => $x->amount, 'for' => $x->source_type ? class_basename($x->source_type) : null, 'at' => $this->date($x->created_at)])->all(),
             'review_queue' => ReviewItem::where('user_id', $user->id)->with('lesson')->orderBy('due_on')->get()
-                ->map(fn (ReviewItem $r) => ['lesson' => $r->lesson?->title, 'step' => $r->step_index + 1, 'box' => $r->box, 'due_on' => $r->due_on->toDateString()])->all(),
+                ->map(fn (ReviewItem $r) => $r->isFromGame()
+                    ? ['game_id' => $r->game_id, 'ply' => $r->ply, 'position' => $r->position, 'box' => $r->box, 'due_on' => $r->due_on->toDateString()]
+                    : ['lesson' => $r->lesson?->title, 'step' => (int) $r->step_index + 1, 'box' => $r->box, 'due_on' => $r->due_on->toDateString()])->all(),
             'badges' => UserBadge::where('user_id', $user->id)->orderBy('awarded_at')->get()
                 ->map(fn (UserBadge $b) => ['badge' => Badges::all()[$b->badge]['name'] ?? $b->badge, 'awarded_at' => $this->date($b->awarded_at)])->all(),
             'classes' => $user->classrooms()->with('teacher')->orderBy('name')->get()
