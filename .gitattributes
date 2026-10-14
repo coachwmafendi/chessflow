@@ -9,3 +9,6 @@
 CHANGELOG.md export-ignore
 README.md export-ignore
 .github/workflows/browser-tests.yml export-ignore
+
+# Third-party engine files are served exactly as shipped (GPL licence text included).
+public/stockfish/** -text

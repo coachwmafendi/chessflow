@@ -75,6 +75,7 @@ Coolify → resource DB → Backups: harian (cth. 02:00), simpan 14 hari, destin
 ## 8. Ujian asap selepas deploy
 
 - [ ] `curl -I https://<domain>/stockfish/stockfish.wasm` → `Content-Type: application/wasm`
+- [ ] `curl -I https://<domain>/stockfish/19/stockfish-19-lite-single.wasm` → `Content-Type: application/wasm` (papan analisis; jika gagal, papan guna Stockfish 10)
 - [ ] `/` dipaparkan dalam BM; `/tentang` ada notis lesen.
 - [ ] Log masuk guru → `/guru` → cipta kelas → tambah 2 murid.
 - [ ] Log masuk murid di `/masuk-murid` → habiskan Papan Catur → Kenal Kuda terbuka, XP bertambah.

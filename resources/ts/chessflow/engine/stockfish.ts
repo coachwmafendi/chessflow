@@ -42,6 +42,8 @@ interface Job {
 }
 
 const WORKER_URL = '/stockfish/stockfish.js';
+/** Stockfish 19 "lite single-threaded" (NNUE, ~1.9 MB): stronger, needs no cross-origin isolation. Analysis board only. */
+const ANALYSIS_WORKER_URL = '/stockfish/19/stockfish-19-lite-single.js';
 
 export class StockfishEngine {
     private worker: WorkerLike | null = null;
@@ -54,6 +56,8 @@ export class StockfishEngine {
     constructor(
         private readonly factory: () => WorkerLike = () => new Worker(WORKER_URL) as unknown as WorkerLike,
         private readonly timeoutMs = 9000,
+        /** Shown to the user, e.g. "Stockfish 10". */
+        readonly name = 'Stockfish 10',
     ) {}
 
     get available(): boolean {
@@ -197,7 +201,16 @@ export function sharedEngine(): StockfishEngine {
     return (shared ??= new StockfishEngine());
 }
 
+let analysis: StockfishEngine | null = null;
+
+/** The stronger engine for the free analysis board. Games and hints keep the small Stockfish 10. */
+export function analysisEngine(): StockfishEngine {
+    return (analysis ??= new StockfishEngine(() => new Worker(ANALYSIS_WORKER_URL) as unknown as WorkerLike, 9000, 'Stockfish 19 (lite)'));
+}
+
 export function destroySharedEngine(): void {
     shared?.destroy();
     shared = null;
+    analysis?.destroy();
+    analysis = null;
 }

@@ -18,7 +18,6 @@
     "<b>Fon</b> Baloo 2 dan Lexend — lesen SIL Open Font License 1.1, disimpan dan dihantar dari pelayan ChessFlow sendiri.": "<b>Fonts</b> Baloo 2 and Lexend — SIL Open Font License 1.1, stored on and served from ChessFlow's own server.",
     "<b>Fork!</b> Kuda serang raja dan tir serentak.": "<b>Fork!</b> The knight attacks the king and the rook at once.",
     "<b>Pak Kuda</b> (logo ChessFlow) — kuda putih daripada set \"rhosgfx\" oleh RhosGFX, didedikasikan ke domain awam (CC0 1.0). Diambil dari :repo.": "<b>Pak Kuda</b> (the ChessFlow logo) — the white knight from the \"rhosgfx\" set by RhosGFX, dedicated to the public domain (CC0 1.0). Taken from the :repo.",
-    "<b>Stockfish</b> (enjin catur untuk permainan dan petunjuk) — lesen GNU GPL v3. Kami guna :sfjs, versi WebAssembly; kod sumber Stockfish di :src. Fail enjin dihantar tanpa diubah di :files.": "<b>Stockfish</b> (the chess engine for games and hints) — GNU GPL v3 licence. We use :sfjs, the WebAssembly build; Stockfish source code is at :src. The engine files are served unmodified at :files.",
     "Ada kod kelas daripada guru? Sertai kelas": "Got a class code from your teacher? Join a class",
     "Ada soalan?": "Questions?",
     "Adakah murid belajar istilah catur dalam bahasa Inggeris?": "Do students learn chess terms in English?",
@@ -519,5 +518,6 @@
     "Murid siap": "Students done",
     "Purata ★": "Average ★",
     "Admin": "Admin",
-    "← Main": "← Play"
+    "← Main": "← Play",
+    "<b>Stockfish</b> (enjin catur) — lesen GNU GPL v3. Kami guna :sfjs, versi WebAssembly: Stockfish 10 untuk permainan dan petunjuk, dan Stockfish 19 (lite) untuk papan analisis. Kod sumber Stockfish di :src. Fail enjin dihantar tanpa diubah di :files.": "<b>Stockfish</b> (chess engine) — GNU GPL v3 licence. We use :sfjs, the WebAssembly build: Stockfish 10 for games and hints, and Stockfish 19 (lite) for the analysis board. Stockfish source code at :src. The engine files are served unmodified at :files."
 }

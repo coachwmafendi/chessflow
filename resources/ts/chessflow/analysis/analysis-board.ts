@@ -2,7 +2,7 @@ import { Chess, type Move, type Square } from 'chess.js';
 import type { ArrowDrawSpec, BoardApi } from '../types';
 import { createBoard } from '../core/board';
 import { nm, pathFor, sq } from '../core/squares';
-import { sharedEngine, type StockfishEngine, type Evaluation, type EngineLine } from '../engine/stockfish';
+import { analysisEngine, sharedEngine, type StockfishEngine, type Evaluation, type EngineLine } from '../engine/stockfish';
 import { t } from '../i18n';
 
 export const START_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
@@ -82,7 +82,7 @@ function isFen(text: string): boolean {
 /** A free analysis board: move both sides, step through the moves, and ask Stockfish for the score and best lines. */
 export class AnalysisRunner {
     private readonly root: HTMLElement;
-    private readonly engine: StockfishEngine;
+    private engine: StockfishEngine;
     /** Position at `ply`. */
     private g = new Chess();
     private startFen = START_FEN;
@@ -106,7 +106,7 @@ export class AnalysisRunner {
         this.goToPly(go[e.key]);
     };
 
-    constructor(root: HTMLElement, engine: StockfishEngine = sharedEngine()) {
+    constructor(root: HTMLElement, engine: StockfishEngine = analysisEngine()) {
         this.root = root;
         this.engine = engine;
         this.render();
@@ -148,6 +148,7 @@ export class AnalysisRunner {
             '<p class="eval-verdict"></p>' +
             '<p class="eval-best"></p>' +
             '<div class="engine-lines"></div>' +
+            '<p class="engine-name"></p>' +
             '</div>' +
             '<div class="actions analysis-actions">' +
             '<button class="ghost" type="button" data-act="reset">' + t('Mula semula') + '</button>' +
@@ -300,7 +301,12 @@ export class AnalysisRunner {
         if (!this.engine.available) return;
         this.$('.eval-score').textContent = t('Pak Kuda sedang fikir…');
         const fen = this.g.fen();
-        const ev = await this.engine.analyse({ fen, depth: 14, timeoutMs: 5000, lines: ENGINE_LINES });
+        let ev = await this.engine.analyse({ fen, depth: 14, timeoutMs: 5000, lines: ENGINE_LINES });
+        // Stockfish 19 needs a newer browser (e.g. iOS 16+); fall back to the Stockfish 10 used everywhere else.
+        if (!this.engine.available && this.engine !== sharedEngine()) {
+            this.engine = sharedEngine();
+            ev = await this.engine.analyse({ fen, depth: 14, timeoutMs: 5000, lines: ENGINE_LINES });
+        }
         if (fen !== this.g.fen()) return;
         this.currentEval = ev;
         this.drawMarks();
@@ -308,6 +314,7 @@ export class AnalysisRunner {
     }
 
     private updateInfo(): void {
+        this.$('.engine-name').textContent = this.engine.available ? t('Enjin: :name', { name: this.engine.name }) : '';
         this.$('.eval-turn').textContent = this.g.turn() === 'w' ? t('Putih untuk bergerak') : t('Hitam untuk bergerak');
         this.renderMoves();
         (this.$('[data-act="best"]') as HTMLButtonElement).disabled = !this.currentEval?.best;

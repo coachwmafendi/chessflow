@@ -53,6 +53,7 @@ class DoctorCommand extends Command
         $this->check('Node available (lesson validation on import)', $node->successful(), 'warn', trim($node->output()) ?: 'use --skip-validation if Node is absent');
         $this->check('Vite build present', is_file(public_path('build/manifest.json')), 'fail', 'npm run build');
         $this->check('Stockfish files present', is_file(public_path('stockfish/stockfish.js')) && is_file(public_path('stockfish/stockfish.wasm')), 'fail', 'public/stockfish/');
+        $this->check('Stockfish 19 (analysis board) present', is_file(public_path('stockfish/19/stockfish-19-lite-single.js')) && is_file(public_path('stockfish/19/stockfish-19-lite-single.wasm')), 'warn', 'public/stockfish/19/');
 
         $this->table(['', 'Check', 'Detail'], $this->rows);
         $this->line('Also check from outside: curl -I '.rtrim((string) config('app.url'), '/').'/stockfish/stockfish.wasm  → Content-Type: application/wasm');
