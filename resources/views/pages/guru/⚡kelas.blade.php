@@ -11,6 +11,7 @@ use App\Models\User;
 use App\Support\AssignmentReport;
 use App\Support\Chessflow;
 use App\Support\Curriculum;
+use App\Support\PlayReport;
 use App\Support\ProgressReport;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
@@ -136,6 +137,7 @@ new #[Layout('layouts::chessflow')] class extends Component {
 
         return $this->view([
             'rows' => app(ProgressReport::class)->forStudents($students),
+            'play' => app(PlayReport::class)->forStudents($students),
             'lessons' => app(Curriculum::class)->lessons(),
             'assignments' => app(AssignmentReport::class)->forClassroom($this->classroom),
             'levels' => Level::orderBy('position')->get(),
@@ -238,6 +240,9 @@ new #[Layout('layouts::chessflow')] class extends Component {
     </section>
 
     <x-chessflow.progress-table :rows="$rows" :lessons="$lessons" :actions="fn ($s) => $this->actionsHtml($s)" />
+    @if ($play->isNotEmpty())
+        <x-chessflow.play-summary :rows="$play" />
+    @endif
 
     <section class="panel-card no-print">
         <h2>{{ __('Tambah murid') }}</h2>

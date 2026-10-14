@@ -6,6 +6,7 @@ use App\Actions\ResetStudentPin;
 use App\Enums\Role;
 use App\Models\User;
 use App\Support\Curriculum;
+use App\Support\PlayReport;
 use App\Support\ProgressReport;
 use App\Support\UserDataExport;
 use Illuminate\Support\Facades\Hash;
@@ -107,6 +108,7 @@ new #[Layout('layouts::chessflow')] #[Title('Anak saya')] class extends Componen
 
         return [
             'rows' => app(ProgressReport::class)->forStudents($children),
+            'play' => app(PlayReport::class)->forStudents($children),
             'lessons' => app(Curriculum::class)->lessons(),
         ];
     }
@@ -137,6 +139,9 @@ new #[Layout('layouts::chessflow')] #[Title('Anak saya')] class extends Componen
     @endif
 
     <x-chessflow.progress-table :rows="$rows" :lessons="$lessons" :actions="fn ($c) => $this->actionsHtml($c)" />
+    @if ($play->isNotEmpty())
+        <x-chessflow.play-summary :rows="$play" />
+    @endif
 
     <section class="panel-card">
         <h2>{{ __('Cipta akaun anak') }}</h2>

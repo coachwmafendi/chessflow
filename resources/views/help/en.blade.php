@@ -75,6 +75,7 @@
     <li>Your child already has an account (made by a teacher, for example)? <b>Link</b> it with the child's username and PIN.</li>
     <li>The progress table shows each child's lessons, stars, XP and streak. The ✓ on a passed exam opens the child's certificate.</li>
     <li>Forgot the PIN? Press <b>New PIN</b>. <b>Unlink</b> only removes the link; the child's account stays.</li>
+    <li><b>Games &amp; practice</b> (under the progress table): games against Pak Kuda, won/lost/drawn, the best level won, the most played opening, and the <b>common mistake</b> (the pattern that comes up most in Practise again, e.g. Fork Kuda), so you know what to practise.</li>
     <li><b>Download data</b> gives a copy of the child's data (JSON). <b>Delete account</b> permanently deletes the child's account and all its data (type PADAM to confirm).</li>
 </ul>
 
@@ -84,6 +85,7 @@
     <li>Press <b>Classes</b> at the top, then <b>Create a class</b>. Each class has a <b>join code</b>.</li>
     <li><b>Add students</b>: one name per line (up to 40 at a time). Usernames and PINs are shown once only; print them to hand out. Students who already have an account can join with the class code.</li>
     <li><b>Tasks</b>: pick a lesson or exam, an optional due date and note, then <b>Set task</b>. The lesson unlocks for everyone in the class. See how many have finished and who has not.</li>
+    <li><b>Games &amp; practice</b> (under the progress table): games against Pak Kuda, won/lost/drawn, the best level won, the most played opening, and the <b>common mistake</b> (the pattern that comes up most in Practise again, e.g. Fork Kuda), so you know what to practise.</li>
     <li>The progress table shows every student's stars for every lesson; the ✓ on a passed exam opens that student's certificate. For each student: <b>New PIN</b>, <b>Remove</b> from the class, or <b>Delete account</b> (only when the student is not linked to a parent or another teacher's class).</li>
 </ul>
 

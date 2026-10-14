@@ -544,5 +544,14 @@
     "Hitam untuk bergerak. Cari langkah yang lebih baik.": "Black to move. Find the better move.",
     "Belum. Semak dulu: ada sah, ada buah yang boleh dimakan, ada ancaman?": "Not yet. Check first: any checks, any pieces to capture, any threats?",
     "Betul! :san ialah langkah yang lebih baik.": "Right! :san is the better move.",
-    "Corak ini diajar dalam pelajaran :lesson.": "This idea is taught in the lesson :lesson."
+    "Corak ini diajar dalam pelajaran :lesson.": "This idea is taught in the lesson :lesson.",
+    "Permainan & latihan": "Games & practice",
+    "Belum ada permainan lawan Pak Kuda atau Latih semula.": "No games against Pak Kuda or Practise again items yet.",
+    "\"Kesilapan kerap\" ialah corak yang paling banyak dalam Latih semula daripada permainan, jadi itulah yang paling perlu dilatih.": "\"Common mistake\" is the pattern that comes up most in Practise again from games, so it is what most needs practice.",
+    "Menang · Kalah · Seri": "Won · Lost · Drawn",
+    "Menang tertinggi": "Best win",
+    "Pembukaan kerap": "Common opening",
+    "Kesilapan kerap": "Common mistake",
+    ":due hari ini · :total": ":due today · :total",
+    "Permainan terakhir": "Last game"
 }

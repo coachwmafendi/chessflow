@@ -365,3 +365,9 @@ details.tahap:not([open]) > summary.tahap-head{border-bottom-style:solid}
 .scroll-fade.more-above>.fade-top,.scroll-fade.more-below>.fade-bottom{opacity:1}
 .moves .scroll-fade{margin-top:6px}
 .moves .scroll-fade>ol{margin-top:0}
+
+/* Games & practice summary for parents and teachers */
+.play-summary .muted{margin:0 0 10px}
+.play-table :is(td,th).left{text-align:left;max-width:240px;overflow:hidden;text-overflow:ellipsis}
+.play-table .w{color:var(--good);font-weight:700}
+.play-table .l{color:var(--coral);font-weight:700}
