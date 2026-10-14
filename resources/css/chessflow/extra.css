@@ -177,7 +177,9 @@
 .pill.icon-btn{position:relative;padding:6px;width:34px;height:34px;justify-content:center}
 .tb-ico{width:20px;height:20px;display:block}
 .icon-btn[data-tip]::after{content:attr(data-tip);position:absolute;top:calc(100% + 8px);right:0;z-index:30;white-space:nowrap;background:var(--ink);color:var(--bg);font-size:12px;font-weight:600;padding:5px 9px;border-radius:8px;pointer-events:none;opacity:0;transform:translateY(-3px);transition:opacity .15s,transform .15s}
+.icon-btn[data-tip]::before{content:"";position:absolute;top:calc(100% + 3px);right:12px;z-index:31;width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-bottom:5px solid var(--ink);pointer-events:none;opacity:0;transition:opacity .15s}
 .icon-btn[data-tip]:hover::after,.icon-btn[data-tip]:focus-visible::after{opacity:1;transform:none}
+.icon-btn[data-tip]:hover::before,.icon-btn[data-tip]:focus-visible::before{opacity:1}
 /* collapsible map levels (pages/⚡peta, core/map-levels.ts) */
 details.tahap > summary.tahap-head{list-style:none;cursor:pointer;border-radius:12px;padding-inline:6px;margin-inline:-6px}
 details.tahap > summary.tahap-head::-webkit-details-marker{display:none}
@@ -329,3 +331,8 @@ details.tahap:not([open]) > summary.tahap-head{border-bottom-style:solid}
 .history-none{color:var(--muted);padding:12px}
 .history-more{text-align:center;margin-top:12px}
 @media (max-width:560px){.history-summary{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* Latih semula from game mistakes: note under the post-game review; Play button icons */
+.review-saved{margin:8px 0 0;padding:10px 12px;border-radius:12px;background:var(--accent-soft);font-weight:500;font-size:14px}
+[data-chessflow="game"] .undo-ico{color:var(--accent)}
+[data-chessflow="game"] .hint-ico{color:var(--sun)}
