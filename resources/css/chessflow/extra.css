@@ -192,7 +192,8 @@ details.tahap > summary.tahap-head:focus-visible{outline:3px solid var(--sun);ou
 .tahap-badge.locked svg{width:13px;height:13px;fill:currentColor}
 .tahap-stars{display:inline-flex;align-items:center;gap:4px;color:var(--ink)}
 .tahap-stars .star-ico{width:16px;height:16px}
-.tahap-preview{width:28px;height:28px;display:block;opacity:.6;filter:grayscale(1)}
+/* First lesson's piece, on a light-square disc so black and white pieces both show in light and dark themes */
+.tahap-preview{width:32px;height:32px;display:block;border-radius:50%;background-color:var(--sq-light);background-size:72%;background-position:center;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--sq-dark) 45%,transparent);opacity:.85}
 .tahap-toggle{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:var(--surface);border:1px solid var(--line)}
 .tahap-toggle::before{content:"";width:8px;height:8px;border-right:2px solid var(--ink);border-bottom:2px solid var(--ink);transform:translateY(-2px) rotate(45deg);transition:transform .2s}
 details.tahap[open] .tahap-toggle::before{transform:translateY(2px) rotate(-135deg)}
@@ -350,3 +351,7 @@ details.tahap:not([open]) > summary.tahap-head{border-bottom-style:solid}
 .opening-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
 .opening-eco,.opening-lesson{flex:none}
 .history-opening-name{font-weight:600;color:var(--ink)}
+
+/* Chess-piece icons on dark tiles: black pieces vanish on the dark teal, so in the dark theme the tile is a light board square. */
+:root[data-theme="dark"] .qico:has(> .pc){background:var(--sq-light)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .qico:has(> .pc){background:var(--sq-light)}}
