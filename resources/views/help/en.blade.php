@@ -58,6 +58,7 @@
 <ul>
     <li>Press <b>Play</b> at the top. Choose a colour (White, Black or Random) and a level (Easy, Medium or Hard), then <b>New game</b>.</li>
     <li>The <b>opening</b> name (for example Italian Game, C50) appears next to the move list while you play and on the analysis board, and is saved in History. If a lesson teaches that opening, press <b>Lesson →</b>.</li>
+    <li><b>Games from elsewhere</b>: on the analysis board, paste a PGN or press <b>Choose a .pgn file</b> (for example a game from Lichess or a tournament), then <b>Analyse the whole game</b>. Pak Kuda shows a graph of who was better through the game and the biggest mistakes on both sides. Press a mistake to see the better move. Nothing is stored on the server.</li>
     <li><b>History</b> (button at the top of the Play page): all your games against Pak Kuda, with wins, losses and draws for each level. Press <b>Analyse</b> on any game to go through it move by move.</li>
     <li><b>Analysis board</b> (button at the top of the Play page, or <b>Open on the analysis board</b> after a game): move the pieces for both sides and Pak Kuda scores the position, shows his 3 best lines and says who is better. Paste a FEN or PGN, and use <b>Copy link</b> to share the position with its moves.</li>
     <li>Want a bigger board? Press <b>Big board</b> (computers) to size the board to the screen height, or <b>Full screen</b> to hide everything else. Press <b>Esc</b> to leave. Handy on a classroom projector.</li>

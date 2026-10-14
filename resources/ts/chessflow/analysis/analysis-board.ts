@@ -6,7 +6,9 @@ import { scrollFade } from '../core/scroll-fade';
 import { analysisEngine, sharedEngine, type StockfishEngine, type Evaluation, type EngineLine } from '../engine/stockfish';
 import { t } from '../i18n';
 import { loadOpenings, openingFor, type OpeningTable } from '../core/openings';
-import { openingHtml, type PatternLessonInfo } from '../game/game';
+import { lessonLinkHtml, openingHtml, type PatternLessonInfo } from '../game/game';
+import type { Mistake } from '../game/analysis';
+import { evalGraphSvg, reviewGame, type GameReview } from './game-review';
 
 export const START_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
 const MAX_LINE_MOVES = 6;
@@ -104,6 +106,10 @@ export class AnalysisRunner {
     private openings: OpeningTable | null = null;
     /** Refreshes the fades on the move list after it changes. */
     private updateFade: () => void = () => {};
+    /** Whole-game review (both sides), its run token, and arrows pinned while a mistake is shown. */
+    private review: GameReview | null = null;
+    private reviewToken = 0;
+    private mistakeArrows: ArrowDrawSpec[] | null = null;
     /** Lessons for opening links (from the page), by slug. */
     private lessons: Record<string, PatternLessonInfo> = {};
     private readonly onKey = (e: KeyboardEvent): void => {
@@ -141,6 +147,7 @@ export class AnalysisRunner {
     }
 
     destroy(): void {
+        this.reviewToken++;
         this.clearTimer();
         if (this.statusTimer) clearTimeout(this.statusTimer);
         document.removeEventListener('keydown', this.onKey);
@@ -159,7 +166,7 @@ export class AnalysisRunner {
 
     private render(): void {
         this.root.innerHTML =
-            '<div class="lesson-bar"><h2>' + t('Analisis papan bebas') + '</h2></div>' +
+            '<div class="lesson-bar"><h2>' + t('Analisis papan bebas') + '</h2><p class="game-info" hidden></p></div>' +
             '<div class="lesson analysis-layout"><div class="board-wrap"><div class="gbw"></div><p class="turn eval-turn"></p></div>' +
             '<div class="panel">' +
             '<div class="analysis-info">' +
@@ -184,10 +191,14 @@ export class AnalysisRunner {
             '<button type="button" class="ghost" data-act="next" aria-label="' + t('Maju satu') + '" title="' + t('Maju satu') + ' (→)">' + ICON_NEXT + '</button>' +
             '<button type="button" class="ghost" data-act="last" aria-label="' + t('Akhir') + '" title="' + t('Akhir') + ' (End)">' + ICON_LAST + '</button>' +
             '</div></div>' +
+            '<section class="full-review" aria-labelledby="fr-h"><div class="fr-head"><h3 id="fr-h">' + t('Analisis penuh') + '</h3>' +
+            '<button class="ghost" type="button" data-act="review" disabled>' + t('Analisis seluruh permainan') + '</button></div>' +
+            '<div class="fr-body" aria-live="polite"><p class="muted">' + t('Pak Kuda nilai setiap langkah dan tunjuk kesilapan terbesar kedua-dua pihak.') + '</p></div></section>' +
             '<div class="analysis-import">' +
             '<label for="fen-pgn">' + t('Muat FEN atau PGN:') + '</label>' +
             '<textarea id="fen-pgn" data-input="fen-pgn" rows="2" placeholder="' + START_FEN + '"></textarea>' +
-            '<button class="ghost" type="button" data-act="load">' + t('Muatkan') + '</button>' +
+            '<div class="import-btns"><button class="ghost" type="button" data-act="load">' + t('Muatkan') + '</button>' +
+            '<label class="ghost file-btn">' + t('Pilih fail .pgn') + '<input type="file" accept=".pgn,.txt,text/plain,application/x-chess-pgn" data-input="pgn-file"></label></div>' +
             '<span class="load-status" aria-live="polite"></span>' +
             '</div>' +
             '<p class="analysis-help">' + t('Gerakkan buah untuk kedua-dua pihak (ketuk atau seret). Tekan satu barisan Pak Kuda untuk main langkah pertamanya.') + '</p>' +
@@ -203,6 +214,18 @@ export class AnalysisRunner {
         this.$('[data-act="next"]').onclick = () => this.goToPly(this.ply + 1);
         this.$('[data-act="last"]').onclick = () => this.goToPly(this.moves.length);
         this.$('[data-act="load"]').onclick = () => this.loadFromInput();
+        this.$('[data-act="review"]').onclick = () => void this.runReview();
+        const file = this.$('[data-input="pgn-file"]') as HTMLInputElement;
+        file.onchange = () => {
+            const f = file.files?.[0];
+            if (!f) return;
+            if (f.size > 2_000_000) return this.setLoadStatus(t('Fail terlalu besar.'));
+            void f.text().then((text) => {
+                (this.$('[data-input="fen-pgn"]') as HTMLTextAreaElement).value = text.slice(0, 20000);
+                this.applyInput(text, true);
+                file.value = '';
+            });
+        };
         this.$('.engine-lines').onclick = (e) => {
             const b = (e.target as HTMLElement).closest<HTMLElement>('[data-line]');
             const line = b && this.currentEval?.lines?.[Number(b.dataset.line)];
@@ -230,6 +253,7 @@ export class AnalysisRunner {
         const last = this.ply > 0 ? this.moves[this.ply - 1] : null;
         const king = this.g.inCheck() ? this.g.findPiece({ type: 'k', color: this.g.turn() })[0] : null;
         this.board.mark({ sel: null, dots: [], last: last ? [sq(last.from), sq(last.to)] : [], check: king ? [sq(king)] : [] });
+        if (this.mistakeArrows) return this.board.arrows(this.mistakeArrows);
         // Knights get an L-shaped arrow, like in the lessons.
         const best = this.currentEval?.best;
         const piece = best ? this.g.get(best.slice(0, 2) as Square) : null;
@@ -287,7 +311,10 @@ export class AnalysisRunner {
             return null;
         }
         const next = this.moves[this.ply];
-        if (!next || next.san !== m.san) this.moves = [...this.moves.slice(0, this.ply), m];
+        if (!next || next.san !== m.san) {
+            this.moves = [...this.moves.slice(0, this.ply), m];
+            this.clearReview();
+        }
         this.ply++;
         this.board.applyMove(m);
         this.afterPositionChange();
@@ -304,6 +331,8 @@ export class AnalysisRunner {
 
     private afterPositionChange(): void {
         this.sel = null;
+        this.mistakeArrows = null;
+        this.drawGraph();
         this.currentEval = this.cache.get(this.g.fen()) ?? null;
         this.drawMarks();
         this.updateInfo();
@@ -464,6 +493,7 @@ export class AnalysisRunner {
         this.clearTimer();
         this.startFen = startFen;
         this.moves = moves;
+        this.clearReview();
         this.g = new Chess(startFen);
         this.board.setFen(this.g.fen());
         this.ply = 0;
@@ -485,9 +515,11 @@ export class AnalysisRunner {
                 next.load(text);
                 this.setGame(next.fen(), [], 0);
             } else {
-                next.loadPgn(text);
+                // A .pgn file can hold many games: take the first.
+                next.loadPgn(text.split(/\r?\n\s*\r?\n(?=\s*\[Event )/)[0]);
                 const moves = next.history({ verbose: true });
                 this.setGame(next.getHeaders().FEN || START_FEN, moves, moves.length);
+                this.showGameInfo(next.getHeaders());
             }
             if (shouldSyncUrl) this.syncUrl();
             this.setLoadStatus(t('Kedudukan dimuatkan.'));
@@ -496,6 +528,107 @@ export class AnalysisRunner {
             this.setLoadStatus(t('FEN atau PGN tidak sah. Semak semula teks tersebut.'));
             return false;
         }
+    }
+
+    /** "Carlsen – Nakamura · Event · 2024 · 1-0" from the PGN headers (unknown "?" values left out). */
+    private showGameInfo(h: Record<string, string>): void {
+        const el = this.$('.game-info');
+        const v = (k: string) => (h[k] && !/^\?/.test(h[k]) ? h[k] : '');
+        const players = v('White') || v('Black') ? (v('White') || '?') + ' – ' + (v('Black') || '?') : '';
+        const parts = [players, v('Event'), v('Date').replace(/\.\?\?/g, ''), h.Result && h.Result !== '*' ? h.Result : ''].filter(Boolean);
+        el.textContent = parts.join(' · ');
+        el.hidden = parts.length === 0;
+    }
+
+    // ---- whole-game review ----
+
+    private clearReview(): void {
+        this.reviewToken++;
+        this.review = null;
+        const body = this.root.querySelector('.fr-body');
+        if (body) body.innerHTML = '<p class="muted">' + t('Pak Kuda nilai setiap langkah dan tunjuk kesilapan terbesar kedua-dua pihak.') + '</p>';
+        const btn = this.root.querySelector<HTMLButtonElement>('[data-act="review"]');
+        if (btn) btn.disabled = this.moves.length < 2;
+    }
+
+    private async runReview(): Promise<void> {
+        const body = this.$('.fr-body');
+        if (!this.engine.available) {
+            body.innerHTML = '<p class="muted">' + t('Analisis perlukan enjin catur, tetapi enjin tidak dapat dimuatkan pada peranti ini.') + '</p>';
+            return;
+        }
+        const token = ++this.reviewToken;
+        const moves = this.moves;
+        (this.$('[data-act="review"]') as HTMLButtonElement).disabled = true;
+        body.innerHTML =
+            '<p class="analysis-note">' + t('Pak Kuda sedang menyemak permainan…') + ' <b class="pct">0%</b></p><div class="meter analysis-meter"><span style="width:0%"></span></div>' +
+            '<button type="button" class="ghost" data-act="cancel-review">' + t('Batal') + '</button>';
+        (body.querySelector('[data-act="cancel-review"]') as HTMLElement).onclick = () => this.clearReview();
+        // Deeper than the post-game review: combinations (e.g. a sacrifice before mate) need it to be judged right.
+        const r = await reviewGame(
+            moves,
+            (fen) => this.engine.analyse({ fen, depth: 16, timeoutMs: 6000 }),
+            (done) => {
+                if (token !== this.reviewToken) return;
+                const v = Math.round(done * 100) + '%';
+                (body.querySelector('.analysis-meter span') as HTMLElement | null)?.style.setProperty('width', v);
+                const pct = body.querySelector('.pct');
+                if (pct) pct.textContent = v;
+            },
+            () => token !== this.reviewToken,
+        );
+        if (!r || token !== this.reviewToken) return;
+        this.review = r;
+        (this.$('[data-act="review"]') as HTMLButtonElement).disabled = false;
+        this.renderReview();
+    }
+
+    private renderReview(): void {
+        const r = this.review;
+        if (!r) return;
+        const side = (c: 'w' | 'b', list: Mistake[]) =>
+            '<div class="fr-side"><h4>' + (c === 'w' ? t('Putih') : t('Hitam')) + '</h4>' +
+            (list.length
+                ? '<ol>' + list.map((m) =>
+                      '<li><button type="button" class="fr-mistake" data-ply="' + m.ply + '" data-side="' + c + '"><b>' + (m.ply % 2 === 0 ? m.moveNo + '. ' : m.moveNo + '… ') + m.san + '</b> ' +
+                      '<span class="tag ' + m.severity + '">' + (m.severity === 'besar' ? t('Kesilapan besar') : t('Silap kecil')) + '</span><span>' + m.text + '</span></button>' +
+                      lessonLinkHtml(m.lesson, this.lessons) + '</li>').join('') + '</ol>'
+                : '<p class="muted">' + t('Tiada kesilapan besar.') + '</p>') +
+            '</div>';
+        this.$('.fr-body').innerHTML =
+            '<div class="fr-graph" title="' + t('Tekan graf untuk pergi ke langkah itu') + '"></div>' +
+            '<p class="fr-legend muted">' + t('Atas: Putih lebih baik. Bawah: Hitam lebih baik. Titik merah: kesilapan.') + '</p>' +
+            '<div class="fr-sides">' + side('w', r.mistakes.w) + side('b', r.mistakes.b) + '</div>';
+        this.drawGraph();
+        const graph = this.$('.fr-graph');
+        graph.onclick = (e) => {
+            const box = graph.getBoundingClientRect();
+            this.goToPly(Math.round(((e.clientX - box.left) / box.width) * this.moves.length));
+        };
+        this.root.querySelectorAll<HTMLElement>('.fr-mistake').forEach((b) => {
+            b.onclick = () => {
+                const list = r.mistakes[b.dataset.side as 'w' | 'b'];
+                const m = list.find((x) => x.ply === Number(b.dataset.ply));
+                if (m) this.showMistake(m);
+            };
+        });
+    }
+
+    /** The position before the mistake, with the move played (red) and the better one (green). */
+    private showMistake(m: Mistake): void {
+        this.goToPly(m.ply);
+        const piece = this.g.get(m.from as Square);
+        const arrows: ArrowDrawSpec[] = [{ ...pathFor(piece?.type.toUpperCase() ?? '', sq(m.from), sq(m.to)), kind: 'coral' }];
+        if (m.best) arrows.push(pathFor(this.g.get(m.best.from as Square)?.type.toUpperCase() ?? '', sq(m.best.from), sq(m.best.to)));
+        this.mistakeArrows = arrows;
+        this.drawMarks();
+    }
+
+    private drawGraph(): void {
+        const el = this.root.querySelector('.fr-graph');
+        if (!el || !this.review) return;
+        const plies = [...this.review.mistakes.w, ...this.review.mistakes.b].map((m) => m.ply);
+        el.innerHTML = evalGraphSvg(this.review.scores, this.ply, plies);
     }
 
     private loadFromUrl(fen: string, moves: string, ply?: string): boolean {

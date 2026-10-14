@@ -371,3 +371,32 @@ details.tahap:not([open]) > summary.tahap-head{border-bottom-style:solid}
 .play-table :is(td,th).left{text-align:left;max-width:240px;overflow:hidden;text-overflow:ellipsis}
 .play-table .w{color:var(--good);font-weight:700}
 .play-table .l{color:var(--coral);font-weight:700}
+
+/* Analysis board: game info, PGN file, whole-game review */
+.game-info{margin:0;color:var(--muted);font-size:14px;flex-basis:100%}
+.import-btns{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.file-btn{position:relative;overflow:hidden;cursor:pointer;display:inline-flex;align-items:center}
+.file-btn input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.file-btn:focus-within{outline:3px solid var(--sun);outline-offset:2px}
+.full-review{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.fr-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.fr-head h3{font-size:18px}
+.fr-body .muted,.fr-legend{margin:0;font-size:13px;color:var(--muted)}
+.fr-graph{cursor:pointer;border-radius:10px;overflow:hidden;border:1px solid var(--line)}
+.eval-graph{display:block;width:100%;height:90px}
+.eg-black{fill:#2B3440}
+.eg-white{fill:#F4F1E8}
+.eg-mid{stroke:var(--muted);stroke-width:1;stroke-dasharray:4 4;opacity:.6}
+.eg-now{stroke:var(--accent);stroke-width:3}
+.eg-mistake{fill:var(--coral);stroke:#fff;stroke-width:1.5}
+.fr-sides{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:560px){.fr-sides{grid-template-columns:1fr}}
+.fr-side h4{margin:0 0 6px;font-family:var(--display);font-size:16px}
+.fr-side ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.fr-mistake{width:100%;text-align:left;display:flex;flex-direction:column;gap:3px;background:var(--bg);border:2px solid var(--line);border-radius:12px;padding:8px 10px;font-size:13px}
+.fr-mistake:hover{border-color:var(--accent)}
+.fr-mistake b{font-family:ui-monospace,monospace;font-size:14px}
+.fr-mistake .tag{align-self:flex-start;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;border-radius:99px;padding:2px 7px}
+.fr-mistake .tag.besar{background:var(--coral-soft);color:var(--coral)}
+.fr-mistake .tag.kecil{background:var(--sun-soft);color:color-mix(in srgb,var(--sun) 60%,var(--ink))}
+.fr-side .mistake-lesson{margin-left:4px}

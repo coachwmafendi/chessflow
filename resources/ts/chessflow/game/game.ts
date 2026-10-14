@@ -96,6 +96,16 @@ export function openingHtml(o: Opening, lessons: Record<string, PatternLessonInf
     );
 }
 
+/** "Belajar: Fork Kuda →" for a mistake's pattern lesson, or where it is taught when that lesson is still locked. */
+export function lessonLinkHtml(slug: string | null, lessons: Record<string, PatternLessonInfo>): string {
+    const l = slug ? lessons[slug] : undefined;
+    if (!slug || !l) return '';
+    const title = esc(l.title);
+    return l.open
+        ? '<a class="mistake-lesson" href="/pelajaran/' + encodeURIComponent(slug) + '">' + t('Belajar: :lesson →', { lesson: title }) + '</a>'
+        : '<span class="mistake-lesson locked">' + t('Corak ini diajar dalam :lesson (Tahap :n).', { lesson: title, n: l.level }) + '</span>';
+}
+
 /** Full game against Pak Kuda (prototype openGame), reporting the finished game to the server. */
 export class GameRunner {
     private readonly root: HTMLElement;
@@ -179,12 +189,7 @@ export class GameRunner {
     /** Server reply to a reported game (Livewire `game-result`). */
     /** "Belajar: Fork Kuda →" under a mistake, or the level where it is taught if that lesson is still locked. */
     private lessonLink(slug: string | null): string {
-        const l = slug ? this.lessons[slug] : undefined;
-        if (!slug || !l) return '';
-        const title = l.title.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c] as string);
-        return l.open
-            ? '<a class="mistake-lesson" href="/pelajaran/' + encodeURIComponent(slug) + '">' + t('Belajar: :lesson →', { lesson: title }) + '</a>'
-            : '<span class="mistake-lesson locked">' + t('Corak ini diajar dalam :lesson (Tahap :n).', { lesson: title, n: l.level }) + '</span>';
+        return lessonLinkHtml(slug, this.lessons);
     }
 
     /** Mistakes go to "Latih semula" once the server has told us which game they belong to. */

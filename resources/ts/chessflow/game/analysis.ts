@@ -61,14 +61,24 @@ const name = (p: string | undefined) => (p ? PNAME[p.toUpperCase()] : '');
 const VALUE: Record<string, number> = { p: 1, n: 3, b: 3, r: 5, q: 9, k: 0 };
 
 /** One sentence on what went wrong, from the engine's best move before and best reply after. */
-export function explain(san: string, before: Evaluation, after: Evaluation, best: Move | null, reply: Move | null, loss: number): string {
+/** Who the other side is: Pak Kuda in a game on the Play page, "lawan" (the opponent) for any other game. */
+export type Opponent = 'pakkuda' | 'lawan';
+
+export function explain(san: string, before: Evaluation, after: Evaluation, best: Move | null, reply: Move | null, loss: number, opponent: Opponent = 'pakkuda'): string {
+    const pk = opponent === 'pakkuda';
     if (after.mate !== null && after.mate > 0 && reply) {
         return after.mate > 1
-            ? t('Langkah ini beri Pak Kuda peluang sah mati dalam :n langkah, bermula dengan :san.', { n: after.mate, san: reply.san })
-            : t('Langkah ini beri Pak Kuda peluang sah mati, bermula dengan :san.', { san: reply.san });
+            ? pk
+                ? t('Langkah ini beri Pak Kuda peluang sah mati dalam :n langkah, bermula dengan :san.', { n: after.mate, san: reply.san })
+                : t('Langkah ini beri lawan peluang sah mati dalam :n langkah, bermula dengan :san.', { n: after.mate, san: reply.san })
+            : pk
+              ? t('Langkah ini beri Pak Kuda peluang sah mati, bermula dengan :san.', { san: reply.san })
+              : t('Langkah ini beri lawan peluang sah mati, bermula dengan :san.', { san: reply.san });
     }
     if (reply?.captured && reply.captured !== 'p') {
-        return t('Selepas :move, Pak Kuda boleh makan :piece awak dengan :san.', { move: san, piece: name(reply.captured), san: reply.san });
+        return pk
+            ? t('Selepas :move, Pak Kuda boleh makan :piece awak dengan :san.', { move: san, piece: name(reply.captured), san: reply.san })
+            : t('Selepas :move, lawan boleh makan :piece dengan :san.', { move: san, piece: name(reply.captured), san: reply.san });
     }
     if (before.mate !== null && before.mate > 0 && best) {
         return before.mate > 1
@@ -80,7 +90,9 @@ export function explain(san: string, before: Evaluation, after: Evaluation, best
         return t('Awak terlepas peluang makan :piece dengan :san.', { piece: name(best.captured), san: best.san });
     }
     if (reply?.captured) {
-        return t('Selepas :move, Pak Kuda boleh makan bidak awak dengan :san.', { move: san, san: reply.san });
+        return pk
+            ? t('Selepas :move, Pak Kuda boleh makan bidak awak dengan :san.', { move: san, san: reply.san })
+            : t('Selepas :move, lawan boleh makan bidak dengan :san.', { move: san, san: reply.san });
     }
     return best ? t('Langkah yang lebih kuat ialah :san.', { san: best.san }) : t('Langkah ini melemahkan kedudukan awak.');
 }
@@ -95,6 +107,7 @@ export async function analyseGame(
     evaluate: Evaluate,
     onProgress: (done: number) => void = () => {},
     stop: () => boolean = () => false,
+    opponent: Opponent = 'pakkuda',
 ): Promise<Mistake[] | null> {
     const list = moves.slice(0, MAX_PLIES);
     const fens = [...list.map((m) => m.before), list.length ? list[list.length - 1].after : ''];
@@ -152,7 +165,7 @@ export async function analyseGame(
             lesson: lessonForMistake({ played: m, best, reply, mateBefore: evB.mate, mateAfter: evA.mate }),
             loss,
             severity: loss >= BIG_CP ? 'besar' : 'kecil',
-            text: explain(m.san, evB, evA, best, reply, loss),
+            text: explain(m.san, evB, evA, best, reply, loss, opponent),
         });
     });
 

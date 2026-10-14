@@ -189,5 +189,17 @@
     "Belajar: :lesson →": "Learn: :lesson →",
     "Corak ini diajar dalam :lesson (Tahap :n).": "This idea is taught in :lesson (Level :n).",
     "Diajar dalam :lesson": "Taught in :lesson",
-    "Pelajaran →": "Lesson →"
+    "Pelajaran →": "Lesson →",
+    "Analisis penuh": "Full analysis",
+    "Analisis seluruh permainan": "Analyse the whole game",
+    "Pak Kuda nilai setiap langkah dan tunjuk kesilapan terbesar kedua-dua pihak.": "Pak Kuda scores every move and shows the biggest mistakes on both sides.",
+    "Pilih fail .pgn": "Choose a .pgn file",
+    "Fail terlalu besar.": "The file is too big.",
+    "Tiada kesilapan besar.": "No big mistakes.",
+    "Tekan graf untuk pergi ke langkah itu": "Press the graph to go to that move",
+    "Atas: Putih lebih baik. Bawah: Hitam lebih baik. Titik merah: kesilapan.": "Up: White is better. Down: Black is better. Red dots: mistakes.",
+    "Langkah ini beri lawan peluang sah mati dalam :n langkah, bermula dengan :san.": "This move gave the opponent a mate in :n, starting with :san.",
+    "Langkah ini beri lawan peluang sah mati, bermula dengan :san.": "This move gave the opponent a mate, starting with :san.",
+    "Selepas :move, lawan boleh makan :piece dengan :san.": "After :move, the opponent can take the :piece with :san.",
+    "Selepas :move, lawan boleh makan bidak dengan :san.": "After :move, the opponent can take a pawn with :san."
 }
