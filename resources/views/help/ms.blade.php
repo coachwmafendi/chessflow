@@ -57,6 +57,7 @@
 <h2 id="main">3. Main lawan Pak Kuda</h2>
 <ul>
     <li>Tekan <b>Main</b> di atas. Pilih warna (Putih, Hitam atau Rawak) dan tahap (Mudah, Sederhana atau Sukar), kemudian <b>Permainan baru</b>.</li>
+    <li>Nama <b>pembukaan</b> (contohnya Italian Game, C50) muncul di sebelah senarai langkah semasa bermain dan di papan analisis, dan disimpan dalam Sejarah. Jika pembukaan itu diajar dalam pelajaran, tekan <b>Pelajaran →</b>.</li>
     <li><b>Sejarah</b> (butang di atas halaman Main): semua permainan awak lawan Pak Kuda, dengan rekod menang, kalah dan seri bagi setiap tahap. Tekan <b>Analisis</b> pada mana-mana permainan untuk menyemaknya langkah demi langkah.</li>
     <li><b>Papan analisis</b> (butang di atas halaman Main, atau <b>Buka di papan analisis</b> selepas permainan): gerakkan buah untuk kedua-dua pihak dan Pak Kuda nilai kedudukan, tunjuk 3 barisan terbaik dan bertulis siapa lebih baik. Boleh tampal FEN atau PGN, dan <b>Salin pautan</b> untuk kongsi kedudukan berserta langkah.</li>
     <li>Nak papan lebih besar? Tekan <b>Papan besar</b> (komputer) untuk papan ikut tinggi skrin, atau <b>Skrin penuh</b> untuk sorok semua yang lain. Tekan <b>Esc</b> untuk keluar. Sesuai untuk projektor di kelas.</li>

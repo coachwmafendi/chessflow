@@ -13,6 +13,9 @@ class PatternLessons
 {
     public const SLUGS = ['sah', 'mate2', 'scholar', 'fork', 'pin', 'terbuka', 'cct'];
 
+    /** Tahap 2 lessons that teach named openings (core/openings.ts lessonForOpening). */
+    public const OPENING_SLUGS = ['putih', 'hitam', 'gambit'];
+
     /**
      * @return array<string, array{title: string, level: int, open: bool}>
      */
@@ -21,7 +24,7 @@ class PatternLessons
         $curriculum = app(Curriculum::class);
         $completed = $curriculum->completedIds($user);
 
-        return Lesson::with('level')->whereIn('slug', self::SLUGS)->where('is_published', true)->get()
+        return Lesson::with('level')->whereIn('slug', [...self::SLUGS, ...self::OPENING_SLUGS])->where('is_published', true)->get()
             ->mapWithKeys(fn (Lesson $l) => [$l->slug => [
                 'title' => (string) $l->title,
                 'level' => $l->level->number,

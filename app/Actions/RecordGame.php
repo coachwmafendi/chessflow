@@ -16,15 +16,16 @@ class RecordGame
      * Games are played in the browser, so the result is trusted as reported; XP for wins is
      * capped per day to limit what a forged request can earn.
      *
+     * @param  array{eco: string, name: string}|null  $opening  already checked with Openings::check()
      * @return array{xp: int, wins: int, game: int}
      */
-    public function handle(User $user, string $userColor, int $level, GameResult $result, string $pgn, int $moveCount): array
+    public function handle(User $user, string $userColor, int $level, GameResult $result, string $pgn, int $moveCount, ?array $opening = null): array
     {
         /** @var list<int> $levelXp */
         $levelXp = config('chessflow.game.xp');
         $level = max(0, min(count($levelXp) - 1, $level));
 
-        return DB::transaction(function () use ($user, $userColor, $level, $result, $pgn, $moveCount, $levelXp) {
+        return DB::transaction(function () use ($user, $userColor, $level, $result, $pgn, $moveCount, $levelXp, $opening) {
             $game = Game::create([
                 'user_id' => $user->id,
                 'user_color' => $userColor === 'b' ? 'b' : 'w',
@@ -32,6 +33,8 @@ class RecordGame
                 'result' => $result,
                 'pgn' => mb_substr($pgn, 0, 20000),
                 'move_count' => max(0, min($moveCount, 2000)),
+                'opening' => $opening['name'] ?? null,
+                'eco' => $opening['eco'] ?? null,
                 'finished_at' => now(),
             ]);
 

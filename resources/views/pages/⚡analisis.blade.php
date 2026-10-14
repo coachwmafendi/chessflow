@@ -10,7 +10,7 @@ new #[Layout('layouts::chessflow')] #[Title('Analisis papan bebas')] class exten
 
 <div>
     <p class="no-print" style="margin-block: 8px 0"><a class="ghost" href="{{ route('main') }}">{{ __('← Main') }}</a></p>
-    <div wire:ignore data-chessflow="analysis"
+    <div wire:ignore data-chessflow="analysis" data-lessons="{{ json_encode(\App\Support\PatternLessons::for(auth()->user())) }}"
         data-fen="{{ request()->string('fen')->limit(100, '') }}"
         data-moves="{{ request()->string('moves')->limit(4000, '') }}"
         data-ply="{{ request()->string('ply')->limit(4, '') }}"></div>

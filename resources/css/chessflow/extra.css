@@ -338,3 +338,15 @@ details.tahap:not([open]) > summary.tahap-head{border-bottom-style:solid}
 [data-chessflow="game"] .hint-ico{color:var(--sun)}
 .mistake-lesson{display:inline-block;margin:4px 0 0 12px;font-size:14px;font-weight:600;color:var(--accent)}
 .mistake-lesson.locked{color:var(--muted);font-weight:500}
+
+/* Opening name next to the move list (/main, /analisis) and in the game history */
+.moves-head{display:flex;align-items:baseline;gap:10px;min-width:0;min-height:1.5em}
+.moves-head small{flex:none}
+.opening{min-width:0;font-size:13px;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.opening-name{font-weight:600}
+.opening-eco{color:var(--muted);font-variant-numeric:tabular-nums;font-size:12px}
+.opening-lesson{color:var(--accent);font-weight:600;margin-left:4px;white-space:nowrap}
+.opening{display:flex;align-items:baseline;gap:4px}
+.opening-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.opening-eco,.opening-lesson{flex:none}
+.history-opening-name{font-weight:600;color:var(--ink)}

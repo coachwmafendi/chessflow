@@ -71,3 +71,19 @@ it('invites a player with no games to play', function () {
         ->assertOk()
         ->assertSee(__('Belum ada permainan. Main lawan Pak Kuda, dan setiap permainan akan disimpan di sini.'));
 });
+
+it('stores a known opening with the game and shows it in the history', function () {
+    $user = User::factory()->student()->create();
+    $pgn = "[Event \"?\"]\n\n1. e4 e5 2. Nf3 Nc6 3. Bc4 *";
+
+    Livewire::actingAs($user)->test('pages::main')
+        ->dispatch('game-finished', userColor: 'w', level: 0, result: 'loss', pgn: $pgn, moveCount: 5, opening: ['eco' => 'C50', 'name' => 'Italian Game']);
+    expect(Game::sole())->opening->toBe('Italian Game')->eco->toBe('C50');
+
+    // a name that is not in the table is not stored
+    Livewire::actingAs($user)->test('pages::main')
+        ->dispatch('game-finished', userColor: 'w', level: 0, result: 'loss', pgn: $pgn, moveCount: 5, opening: ['eco' => 'C50', 'name' => '<script>Fake</script>']);
+    expect(Game::latest('id')->first()->opening)->toBeNull();
+
+    Livewire::actingAs($user)->test('pages::sejarah')->assertSee('Italian Game')->assertSee('C50');
+});

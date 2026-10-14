@@ -4,6 +4,8 @@ import { createBoard } from '../core/board';
 import { nm, pathFor, sq } from '../core/squares';
 import { analysisEngine, sharedEngine, type StockfishEngine, type Evaluation, type EngineLine } from '../engine/stockfish';
 import { t } from '../i18n';
+import { loadOpenings, openingFor, type OpeningTable } from '../core/openings';
+import { openingHtml, type PatternLessonInfo } from '../game/game';
 
 export const START_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
 const MAX_LINE_MOVES = 6;
@@ -98,6 +100,9 @@ export class AnalysisRunner {
     private currentEval: Evaluation | null = null;
     /** Evaluations by FEN, so stepping back and forth through a game shows them at once. */
     private readonly cache = new Map<string, Evaluation>();
+    private openings: OpeningTable | null = null;
+    /** Lessons for opening links (from the page), by slug. */
+    private lessons: Record<string, PatternLessonInfo> = {};
     private readonly onKey = (e: KeyboardEvent): void => {
         if (e.metaKey || e.ctrlKey || e.altKey || e.defaultPrevented) return;
         const el = e.target instanceof HTMLElement ? e.target : null;
@@ -116,6 +121,15 @@ export class AnalysisRunner {
 
         // Shared links: ?fen=<start position>&moves=e4 e5 Nf3&ply=2 (all optional).
         const d = this.root.dataset;
+        try {
+            this.lessons = JSON.parse(d.lessons || '{}') as Record<string, PatternLessonInfo>;
+        } catch {
+            this.lessons = {};
+        }
+        void loadOpenings().then((tbl) => {
+            this.openings = tbl;
+            this.showOpening();
+        });
         if (!this.loadFromUrl(d.fen?.trim() || '', d.moves?.trim() || '', d.ply)) {
             this.updateInfo();
             this.debouncedAnalyse();
@@ -159,7 +173,7 @@ export class AnalysisRunner {
             '<button class="ghost" type="button" data-act="copy">' + t('Salin pautan') + '</button>' +
             '<button class="cta" type="button" data-act="best">' + t('Main langkah terbaik') + '</button>' +
             '</div>' +
-            '<div class="analysis-moves"><small>' + t('Langkah') + '</small><ol data-empty="' + t('Belum ada langkah.') + '"></ol>' +
+            '<div class="analysis-moves"><div class="moves-head"><small>' + t('Langkah') + '</small><span class="opening" aria-live="polite"></span></div><ol data-empty="' + t('Belum ada langkah.') + '"></ol>' +
             '<div class="nav-btns">' +
             '<button type="button" class="ghost" data-act="first" aria-label="' + t('Mula') + '" title="' + t('Mula') + ' (Home)">' + ICON_FIRST + '</button>' +
             '<button type="button" class="ghost" data-act="prev" aria-label="' + t('Undur satu') + '" title="' + t('Undur satu') + ' (←)">' + ICON_PREV + '</button>' +
@@ -398,7 +412,17 @@ export class AnalysisRunner {
             '</ol>';
     }
 
+    /** The most specific named opening reached up to the current move. */
+    private showOpening(): void {
+        const el = this.root.querySelector('.opening');
+        if (!el) return;
+        const o = this.openings ? openingFor(this.openings, [this.startFen, ...this.moves.slice(0, this.ply).map((m) => m.after)]) : null;
+        el.innerHTML = o ? openingHtml(o, this.lessons) : '';
+        el.setAttribute('title', o ? o.name + ' (' + o.eco + ')' : '');
+    }
+
     private renderMoves(): void {
+        this.showOpening();
         const ol = this.$('.analysis-moves ol');
         const firstNo = Number(this.startFen.split(' ')[5]) || 1;
         const blackFirst = this.startFen.split(' ')[1] === 'b';

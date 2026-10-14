@@ -131,6 +131,9 @@ new #[Layout('layouts::chessflow')] #[Title('Sejarah permainan')] class extends 
                         </p>
                         <p class="history-meta">
                             <time datetime="{{ $game->finished_at->toIso8601String() }}">{{ $game->finished_at->setTimezone($tz)->locale(app()->getLocale())->translatedFormat('j M Y, g:i A') }}</time>
+                            @if ($game->opening)
+                                · <span class="history-opening-name" lang="en">{{ $game->opening }}</span> <span class="opening-eco">{{ $game->eco }}</span>
+                            @endif
                             @if ($opening = \App\Support\PgnMoves::opening($game->pgn))
                                 · <span class="history-opening">{{ $opening }}</span>
                             @endif

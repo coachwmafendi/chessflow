@@ -12,7 +12,7 @@ use Livewire\Component;
 
 new #[Layout('layouts::chessflow')] #[Title('Main lawan Pak Kuda')] class extends Component {
     #[On('game-finished')]
-    public function finish(string $userColor = 'w', int $level = 0, string $result = '', string $pgn = '', int $moveCount = 0): void
+    public function finish(string $userColor = 'w', int $level = 0, string $result = '', string $pgn = '', int $moveCount = 0, mixed $opening = null): void
     {
         $gameResult = GameResult::tryFrom($result);
         if (! $gameResult) {
@@ -24,7 +24,7 @@ new #[Layout('layouts::chessflow')] #[Title('Main lawan Pak Kuda')] class extend
             return;
         }
 
-        $r = app(RecordGame::class)->handle($user, $userColor, $level, $gameResult, $pgn, $moveCount);
+        $r = app(RecordGame::class)->handle($user, $userColor, $level, $gameResult, $pgn, $moveCount, \App\Support\Openings::check($opening));
 
         $this->dispatch('game-result', xp: $r['xp'], wins: $r['wins'], gameId: $r['game'], totalXp: $user->fresh()->xp, badges: app(AwardBadges::class)->handle($user->fresh()));
     }

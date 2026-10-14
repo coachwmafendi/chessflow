@@ -57,6 +57,7 @@
 <h2 id="main">3. Playing Pak Kuda</h2>
 <ul>
     <li>Press <b>Play</b> at the top. Choose a colour (White, Black or Random) and a level (Easy, Medium or Hard), then <b>New game</b>.</li>
+    <li>The <b>opening</b> name (for example Italian Game, C50) appears next to the move list while you play and on the analysis board, and is saved in History. If a lesson teaches that opening, press <b>Lesson →</b>.</li>
     <li><b>History</b> (button at the top of the Play page): all your games against Pak Kuda, with wins, losses and draws for each level. Press <b>Analyse</b> on any game to go through it move by move.</li>
     <li><b>Analysis board</b> (button at the top of the Play page, or <b>Open on the analysis board</b> after a game): move the pieces for both sides and Pak Kuda scores the position, shows his 3 best lines and says who is better. Paste a FEN or PGN, and use <b>Copy link</b> to share the position with its moves.</li>
     <li>Want a bigger board? Press <b>Big board</b> (computers) to size the board to the screen height, or <b>Full screen</b> to hide everything else. Press <b>Esc</b> to leave. Handy on a classroom projector.</li>

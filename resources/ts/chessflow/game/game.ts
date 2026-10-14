@@ -10,6 +10,7 @@ import { judgeDrawOffer } from './draw';
 import { analyseGame, type Mistake } from './analysis';
 import { newBadgesHtml, type NewBadge } from '../core/badges';
 import { t } from '../i18n';
+import { lessonForOpening, loadOpenings, openingFor, type Opening, type OpeningTable } from '../core/openings';
 
 export type GameOutcome = 'win' | 'loss' | 'draw' | 'resign';
 
@@ -19,6 +20,8 @@ export interface GameReport {
     result: GameOutcome;
     pgn: string;
     moveCount: number;
+    /** Opening reached, e.g. { eco: 'C50', name: 'Italian Game' } (checked against the same table on the server). */
+    opening: Opening | null;
 }
 
 export interface PatternLessonInfo {
@@ -77,6 +80,21 @@ function loadPref(): { color: ColorChoice; level: number } {
     }
 }
 
+const esc = (s: string): string => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c] as string);
+
+/** Opening name, ECO code and, when the syllabus teaches it and the player can open it, a link to that lesson. */
+export function openingHtml(o: Opening, lessons: Record<string, PatternLessonInfo>): string {
+    const slug = lessonForOpening(o.name);
+    const l = slug ? lessons[slug] : undefined;
+    return (
+        '<span class="opening-name" lang="en">' + esc(o.name) + '</span> <span class="opening-eco">' + esc(o.eco) + '</span>' +
+        // Short label so the line never wraps; the full "Taught in …" is the tooltip and accessible name.
+        (slug && l?.open
+            ? ' <a class="opening-lesson" href="/pelajaran/' + slug + '" title="' + t('Diajar dalam :lesson', { lesson: esc(l.title) }) + '" aria-label="' + t('Diajar dalam :lesson', { lesson: esc(l.title) }) + '">' + t('Pelajaran →') + '</a>'
+            : '')
+    );
+}
+
 /** Full game against Pak Kuda (prototype openGame), reporting the finished game to the server. */
 export class GameRunner {
     private readonly root: HTMLElement;
@@ -99,6 +117,8 @@ export class GameRunner {
     private serverGameId: number | null = null;
     /** Lessons a mistake can point to (from the page), by slug. */
     private lessons: Record<string, PatternLessonInfo> = {};
+    private openings: OpeningTable | null = null;
+    private opening: Opening | null = null;
     private pendingMistakes: Mistake[] | null = null;
     /** Ply count when Pak Kuda last refused a draw offer. */
     private drawRefusedAt: number | null = null;
@@ -126,6 +146,20 @@ export class GameRunner {
         this.level = pref.level;
         this.render();
         this.start();
+        void loadOpenings().then((tbl) => {
+            this.openings = tbl;
+            this.showOpening();
+        });
+    }
+
+    /** "Italian Game (C50)" next to the move list, with the lesson that teaches it when there is one. */
+    private showOpening(): void {
+        const el = this.root.querySelector('.opening');
+        if (!el) return;
+        const h = this.g.history({ verbose: true });
+        this.opening = this.openings ? openingFor(this.openings, h.map((m) => m.after)) : null;
+        el.innerHTML = this.opening ? openingHtml(this.opening, this.lessons) : '';
+        el.setAttribute('title', this.opening ? this.opening.name + ' (' + this.opening.eco + ')' : '');
     }
 
     destroy(): void {
@@ -213,7 +247,7 @@ export class GameRunner {
             '</div><button class="cta" type="button" data-act="new">' + t('Permainan baru') + '</button></div>' +
             '<div class="status" role="status" aria-live="polite"></div>' +
             '<div class="actions"><button class="ghost" type="button" data-act="undo">' + ICON_UNDO + t('Undur') + '</button><button class="ghost" type="button" data-act="hint">' + ICON_HINT + t('Petunjuk') + '</button><span class="spacer"></span><span class="actions-end"><button class="ghost" type="button" data-act="draw">' + ICON_DRAW + t('Minta seri') + '</button><button class="ghost" type="button" data-act="resign">' + ICON_RESIGN + t('Mengaku kalah') + '</button></span></div>' +
-            '<div class="moves"><small>' + t('Langkah') + '</small><ol data-empty="' + t('Belum ada langkah.') + '"></ol>' +
+            '<div class="moves"><div class="moves-head"><small>' + t('Langkah') + '</small><span class="opening" aria-live="polite"></span></div><ol data-empty="' + t('Belum ada langkah.') + '"></ol>' +
             '<p class="notation-key">' +
             t('K Raja · Q Menteri · R Tir · B Gajah · N Kuda · x makan · + sah · # sah mati') +
             ' · <a href="/istilah">' +
@@ -302,6 +336,7 @@ export class GameRunner {
         const ol = this.$('.moves ol');
         ol.innerHTML = out;
         ol.scrollTop = ol.scrollHeight;
+        this.showOpening();
         this.$('.turn').textContent = this.over ? '' : this.g.turn() === this.user ? t('Giliran awak') : t('Pak Kuda sedang berfikir…');
     }
 
@@ -348,6 +383,7 @@ export class GameRunner {
             result,
             pgn: this.g.pgn(),
             moveCount: this.g.history().length,
+            opening: this.opening,
         });
     }
 

@@ -15,10 +15,12 @@ use Illuminate\Support\Carbon;
  * @property int $level
  * @property GameResult $result
  * @property string $pgn
+ * @property string|null $opening
+ * @property string|null $eco
  * @property int $move_count
  * @property Carbon $finished_at
  */
-#[Fillable(['user_id', 'user_color', 'level', 'result', 'pgn', 'move_count', 'finished_at'])]
+#[Fillable(['user_id', 'user_color', 'level', 'result', 'pgn', 'opening', 'eco', 'move_count', 'finished_at'])]
 class Game extends Model
 {
     public $timestamps = false;
