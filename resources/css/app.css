@@ -105,3 +105,32 @@ select:focus[data-flux-control] {
     font-weight: 700;
     letter-spacing: -0.005em;
 }
+
+/* Flux tooltip: add a small arrow pointing toward the trigger. */
+.flux-tooltip-arrow {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background: inherit;
+    pointer-events: none;
+}
+[data-flux-tooltip][position^="top"] .flux-tooltip-arrow {
+    bottom: -6px;
+    left: calc(50% - 6px);
+    clip-path: polygon(50% 100%, 0 0, 100% 0);
+}
+[data-flux-tooltip][position^="bottom"] .flux-tooltip-arrow {
+    top: -6px;
+    left: calc(50% - 6px);
+    clip-path: polygon(0 100%, 50% 0, 100% 100%);
+}
+[data-flux-tooltip][position^="left"] .flux-tooltip-arrow {
+    right: -6px;
+    top: calc(50% - 6px);
+    clip-path: polygon(0 0, 0 100%, 100% 50%);
+}
+[data-flux-tooltip][position^="right"] .flux-tooltip-arrow {
+    left: -6px;
+    top: calc(50% - 6px);
+    clip-path: polygon(100% 0, 100% 100%, 0 50%);
+}
