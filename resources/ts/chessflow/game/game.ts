@@ -4,6 +4,7 @@ import { createBoard } from '../core/board';
 import { nm, sq } from '../core/squares';
 import { SFX } from '../core/sound';
 import { confetti } from '../core/confetti';
+import { scrollFade } from '../core/scroll-fade';
 import { bot } from '../engine/simple-bot';
 import { sharedEngine, type StockfishEngine } from '../engine/stockfish';
 import { judgeDrawOffer } from './draw';
@@ -118,6 +119,8 @@ export class GameRunner {
     /** Lessons a mistake can point to (from the page), by slug. */
     private lessons: Record<string, PatternLessonInfo> = {};
     private openings: OpeningTable | null = null;
+    /** Refreshes the fades on the move list after it changes. */
+    private updateFade: () => void = () => {};
     private opening: Opening | null = null;
     private pendingMistakes: Mistake[] | null = null;
     /** Ply count when Pak Kuda last refused a draw offer. */
@@ -145,6 +148,7 @@ export class GameRunner {
         this.color = pref.color;
         this.level = pref.level;
         this.render();
+        this.updateFade = scrollFade(this.$('.moves ol'));
         this.start();
         void loadOpenings().then((tbl) => {
             this.openings = tbl;
@@ -336,6 +340,7 @@ export class GameRunner {
         const ol = this.$('.moves ol');
         ol.innerHTML = out;
         ol.scrollTop = ol.scrollHeight;
+        this.updateFade();
         this.showOpening();
         this.$('.turn').textContent = this.over ? '' : this.g.turn() === this.user ? t('Giliran awak') : t('Pak Kuda sedang berfikir…');
     }

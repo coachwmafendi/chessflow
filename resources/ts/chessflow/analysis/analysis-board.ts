@@ -2,6 +2,7 @@ import { Chess, type Move, type Square } from 'chess.js';
 import type { ArrowDrawSpec, BoardApi } from '../types';
 import { createBoard } from '../core/board';
 import { nm, pathFor, sq } from '../core/squares';
+import { scrollFade } from '../core/scroll-fade';
 import { analysisEngine, sharedEngine, type StockfishEngine, type Evaluation, type EngineLine } from '../engine/stockfish';
 import { t } from '../i18n';
 import { loadOpenings, openingFor, type OpeningTable } from '../core/openings';
@@ -101,6 +102,8 @@ export class AnalysisRunner {
     /** Evaluations by FEN, so stepping back and forth through a game shows them at once. */
     private readonly cache = new Map<string, Evaluation>();
     private openings: OpeningTable | null = null;
+    /** Refreshes the fades on the move list after it changes. */
+    private updateFade: () => void = () => {};
     /** Lessons for opening links (from the page), by slug. */
     private lessons: Record<string, PatternLessonInfo> = {};
     private readonly onKey = (e: KeyboardEvent): void => {
@@ -117,6 +120,7 @@ export class AnalysisRunner {
         this.root = root;
         this.engine = engine;
         this.render();
+        this.updateFade = scrollFade(this.$('.analysis-moves ol'));
         this.buildBoard();
 
         // Shared links: ?fen=<start position>&moves=e4 e5 Nf3&ply=2 (all optional).
@@ -443,6 +447,7 @@ export class AnalysisRunner {
             const top = active.offsetTop; // the list is position:relative, so this is inside it
             if (top < ol.scrollTop || top + active.offsetHeight > ol.scrollTop + ol.clientHeight) ol.scrollTop = top - ol.clientHeight / 2;
         }
+        this.updateFade();
     }
 
     private goToPly(ply: number): void {

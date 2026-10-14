@@ -355,3 +355,13 @@ details.tahap:not([open]) > summary.tahap-head{border-bottom-style:solid}
 /* Chess-piece icons on dark tiles: black pieces vanish on the dark teal, so in the dark theme the tile is a light board square. */
 :root[data-theme="dark"] .qico:has(> .pc){background:var(--sq-light)}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .qico:has(> .pc){background:var(--sq-light)}}
+
+/* Fades on scrolling move lists (core/scroll-fade.ts): shown only where more moves are hidden */
+.scroll-fade{position:relative;--fade-bg:var(--surface)}
+.analysis-moves .scroll-fade{--fade-bg:var(--bg)}
+.scroll-fade>.fade-top,.scroll-fade>.fade-bottom{position:absolute;left:1px;right:1px;height:28px;pointer-events:none;opacity:0;transition:opacity .2s}
+.scroll-fade>.fade-top{top:1px;border-radius:12px 12px 0 0;background:linear-gradient(var(--fade-bg),transparent)}
+.scroll-fade>.fade-bottom{bottom:1px;border-radius:0 0 12px 12px;background:linear-gradient(transparent,var(--fade-bg))}
+.scroll-fade.more-above>.fade-top,.scroll-fade.more-below>.fade-bottom{opacity:1}
+.moves .scroll-fade{margin-top:6px}
+.moves .scroll-fade>ol{margin-top:0}
