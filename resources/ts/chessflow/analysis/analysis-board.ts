@@ -159,7 +159,7 @@ export class AnalysisRunner {
             '<button class="ghost" type="button" data-act="copy">' + t('Salin pautan') + '</button>' +
             '<button class="cta" type="button" data-act="best">' + t('Main langkah terbaik') + '</button>' +
             '</div>' +
-            '<div class="analysis-moves"><small>' + t('Langkah') + '</small><ol></ol>' +
+            '<div class="analysis-moves"><small>' + t('Langkah') + '</small><ol data-empty="' + t('Belum ada langkah.') + '"></ol>' +
             '<div class="nav-btns">' +
             '<button type="button" class="ghost" data-act="first" aria-label="' + t('Mula') + '" title="' + t('Mula') + ' (Home)">' + ICON_FIRST + '</button>' +
             '<button type="button" class="ghost" data-act="prev" aria-label="' + t('Undur satu') + '" title="' + t('Undur satu') + ' (←)">' + ICON_PREV + '</button>' +
@@ -407,12 +407,12 @@ export class AnalysisRunner {
             const n = i + 1;
             const btn = '<button type="button" class="move-btn' + (n === this.ply ? ' active' : '') + '" data-ply="' + n + '"' + (n === this.ply ? ' aria-current="true"' : '') + '>' + m.san + '</button>';
             const no = firstNo + Math.floor((i + (blackFirst ? 1 : 0)) / 2);
+            // One row per move number: "12. | f4 | O-O"; a game that starts with Black gets "…" in the White column.
             if (m.color === 'w') out += '<li><span class="move-no">' + no + '.</span>' + btn;
-            else out += (i === 0 ? '<li><span class="move-no">' + no + '…</span>' : '') + btn + '</li>';
+            else out += (i === 0 ? '<li><span class="move-no">' + no + '.</span><span class="move-skip">…</span>' : '') + btn + '</li>';
         });
         ol.innerHTML = out;
         ol.querySelectorAll<HTMLElement>('.move-btn').forEach((b) => (b.onclick = () => this.goToPly(Number(b.dataset.ply))));
-        this.$('.analysis-moves').hidden = this.moves.length === 0;
         // Scroll the move list only (scrollIntoView would also scroll the page).
         const active = ol.querySelector<HTMLElement>('.active');
         if (active) {

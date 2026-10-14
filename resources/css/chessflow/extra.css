@@ -268,7 +268,6 @@ details.tahap:not([open]) > summary.tahap-head{border-bottom-style:solid}
 .analysis-info>*{transition:opacity .15s}
 .analysis-info.is-thinking :is(.eval-bar-wrap,.eval-verdict,.eval-best,.engine-lines){opacity:.45}
 .analysis-info.is-thinking .engine-lines{pointer-events:none}
-.analysis-moves ol{position:relative}
 .engine-name:empty{display:none}
 .analysis-import{display:flex;flex-direction:column;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px}
 .analysis-import label{font-weight:600;font-size:14px}
@@ -277,11 +276,15 @@ details.tahap:not([open]) > summary.tahap-head{border-bottom-style:solid}
 .load-status{min-height:1.4em;color:var(--muted);font-size:14px}
 .analysis-moves{display:flex;flex-direction:column;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px 14px}
 .analysis-moves small{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.06em;font-weight:600}
-.analysis-moves ol{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:4px 10px;max-height:180px;overflow-y:auto}
-.analysis-moves li{display:flex;gap:3px;align-items:center}
-.move-no{color:var(--muted);font-size:13px;min-width:1.8em;text-align:right;font-variant-numeric:tabular-nums}
-.move-btn{font-family:ui-monospace,monospace;font-size:14px;padding:3px 7px;border-radius:8px;border:1px solid transparent;background:transparent;color:var(--ink)}
-.move-btn:hover{border-color:var(--line);background:var(--bg)}
+.analysis-moves ol{list-style:none;margin:0;padding:4px;height:216px;overflow-y:auto;position:relative;background:var(--bg);border:1px solid var(--line);border-radius:12px;scroll-behavior:smooth}
+.analysis-moves ol:empty{padding:12px 14px;color:var(--muted);font-size:14px}
+.analysis-moves ol:empty::before{content:attr(data-empty)}
+.analysis-moves li{display:grid;grid-template-columns:3em 1fr 1fr;align-items:center;gap:4px;padding:1px 4px;border-radius:8px}
+.analysis-moves li:nth-child(even){background:color-mix(in srgb,var(--surface) 60%,transparent)}
+.move-no{color:var(--muted);font-size:13px;text-align:right;padding-right:6px;font-variant-numeric:tabular-nums}
+.move-skip{color:var(--muted);padding-left:8px}
+.move-btn{justify-self:start;font-family:ui-monospace,monospace;font-size:14px;padding:3px 8px;border-radius:7px;border:1px solid transparent;background:transparent;color:var(--ink)}
+.move-btn:hover{border-color:var(--line);background:var(--surface)}
 .move-btn.active{background:var(--accent);color:var(--accent-ink,#fff);border-color:var(--accent)}
 .nav-btns{display:flex;gap:8px;justify-content:center}
 .nav-btns button{flex:1;max-width:90px;height:40px;display:grid;place-items:center;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:0}
@@ -295,3 +298,9 @@ details.tahap:not([open]) > summary.tahap-head{border-bottom-style:solid}
 [data-chessflow="game"] .moves ol{height:180px;max-height:none}
 [data-chessflow="game"] .moves ol:empty{display:block;padding:12px 14px;color:var(--muted);font-size:14px}
 [data-chessflow="game"] .moves ol:empty::before{content:attr(data-empty)}
+
+/* Play page buttons: a tidy 2×2 grid (Undo · Hint / Offer a draw · Resign) instead of a ragged wrap. */
+[data-chessflow="game"] .actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+[data-chessflow="game"] .actions .spacer{display:none}
+[data-chessflow="game"] .actions-end{display:contents}
+[data-chessflow="game"] .actions .ghost{justify-content:center;display:inline-flex;align-items:center;gap:6px;min-height:42px}
