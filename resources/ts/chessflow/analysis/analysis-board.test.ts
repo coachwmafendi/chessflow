@@ -1,101 +1,149 @@
 // @vitest-environment jsdom
-import { Chess } from 'chess.js';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { AnalysisRunner } from './analysis-board';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { AnalysisRunner, formatLine, formatScore, toWhite, verdict } from './analysis-board';
 import type { Evaluation, StockfishEngine } from '../engine/stockfish';
 
-function fakeEngine(ev: Evaluation): StockfishEngine {
+function fakeEngine(ev: Evaluation | ((fen: string) => Evaluation)): StockfishEngine & { calls: string[] } {
+    const calls: string[] = [];
     return {
         available: true,
-        analyse: () => Promise.resolve(ev),
-        bestMove: () => Promise.resolve(ev.best ?? null),
+        calls,
+        analyse: ({ fen }: { fen: string }) => {
+            calls.push(fen);
+            return Promise.resolve(typeof ev === 'function' ? ev(fen) : ev);
+        },
+        bestMove: () => Promise.resolve(null),
         destroy: () => {},
-    } as unknown as StockfishEngine;
+    } as unknown as StockfishEngine & { calls: string[] };
 }
+
+const flush = () => vi.advanceTimersByTimeAsync(400);
+const text = (root: HTMLElement, sel: string) => root.querySelector(sel)?.textContent ?? '';
+const click = (root: HTMLElement, sel: string) => (root.querySelector(sel) as HTMLElement).click();
+type Internals = { applyInput(raw: string, sync: boolean): boolean };
+
+describe('score helpers', () => {
+    it('turns side-to-move scores into White scores', () => {
+        expect(toWhite({ cp: -1300, mate: null }, 'b')).toEqual({ cp: 1300, mate: null });
+        expect(toWhite({ cp: null, mate: 2 }, 'b')).toEqual({ cp: null, mate: -2 });
+        expect(formatScore({ cp: 1300, mate: null })).toBe('+13.0');
+        expect(formatScore({ cp: null, mate: -2 })).toBe('#-2');
+    });
+
+    it('describes the score in words', () => {
+        expect(verdict({ cp: 20, mate: null })).toContain('Seimbang');
+        expect(verdict({ cp: -200, mate: null })).toBe('Hitam lebih baik.');
+        expect(verdict({ cp: 900, mate: null })).toBe('Putih jauh lebih baik.');
+        expect(verdict({ cp: null, mate: 3 })).toBe('Putih boleh sah mati dalam 3 langkah.');
+    });
+
+    it('numbers engine lines from the position, also when Black starts', () => {
+        const fen = 'rnb1kbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 3';
+        expect(formatLine(fen, ['b8c6', 'b1c3', 'g8f6'], 6)).toBe('3… Nc6 4. Nc3 Nf6');
+        expect(formatLine('4k3/P7/8/8/8/8/8/4K3 w - - 0 50', ['a7a8q'], 6)).toBe('50. a8=Q+');
+    });
+});
 
 describe('AnalysisRunner', () => {
     let root: HTMLDivElement;
+    let runner: AnalysisRunner | null = null;
 
     beforeEach(() => {
+        vi.useFakeTimers();
         root = document.createElement('div');
+        document.body.appendChild(root);
+        history.replaceState(null, '', '/analisis');
     });
 
-    it('renders a board and the starting info text', async () => {
-        const runner = new AnalysisRunner(root, fakeEngine({ cp: 20, mate: null, best: 'e2e4' }));
-        // wait for debounced analyse
-        await new Promise((r) => setTimeout(r, 500));
+    afterEach(() => {
+        runner?.destroy();
+        runner = null;
+        root.remove();
+        vi.useRealTimers();
+    });
+
+    it('shows the score from White’s side when Black is to move', async () => {
+        root.dataset.fen = 'rnb1kbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 3';
+        runner = new AnalysisRunner(root, fakeEngine({ cp: -1310, mate: null, best: 'b8c6', lines: [{ pv: ['b8c6', 'b1c3'], cp: -1310, mate: null }] }));
+        await flush();
         expect(root.querySelectorAll('.sq').length).toBe(64);
-        expect(root.querySelector('.eval-score')?.textContent).toContain('Penilaian Pak Kuda');
-        runner.destroy();
+        expect(text(root, '.eval-score')).toContain('+13.1');
+        expect(text(root, '.eval-verdict')).toBe('Putih jauh lebih baik.');
+        expect(text(root, '.eval-best')).toContain('Nc6');
+        expect((root.querySelector('.eval-white') as HTMLElement).style.width).toBe('100%');
+        expect(text(root, '.engine-lines')).toContain('3… Nc6 4. Nc3');
     });
 
-    it('resets to the starting position', () => {
-        const runner = new AnalysisRunner(root, fakeEngine({ cp: 0, mate: null, best: null }));
-        (runner as unknown as { g: Chess }).g.move('e4');
-        (runner as unknown as { reset: () => void }).reset();
-        expect((runner as unknown as { g: Chess }).g.fen()).toBe('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1');
-        runner.destroy();
+    it('plays the best move and a pressed engine line', async () => {
+        runner = new AnalysisRunner(root, fakeEngine((fen) => (fen.includes(' w ') ? { cp: 30, mate: null, best: 'e2e4', lines: [{ pv: ['d2d4'], cp: 20, mate: null }] } : { cp: -30, mate: null, best: 'e7e5', lines: [{ pv: ['c7c5'], cp: -20, mate: null }] })));
+        await flush();
+        click(root, '[data-act="best"]');
+        await flush();
+        click(root, '.engine-lines [data-line="0"]');
+        expect(new URL(location.href).searchParams.get('moves')).toBe('e4 c5');
     });
 
-    it('undoes the last move', () => {
-        const runner = new AnalysisRunner(root, fakeEngine({ cp: 0, mate: null, best: null }));
-        (runner as unknown as { g: Chess }).g.move('e4');
-        (runner as unknown as { undo: () => void }).undo();
-        expect((runner as unknown as { g: Chess }).g.history()).toEqual([]);
-        runner.destroy();
+    it('steps through moves without losing them, and a new move replaces the rest', async () => {
+        root.dataset.moves = 'e4 e5 Nf3 Nc6';
+        runner = new AnalysisRunner(root, fakeEngine({ cp: 0, mate: null, best: 'g1f3' }));
+        await flush();
+        expect(root.querySelectorAll('.move-btn').length).toBe(4);
+        click(root, '[data-act="first"]');
+        click(root, '[data-act="next"]');
+        expect(root.querySelector('.move-btn.active')?.textContent).toBe('e4');
+        expect(new URL(location.href).searchParams.get('ply')).toBe('1');
+        click(root, '[data-act="next"]'); // replaying e5 keeps Nf3 Nc6
+        expect(root.querySelectorAll('.move-btn').length).toBe(4);
+        click(root, '[data-act="prev"]');
+        await flush();
+        click(root, '[data-act="best"]'); // 2. ... different from e5? best is g1f3, illegal for Black: nothing happens
+        expect(root.querySelectorAll('.move-btn').length).toBe(4);
+        click(root, '[data-act="last"]');
+        click(root, '[data-act="undo"]');
+        expect(root.querySelector('.move-btn.active')?.textContent).toBe('Nf3');
     });
 
-    it('flips the board orientation', () => {
-        const runner = new AnalysisRunner(root, fakeEngine({ cp: 0, mate: null, best: null }));
-        expect((runner as unknown as { orient: 'w' | 'b' }).orient).toBe('w');
-        (runner as unknown as { flip: () => void }).flip();
-        expect((runner as unknown as { orient: 'w' | 'b' }).orient).toBe('b');
-        runner.destroy();
-    });
+    it('opens a shared link at its move, and a PGN with its own start position', () => {
+        root.dataset.moves = 'e4 e5 Nf3';
+        root.dataset.ply = '1';
+        runner = new AnalysisRunner(root, fakeEngine({ cp: 0, mate: null, best: null }));
+        expect(root.querySelector('.move-btn.active')?.textContent).toBe('e4');
+        expect(text(root, '.eval-turn')).toBe('Hitam untuk bergerak');
 
-    it('plays the engine best move when the button is pressed', async () => {
-        const runner = new AnalysisRunner(root, fakeEngine({ cp: 30, mate: null, best: 'e2e4' }));
-        await new Promise((r) => setTimeout(r, 500));
-        const g = (runner as unknown as { g: Chess }).g;
-        (runner as unknown as { playBestMove: () => void }).playBestMove();
-        expect(g.history()[0]).toBe('e4');
-        runner.destroy();
-    });
-
-    it('loads a FEN position', () => {
-        const runner = new AnalysisRunner(root, fakeEngine({ cp: 0, mate: null, best: null }));
-        const ok = (runner as unknown as { applyInput: (raw: string, sync: boolean) => boolean }).applyInput(
-            'r1bqkbnr/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 0 1',
-            false,
-        );
+        const ok = (runner as unknown as Internals).applyInput('[SetUp "1"]\n[FEN "4k3/8/8/8/8/8/4P3/4K3 w - - 0 1"]\n\n1. e4 Kd7', false);
         expect(ok).toBe(true);
-        expect((runner as unknown as { g: Chess }).g.fen()).toContain('r1bqkbnr');
-        runner.destroy();
+        expect([...root.querySelectorAll('.move-btn')].map((b) => b.textContent)).toEqual(['e4', 'Kd7']);
     });
 
-    it('loads a PGN string', () => {
-        const runner = new AnalysisRunner(root, fakeEngine({ cp: 0, mate: null, best: null }));
-        const ok = (runner as unknown as { applyInput: (raw: string, sync: boolean) => boolean }).applyInput('1. e4 e5 2. Nf3', false);
-        expect(ok).toBe(true);
-        expect((runner as unknown as { g: Chess }).g.history()).toEqual(['e4', 'e5', 'Nf3']);
-        runner.destroy();
+    it('loads a FEN, and rejects text that is neither', () => {
+        runner = new AnalysisRunner(root, fakeEngine({ cp: 0, mate: null, best: null }));
+        const api = runner as unknown as Internals;
+        expect(api.applyInput('r1bqkbnr/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3', true)).toBe(true);
+        expect(new URL(location.href).searchParams.get('fen')).toContain('r1bqkbnr');
+        expect(api.applyInput('not a position', false)).toBe(false);
+        expect(text(root, '.load-status')).toContain('FEN atau PGN tidak sah');
     });
 
-    it('shows an error for an invalid FEN or PGN', () => {
-        const runner = new AnalysisRunner(root, fakeEngine({ cp: 0, mate: null, best: null }));
-        const ok = (runner as unknown as { applyInput: (raw: string, sync: boolean) => boolean }).applyInput('not a position', false);
-        expect(ok).toBe(false);
-        expect(root.querySelector('.load-status')?.textContent).toContain('FEN atau PGN tidak sah');
-        runner.destroy();
+    it('announces checkmate itself and does not ask the engine', async () => {
+        root.dataset.moves = 'f3 e5 g4 Qh4#';
+        const engine = fakeEngine({ cp: 0, mate: 0, best: null });
+        runner = new AnalysisRunner(root, engine);
+        await flush();
+        expect(text(root, '.eval-score')).toBe('Sah mati. Hitam menang.');
+        expect(engine.calls).toEqual([]);
+        expect((root.querySelector('[data-act="best"]') as HTMLButtonElement).disabled).toBe(true);
     });
 
-    it('syncs the position to the URL', async () => {
-        const spy = vi.spyOn(window.history, 'replaceState');
-        const runner = new AnalysisRunner(root, fakeEngine({ cp: 0, mate: null, best: null }));
-        (runner as unknown as { g: Chess }).g.move('e4');
-        (runner as unknown as { syncUrl: () => void }).syncUrl();
-        expect(spy).toHaveBeenCalled();
-        expect(spy.mock.calls[spy.mock.calls.length - 1][2]).toContain('fen=');
-        runner.destroy();
+    it('flips the board and keeps the arrow keys away from text fields', () => {
+        runner = new AnalysisRunner(root, fakeEngine({ cp: 0, mate: null, best: null }));
+        click(root, '[data-act="flip"]');
+        expect(root.querySelector('.sq')?.getAttribute('data-sq')).toBe('7'); // h1 top-left when Black is at the bottom
+        root.dataset.moves = '';
+        (runner as unknown as Internals).applyInput('1. e4 e5', false);
+        const ta = root.querySelector('textarea') as HTMLTextAreaElement;
+        ta.dispatchEvent(new KeyboardEvent('keydown', { key: 'Home', bubbles: true }));
+        expect(root.querySelector('.move-btn.active')?.textContent).toBe('e5');
+        document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Home' }));
+        expect(root.querySelector('.move-btn.active')).toBeNull();
     });
 });

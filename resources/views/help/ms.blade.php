@@ -57,6 +57,7 @@
 <h2 id="main">3. Main lawan Pak Kuda</h2>
 <ul>
     <li>Tekan <b>Main</b> di atas. Pilih warna (Putih, Hitam atau Rawak) dan tahap (Mudah, Sederhana atau Sukar), kemudian <b>Permainan baru</b>.</li>
+    <li><b>Papan analisis</b> (butang di atas halaman Main, atau <b>Buka di papan analisis</b> selepas permainan): gerakkan buah untuk kedua-dua pihak dan Pak Kuda nilai kedudukan, tunjuk 3 barisan terbaik dan bertulis siapa lebih baik. Boleh tampal FEN atau PGN, dan <b>Salin pautan</b> untuk kongsi kedudukan berserta langkah.</li>
     <li>Nak papan lebih besar? Tekan <b>Papan besar</b> (komputer) untuk papan ikut tinggi skrin, atau <b>Skrin penuh</b> untuk sorok semua yang lain. Tekan <b>Esc</b> untuk keluar. Sesuai untuk projektor di kelas.</li>
     <li><b>Undur</b> membatalkan langkah terakhir awak. <b>Petunjuk</b> menunjukkan langkah yang baik dengan anak panah.</li>
     <li><b>Minta seri</b>: Pak Kuda hanya setuju selepas sekurang-kurangnya 20 langkah setiap pemain, dan jika dia tidak ada lebih buah. Jika dia tolak, tunggu 10 langkah sebelum minta lagi.</li>

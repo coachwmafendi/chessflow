@@ -128,6 +128,17 @@ describe('StockfishEngine', () => {
             { pv: ['d2d4', 'd7d5'], cp: 60, mate: null },
             { pv: ['g1f3', 'h7h5', 'e2e4'], cp: null, mate: 2 },
         ]);
+        // The position's score is the best line's, not the last line printed.
+        expect(result).toMatchObject({ cp: 100, mate: null });
+    });
+
+    it('keeps promotions in analysis lines', async () => {
+        const p = engine.analyse({ fen: 'A', depth: 10, lines: 2 });
+        fake.emit('info depth 10 multipv 1 score cp 900 pv e7e8q b8a8 e8a8');
+        fake.emit('info depth 10 multipv 2 score cp 300 pv e7e8n b8c8');
+        fake.emit('bestmove e7e8q');
+        const result = await p;
+        expect(result?.lines?.map((l) => l.pv)).toEqual([['e7e8q', 'b8a8', 'e8a8'], ['e7e8n', 'b8c8']]);
     });
 
     it('maps "(none)" to null and terminates on destroy', async () => {

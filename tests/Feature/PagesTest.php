@@ -299,3 +299,14 @@ it('links help for everyone and account settings for adults only', function () {
     $this->actingAs($this->student)->get(route('peta'))->assertSee($help, false)->assertDontSee($settings, false);
     $this->actingAs(User::factory()->create())->get(route('tentang'))->assertSee($help, false)->assertSee($settings, false);
 });
+
+it('opens the analysis board for signed-in users, with the moves from a shared link', function () {
+    $this->get('/analisis')->assertRedirect('/login');
+
+    $this->actingAs(User::factory()->create())
+        ->get('/analisis?moves='.urlencode('e4 e5 Nf3').'&ply=1')
+        ->assertOk()
+        ->assertSee('data-chessflow="analysis"', false)
+        ->assertSee('data-moves="e4 e5 Nf3"', false)
+        ->assertSee('data-ply="1"', false);
+});

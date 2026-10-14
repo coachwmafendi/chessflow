@@ -139,6 +139,7 @@ export class GameRunner {
     private render(): void {
         this.root.innerHTML =
             '<div class="lesson-bar"><h2>' + t('Main lawan Pak Kuda') + '</h2><span class="view-btns">' +
+            '<a class="ghost" href="/analisis">' + t('Papan analisis') + '</a>' +
             '<button class="ghost theatre-btn" type="button" data-act="theatre" aria-pressed="false">' + ICON_THEATRE + t('Papan besar') + '</button>' +
             '<button class="ghost" type="button" data-act="fullscreen" aria-pressed="false" hidden>' + ICON_FULLSCREEN + '<span>' + t('Skrin penuh') + '</span></button>' +
             '</span></div>' +
@@ -522,16 +523,22 @@ export class GameRunner {
     /** After the game: offer a review once the player has made a few moves. */
     private offerAnalysis(): void {
         const mine = this.g.history({ verbose: true }).filter((m) => m.color === this.user).length;
-        if (mine < 3) return;
+        if (!this.g.history().length) return;
         const box = this.$('.analysis');
         box.hidden = false;
         box.innerHTML =
-            '<button class="cta" type="button" data-act="analyse">' +
-            t('Semak permainan dengan Pak Kuda') +
-            '</button><small>' +
-            t('Pak Kuda tunjuk langkah yang paling penting untuk dipelajari.') +
-            '</small>';
+            (mine >= 3
+                ? '<button class="cta" type="button" data-act="analyse">' + t('Semak permainan dengan Pak Kuda') + '</button><small>' + t('Pak Kuda tunjuk langkah yang paling penting untuk dipelajari.') + '</small>'
+                : '') +
+            '<a class="ghost analysis-link" href="' + this.analysisUrl() + '">' + t('Buka di papan analisis') + '</a>';
+        if (mine < 3) return;
         (box.querySelector('[data-act="analyse"]') as HTMLElement).onclick = () => void this.runAnalysis();
+    }
+
+    /** The finished game on the free analysis board (/analisis), at its last move. */
+    private analysisUrl(): string {
+        const q = new URLSearchParams({ moves: this.g.history().join(' ') });
+        return '/analisis?' + q.toString();
     }
 
     private async runAnalysis(): Promise<void> {
@@ -548,7 +555,7 @@ export class GameRunner {
         const pct = box.querySelector('.pct') as HTMLElement;
         (box.querySelector('[data-act="cancel-analysis"]') as HTMLElement).onclick = () => {
             this.analysisToken++;
-            this.hideAnalysis();
+            this.offerAnalysis();
         };
         const result = await analyseGame(
             this.g.history({ verbose: true }),
@@ -560,7 +567,7 @@ export class GameRunner {
                 bar.style.width = v;
                 pct.textContent = v;
             },
-            () => token !== this.analysisToken,
+            () => token !== this.analysisToken || id !== this.gameId,
         );
         if (result === null || id !== this.gameId || token !== this.analysisToken) return;
         this.showMistakes(result);
@@ -601,7 +608,7 @@ export class GameRunner {
         (box.querySelector('[data-act="final"]') as HTMLElement).onclick = () => this.showFinalPosition();
         (box.querySelector('[data-act="close-analysis"]') as HTMLElement).onclick = () => {
             this.showFinalPosition();
-            this.hideAnalysis();
+            this.offerAnalysis();
         };
     }
 

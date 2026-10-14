@@ -57,6 +57,7 @@
 <h2 id="main">3. Playing Pak Kuda</h2>
 <ul>
     <li>Press <b>Play</b> at the top. Choose a colour (White, Black or Random) and a level (Easy, Medium or Hard), then <b>New game</b>.</li>
+    <li><b>Analysis board</b> (button at the top of the Play page, or <b>Open on the analysis board</b> after a game): move the pieces for both sides and Pak Kuda scores the position, shows his 3 best lines and says who is better. Paste a FEN or PGN, and use <b>Copy link</b> to share the position with its moves.</li>
     <li>Want a bigger board? Press <b>Big board</b> (computers) to size the board to the screen height, or <b>Full screen</b> to hide everything else. Press <b>Esc</b> to leave. Handy on a classroom projector.</li>
     <li><b>Undo</b> takes back your last move. <b>Hint</b> shows a good move with an arrow.</li>
     <li><b>Offer a draw</b>: Pak Kuda only agrees after at least 20 moves each and when he is not ahead on material. If he refuses, wait 10 moves before asking again.</li>

@@ -128,7 +128,8 @@ export class StockfishEngine {
             // Collect multi-PV analysis lines when requested.
             if (job.lines > 1) {
                 const mpv = / multipv (\d+) /i.exec(line);
-                const pvMatch = / pv ([a-h1-8]+(?: [a-h1-8]+)*)/.exec(line);
+                // UCI moves, including promotions such as e7e8q.
+                const pvMatch = / pv ((?:[a-h][1-8][a-h][1-8][qrbn]?)(?: [a-h][1-8][a-h][1-8][qrbn]?)*)/.exec(line);
                 const score = / score (cp|mate) (-?\d+)/.exec(line);
                 if (mpv && pvMatch && score) {
                     job.collected.set(Number(mpv[1]), {
@@ -139,8 +140,10 @@ export class StockfishEngine {
                 }
             }
             // Keep the deepest score seen; "score cp 34" / "score mate -2" (side to move).
+            // With MultiPV only the first line is the position's score; the others are worse alternatives.
+            const pv = / multipv (\d+) /.exec(line);
             const m = / score (cp|mate) (-?\d+)/.exec(line);
-            if (m && !/ (lowerbound|upperbound)/.test(line)) {
+            if (m && !/ (lowerbound|upperbound)/.test(line) && (!pv || pv[1] === '1')) {
                 this.current.cp = m[1] === 'cp' ? Number(m[2]) : null;
                 this.current.mate = m[1] === 'mate' ? Number(m[2]) : null;
             }
