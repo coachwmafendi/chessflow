@@ -139,6 +139,7 @@ export class GameRunner {
     private render(): void {
         this.root.innerHTML =
             '<div class="lesson-bar"><h2>' + t('Main lawan Pak Kuda') + '</h2><span class="view-btns">' +
+            '<a class="ghost" href="/main/sejarah">' + t('Sejarah') + '</a>' +
             '<a class="ghost" href="/analisis">' + t('Papan analisis') + '</a>' +
             '<button class="ghost theatre-btn" type="button" data-act="theatre" aria-pressed="false">' + ICON_THEATRE + t('Papan besar') + '</button>' +
             '<button class="ghost" type="button" data-act="fullscreen" aria-pressed="false" hidden>' + ICON_FULLSCREEN + '<span>' + t('Skrin penuh') + '</span></button>' +

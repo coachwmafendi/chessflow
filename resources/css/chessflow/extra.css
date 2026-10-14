@@ -304,3 +304,28 @@ details.tahap:not([open]) > summary.tahap-head{border-bottom-style:solid}
 [data-chessflow="game"] .actions .spacer{display:none}
 [data-chessflow="game"] .actions-end{display:contents}
 [data-chessflow="game"] .actions .ghost{justify-content:center;display:inline-flex;align-items:center;gap:6px;min-height:42px}
+
+/* Game history (/main/sejarah) */
+.history-empty{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:22px;color:var(--muted)}
+.history-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:12px}
+.history-summary .stat{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px 14px;display:flex;flex-direction:column}
+.history-summary .stat b{font-family:var(--display);font-size:28px;line-height:1.1}
+.history-summary .stat span{color:var(--muted);font-size:14px}
+.history-summary .stat.good b{color:var(--good)} .history-summary .stat.bad b{color:var(--coral)}
+.history-levels{width:100%;border-collapse:collapse;background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden;font-size:14px;margin-bottom:18px}
+.history-levels th,.history-levels td{padding:8px 12px;text-align:center;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
+.history-levels th[scope=row],.history-levels thead th:first-child{text-align:left}
+.history-levels thead th{color:var(--muted);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.06em}
+.history-levels tbody tr:last-child :is(th,td){border-bottom:0}
+.history-filter{margin-bottom:12px}
+.history-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.history-game{display:grid;grid-template-columns:40px minmax(0,1fr) auto;gap:12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:10px 14px}
+.history-game .pc{width:36px;height:36px;display:block}
+.history-title{margin:0;display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline}
+.history-title .result{font-family:var(--display);font-weight:700;font-size:18px}
+.history-title .result.good{color:var(--good)} .history-title .result.bad{color:var(--coral)}
+.history-meta{margin:2px 0 0;color:var(--muted);font-size:13px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.history-opening{font-family:ui-monospace,monospace}
+.history-none{color:var(--muted);padding:12px}
+.history-more{text-align:center;margin-top:12px}
+@media (max-width:560px){.history-summary{grid-template-columns:repeat(2,minmax(0,1fr))}}

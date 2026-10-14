@@ -114,5 +114,10 @@
     "View recovery codes": "Lihat kod pemulihan",
     "When you enable two-factor authentication, you will be prompted for a secure pin during login. This pin can be retrieved from a TOTP-supported application on your phone.": "Bila pengesahan dua faktor dihidupkan, anda akan diminta pin selamat semasa log masuk. Pin ini diperoleh daripada aplikasi TOTP di telefon anda.",
     "You will be prompted for a secure, random pin during login, which you can retrieve from the TOTP-supported application on your phone.": "Anda akan diminta pin rawak yang selamat semasa log masuk, yang diperoleh daripada aplikasi TOTP di telefon anda.",
-    "Your email address is unverified.": "Alamat e-mel anda belum disahkan."
+    "Your email address is unverified.": "Alamat e-mel anda belum disahkan.",
+    ":n langkah": ":n langkah",
+    ":n kelas diajar": ":n kelas diajar",
+    ":n kelas": ":n kelas",
+    ":n anak": ":n anak",
+    ":n penjaga": ":n penjaga"
 }

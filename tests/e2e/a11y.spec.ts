@@ -47,7 +47,7 @@ for (const scheme of ['light', 'dark'] as const) {
         test('student pages', async ({ page }) => {
             await loginViewer(page);
             const found: string[] = [];
-            for (const path of ['/peta', '/pelajaran/papan', '/harian', '/main', '/latih', '/lencana']) found.push(...(await audit(page, path)));
+            for (const path of ['/peta', '/pelajaran/papan', '/harian', '/main', '/main/sejarah', '/analisis', '/latih', '/lencana']) found.push(...(await audit(page, path)));
             expect(found, found.join('\n')).toEqual([]);
         });
 
